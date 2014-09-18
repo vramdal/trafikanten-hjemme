@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../platform/platform.js"></script>
+    <link rel="import" href="combobox.html"/>
+    <script>
+        function updateSuggestions(evt) {
+            console.log("Updating options from search term ", evt.detail.name);
+            evt.target.displayWaitIndicator(true);
+            var matches = [];
+            for (var i = 0; i < states.length; i++) {
+                var state = states[i];
+                if (state.name.indexOf(evt.detail.name) == 0) {
+                    matches.push(state);
+                }
+            }
+            evt.target.suggestions = matches;
+            evt.target.displayWaitIndicator(false);
+        }
+        function addSuggestions(evt) {
+            console.log("Adding suggestions for value", evt.detail.value);
+            if (evt.detail.value == "CA") {
+//                evt.target.suggestions.push({name: "California", value: "CA"});
+                evt.target.text = "California";
+            }
+        }
+        window.addEventListener("load", function() {
+            var comboBox = document.querySelector("vsr-combobox");
+            comboBox.addEventListener("input-changed", updateSuggestions, false);
+            comboBox.addEventListener("no-name", addSuggestions, false);
+            comboBox.suggestions = states;
+        });
+        var states = [
+            {value: "AL", name: "Alabama"},
+            {value: "AK", name: "Alaska"},
+            {value: "AZ", name: "Arizona", disabled: true},
+            {value: "AR", name: "Arkansas", style: 'color: red'},
+            {value: "ID", name: "Idaho"},
+            {value: "IN", name: "Indiana"},
+            {value: "IL", name: "Illinois"},
+            {value: "FL", name: "Florida"},
+            {value: "LA", name: "Louisiana"},
+            {value: "NY", name: "New York"}
+        ];
+    </script>
+</head>
+<body>
+<vsr-combobox placeholder="Type a US state here" suggestions='[{"name": "Louisiana", "value": "LA"}, {"name": "Florida", "value": "FL"}]'>
+</vsr-combobox>
+</body>
+</html>

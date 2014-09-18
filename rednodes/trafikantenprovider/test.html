@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script>
+        window.addEventListener("load", function() {
+            console.log("oneditprepare", arguments);
+            var stationNameField = document.querySelector("#station-name");
+            var stationIdField = document.querySelector("#station-id");
+            console.log("stationNameField = " + stationNameField);
+            var stationList = document.querySelector("#station-list");
+            var lineList = document.querySelector("#line-list");
+            var _this = this;
+            var lookupStationByName = function(name) {
+                stationList.isLookingUp = true;
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/ruter/Place/GetPlaces/" + name);
+                xhr.setRequestHeader("Accept", "application/json");
+                xhr.responseType = "json";
+                xhr.onreadystatechange = function(evt) {
+                    if (this.readyState == 4) {
+                        stationList.isLookingUp = false;
+                        if (this.status == 200) {
+                            stationNameField.classList.remove("error");
+                            while (stationList.firstElementChild) {
+                                stationList.removeChild(stationList.firstElementChild);
+                            }
+                            var matches = this.response;
+                            var selected = false;
+                            for (var i = 0; i < matches.length && i < 10; i++) {
+                                var match = matches[i];
+                                if (match.PlaceType != "Stop") {
+                                    continue;
+                                }
+                                if (!selected) {
+                                    stationIdField.value = match.ID;
+                                    selected = true;
+                                }
+                                stationList.innerHTML += "<option value=\"" + match.Name + " (" + match.District + ")" +"\">" + match.ID +"</option>";
+                            }
+                        } else {
+                            stationNameField.classList.add("error");
+                            stationNameField.title = "Error: " + this.statusText;
+                        }
+                    }
+                };
+                xhr.send();
+            };
+            stationNameField.addEventListener("keyup", function(evt) {
+                console.log("this.value =", this.value);
+                var now = new Date().getTime();
+                if ((!stationList.lastLookup || stationList.lastLookup + 1000 < now)
+                        && !stationList.isLookingUp
+                        && this.value.length > 2) {
+                    stationList.lastLookup = now;
+                    lookupStationByName(this.value);
+                }
+            }, false);
+        }, false);
+    </script>
+</head>
+<body>
+<script src="/bower_components/platform/platform.js"></script>
+<link rel="import" href="/bower_components/vsr-combobox/combobox.html"/>
+<label for="station-name"><i class="icon-tag"></i>Station</label>
+<input type="text" id="station-name" name="stationName" list="station-list" placeholder="Station name" autocomplete="off" />
+<input type="text" id="station-id" name="station-id" placeholder="Station ID"/>
+<datalist id="station-list">
+</datalist>
+<input type="text" id="line-name" name="lineName" list="line-list" placeholder="Line" autocomplete="off">
+<datalist id="line-list">
+
+</datalist>
+
+<vsr-combobox name="stationName" value="myStation"></vsr-combobox>
+<input is="vsr-combobox">
+
+</body>
+</html>

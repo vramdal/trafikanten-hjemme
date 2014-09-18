@@ -1,0 +1,22 @@
+{
+  "name": "trafikanten-node",
+  "version": "0.0.0",
+  "homepage": "https://github.com/vramdal/trafikanten-node",
+  "authors": [
+    "Vidar S. Ramdal <vramdal@gmail.com>"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.4.0",
+    "vsr-combobox": "vramdal/vsr-combobox"
+  },
+  "resolutions": {
+    "polymer": ">=0.4.0 <1.0.0"
+  }
+}
