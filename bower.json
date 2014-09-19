@@ -14,7 +14,8 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#~0.4.0",
-    "vsr-combobox": "vramdal/vsr-combobox"
+    "vsr-combobox": "vramdal/vsr-combobox",
+    "core-ajax": "Polymer/core-ajax#~0.4.1"
   },
   "resolutions": {
     "polymer": ">=0.4.0 <1.0.0"

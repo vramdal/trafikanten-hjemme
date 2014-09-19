@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="/bower_components/platform/platform.js"></script>
+    <link rel="import" href="/bower_components/vsr-combobox/combobox.html"/>
+    <link rel="import" href="/bower_components/core-ajax/core-ajax.html">
+    <script>
+        window.addEventListener("load", function() {
+            var stationNameField = document.querySelector("*[name = 'stationName']");
+            var stationAjax = document.getElementById("stationAjax");
+            stationNameField.addEventListener("input-changed", function(evt) {
+                var str = evt.detail.name;
+                if (str == "") {
+                    stationNameField.suggestions = [];
+                } else {
+                    stationAjax.url = "/ruter/Place/GetPlaces/" + str;
+                }
+            });
+            stationNameField.addEventListener("change", function(evt) {
+                if (stationNameField.value != "") {
+                    refreshLines(stationNameField.value);
+                }
+            });
+            stationAjax.addEventListener("core-response", function(evt) {
+                var ruterSuggestions = stationAjax.response;
+                var suggestions = [];
+                for (var i = 0; i < ruterSuggestions.length; i++) {
+                    var ruterSuggestion = ruterSuggestions[i];
+                    suggestions.push({name: ruterSuggestion.Name, value: ruterSuggestion.ID})
+                }
+                stationNameField.suggestions = suggestions;
+                console.log("Ruter response", ruterSuggestions);
+            });
+            var lineNumberField = document.querySelector("*[name='lineNumber'");
+            var lineNumberAjax = document.getElementById("lineAjax");
+            var directionAjax = document.getElementById("directionAjax");
+            var directionField = document.querySelector("*[name='directionId'");
+            var refreshLines = function(stopId) {
+                lineNumberAjax.url = "/ruter/Line/GetLinesByStopId/" + stopId;
+            };
+            lineNumberAjax.addEventListener("core-response", function(evt) {
+                var lineResponses = lineNumberAjax.response;
+                var suggestions = [];
+                for (var i = 0; i < lineResponses.length; i++) {
+                    var lineResponse = lineResponses[i];
+                    suggestions.push({name: lineResponse.Name, value: lineResponse.ID})
+                }
+                lineNumberField.suggestions = suggestions;
+            });
+            lineNumberField.addEventListener("change", function(evt) {
+                if (lineNumberField.value != "") {
+                    directionAjax.url = "/ruter/Line/GetStopsByLineID/" + lineNumberField.value;
+                }
+            });
+            directionAjax.addEventListener("core-response", function(evt) {
+                var directionResponses = directionAjax.response;
+                var suggestions = [];
+                if (directionResponses.length > 0) {
+                    var firstStop = directionResponses[0];
+                    suggestions.push({name: firstStop.Name, value: directionResponses[0].ID});
+                    if (directionResponses.length > 1) {
+                        var lastStop = directionResponses[directionResponses.length - 1];
+                        suggestions.push({name: lastStop.Name, value: lastStop.ID});
+                    }
+                }
+                directionField.suggestions = suggestions;
+            });
+        });
+    </script>
+</head>
+<body>
+<label for="station-name"><i class="icon-tag"></i>Station</label>
+<vsr-combobox id="station-name" name="stationName" value="0"></vsr-combobox>
+<core-ajax id="stationAjax"
+        auto="true"
+        url=""
+        handleAs="json"
+        ></core-ajax>
+</body>
+<label for="line-number"><i class="icon-tag"></i>Line</label>
+<vsr-combobox id="line-number" name="lineNumber" value=""></vsr-combobox>
+<core-ajax id="lineAjax"
+           auto="true"
+           url=""
+           handleAs="json"></core-ajax>
+<label for="direction-id"><i class="icon-tag"></i>Direction</label>
+<vsr-combobox id="direction-id" name="directionId" value=""></vsr-combobox>
+<core-ajax id="directionAjax"
+           auto="true"
+           url=""
+           handleAs="json"></core-ajax>
+</html>

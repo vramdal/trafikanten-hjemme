@@ -4,7 +4,12 @@
         Polymer('vsr-combobox', {
             size: 20,
             keypressdelay: 700,
-            value: "",
+            publish: {
+                value: {
+                    value: "",
+                    reflect: true
+                }
+            },
             text: "",
             selectedOptionIdx: -1,
             placeholder: "",
@@ -64,7 +69,7 @@
 
                 var suggestion = this.suggestions[this.selectedOptionIdx];
                 suggestionRowsArr[this.selectedOptionIdx].setAttribute("data-selected", "true");
-                this.value = suggestion.value;
+//                this.value = suggestion.value;
                 console.log("Typed value", this.typeBox.typedValue);
                 if (this.typeBox.typedValue && suggestion.name.indexOf(this.typeBox.typedValue) == 0) {
                     var numberOfTypedCharacters = this.typeBox.typedValue.length;
@@ -105,6 +110,7 @@
                 if (!suggestionMatch) {
                     this.fire("no-name", {value: newValue});
                 }
+                this.fire("change", {value: newValue, oldValue: oldvalue});
                 console.log("Value changed");
             },
 
