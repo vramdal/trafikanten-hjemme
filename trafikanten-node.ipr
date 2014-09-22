@@ -59,6 +59,7 @@
   </component>
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$" libraries="{trafikanten-node node_modules}" />
+    <file url="file://$PROJECT_DIR$/modules/trafikanten-provider" libraries="{Node.js v0.10.23 Core Modules}" />
     <includedPredefinedLibrary name="Node.js Globals" />
   </component>
   <component name="Palette2">
@@ -194,7 +195,7 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="app" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files (x86)/nodejs/node" path-to-js-file="app.js" application-parameters="-v" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="app" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="app.js" application-parameters="-v" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="DEBUG" value="trafikanten-node" />
       </envs>

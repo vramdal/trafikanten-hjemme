@@ -1,0 +1,18 @@
+<script type="text/javascript">
+    RED.nodes.registerType('departure-merger',{
+        category: 'function',
+        color: '#a6bbcf',
+        inputs:2,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"Merge departures";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="trafikanten-provider"></script>
+
+<script type="text/x-red" data-help-name="trafikanten-provider">
+    <p>Merges one or more list of departures by timestamp</p>
+</script>

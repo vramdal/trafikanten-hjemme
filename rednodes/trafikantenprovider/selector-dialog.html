@@ -37,6 +37,8 @@
             var lineNumberAjax = document.getElementById("lineAjax");
             var directionAjax = document.getElementById("directionAjax");
             var directionField = document.querySelector("*[name='directionId'");
+            var favouriteStringField = document.querySelector("*[name='favourite-string']");
+            var nodeNameField = document.querySelector("*[name='node-input-name']");
             var refreshLines = function(stopId) {
                 lineNumberAjax.url = "/ruter/Line/GetLinesByStopId/" + stopId;
             };
@@ -51,22 +53,38 @@
             });
             lineNumberField.addEventListener("change", function(evt) {
                 if (lineNumberField.value != "") {
-                    directionAjax.url = "/ruter/Line/GetStopsByLineID/" + lineNumberField.value;
+//                    directionAjax.url = "/ruter/Line/GetStopsByLineID/" + lineNumberField.value;
+                    directionAjax.url = "/trafikantenprovider/termini.json";
                 }
             });
             directionAjax.addEventListener("core-response", function(evt) {
                 var directionResponses = directionAjax.response;
                 var suggestions = [];
-                if (directionResponses.length > 0) {
-                    var firstStop = directionResponses[0];
-                    suggestions.push({name: firstStop.Name, value: directionResponses[0].ID});
-                    if (directionResponses.length > 1) {
-                        var lastStop = directionResponses[directionResponses.length - 1];
-                        suggestions.push({name: lastStop.Name, value: lastStop.ID});
+                for (var line in directionResponses) {
+                    if (line == lineNumberField.value) {
+                        if (!directionResponses.hasOwnProperty(line)) {
+                            continue;
+                        }
+
+                        var lineTermini = directionResponses[line];
+                        for (var i = 0; i < lineTermini.length; i++) {
+                            var lineTerminus = lineTermini[i];
+                            suggestions.push({name: lineTerminus, value: lineTerminus});
+                        }
                     }
                 }
                 directionField.suggestions = suggestions;
             });
+            var updateCalculatedFields = function (evt) {
+                favouriteStringField.value = stationNameField.value + "-" + lineNumberField.value + "-" + directionField.text;
+                nodeNameField.value = lineNumberField.text + " " + directionField.text + " (" + stationNameField.text + ")";
+            };
+            stationNameField.addEventListener("change", updateCalculatedFields);
+            stationNameField.addEventListener("blur", updateCalculatedFields);
+            lineNumberField.addEventListener("change", updateCalculatedFields);
+            lineNumberField.addEventListener("blur", updateCalculatedFields);
+            directionField.addEventListener("change", updateCalculatedFields);
+            directionField.addEventListener("blur", updateCalculatedFields);
         });
     </script>
 </head>
@@ -85,10 +103,13 @@
            auto="true"
            url=""
            handleAs="json"></core-ajax>
-<label for="direction-id"><i class="icon-tag"></i>Direction</label>
+<label for="direction-id"><i class="icon-tag"></i>Terminus</label>
 <vsr-combobox id="direction-id" name="directionId" value=""></vsr-combobox>
 <core-ajax id="directionAjax"
            auto="true"
            url=""
            handleAs="json"></core-ajax>
+
+<input type="hidden" name="node-input-name" size="30"/>
+<input type="hidden" name="favourite-string" size="30"/>
 </html>

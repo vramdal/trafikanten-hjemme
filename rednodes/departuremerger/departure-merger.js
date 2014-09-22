@@ -4,9 +4,8 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         this.on("input", function(msg) {
-            msg.url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=" + config["configurationString"];
             node.send(msg);
         });
     }
-    RED.nodes.registerType("trafikanten-provider", trafikantenProvider);
+    RED.nodes.registerType("departure-merger", trafikantenProvider);
 };

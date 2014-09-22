@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<polymer-element name="vsr-combobox" attributes="size keypressdelay suggestions value text placeholder">
+<polymer-element name="vsr-combobox" attributes="size keypressdelay suggestions value text placeholder matchRequired">
     <script>
         Polymer('vsr-combobox', {
             size: 20,
@@ -13,6 +13,7 @@
             text: "",
             selectedOptionIdx: -1,
             placeholder: "",
+            matchRequired: true,
 
             created: function() {
                 this.suggestions = [];
@@ -75,12 +76,14 @@
                     var numberOfTypedCharacters = this.typeBox.typedValue.length;
                     if (numberOfTypedCharacters < suggestion.name.length) {
                         this.typeBox.value = suggestion.name;
+                        this.text = this.typeBox.value;
                         this.typeBox.selectionStart = numberOfTypedCharacters;
                         this.typeBox.selectionEnd = suggestion.name.length;
 //                            this.typeBox.focus();
                     }
                 } else {
                     this.typeBox.value = suggestion.name;
+                    this.text = this.typeBox.value;
                     this.typeBox.select();
                 }
             },
@@ -172,9 +175,16 @@
                         this.scheduleSuggestionsUpdate();
                     }
                 }.bind(this));
+                this.typeBox.addEventListener("change", function(evt) {
+                    this.text = this.typeBox.value;
+                }.bind(this));
+                this.typeBox.addEventListener("blur", function(evt) {
+                    this.fire("blur");
+                }.bind(this));
             },
             emitSearchEvent: function() {
                 this.typeBox.typedValue = this.typeBox.value;
+                this.text = this.typeBox.value;
                 this.fire("input-changed", {name: this.typeBox.value});
             },
             displaySuggestions: function(trueOrFalse) {
