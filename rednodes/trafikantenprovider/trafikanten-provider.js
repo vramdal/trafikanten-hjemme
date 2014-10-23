@@ -4,7 +4,10 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         this.on("input", function(msg) {
-            msg.url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=" + config["configurationString"];
+            msg.topic = "trafikanten-favourite-config";
+            msg.payload = {
+                config : config["configurationString"]
+            };
             node.send(msg);
         });
     }

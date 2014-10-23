@@ -1,0 +1,18 @@
+<script type="text/javascript">
+    RED.nodes.registerType('trafikanten-fetcher',{
+        category: 'input',
+        color: '#a6bbcf',
+        inputs:2,
+        outputs:1,
+        icon: "hash.png",
+        label: function() {
+            return this.name||"Fetch departures";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="trafikanten-fetcher"></script>
+
+<script type="text/x-red" data-help-name="trafikanten-fetcher">
+    <p>Fetches a list of departures from Ruter</p>
+</script>
