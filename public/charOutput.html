@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript">
+        window.addEventListener("load", function() {
+            var connection = {
+                status: -1,
+                connectWait: 0,
+                receiving: false,
+                ws: null,
+                connect: function () {
+                    this.status = 0;
+                    var _this = this;
+                    this.ws = new WebSocket("ws://localhost:8000/api/ws/display");
+                    this.ws.onopen = function (event) {
+                        _this.status = 1;
+                        console.log("Opprettet forbindelse");
+                    };
+                    this.ws.onclose = function (event) {
+                        _this.status = -1;
+                        console.error("Mistet forbindelsen");
+                        _this.connectWait += 10;
+                        setTimeout(_this.connect.bind(_this), _this.connectWait * 1000);
+                    };
+                    this.ws.onmessage = function (event) {
+                        _this.receiving = true;
+                        var jsonData = JSON.parse(event.data);
+                        console.log("Mottok melding:", jsonData);
+                        var payload = jsonData.payload;
+                        if (!Array.isArray(payload)) {
+                            payload = [payload];
+                        }
+                        if (payload.length == 0) {
+                            document.querySelector("#line1").innerText = "";
+                        }
+                        if (payload.length > 0) {
+                            document.querySelector("#line1").innerText = payload[0];
+                        }
+                        if (payload.length > 1) {
+                            document.querySelector("#line2").innerText = payload[1];
+                        } else {
+                            document.querySelector("#line2").innerText = "";
+                        }
+                        _this.receiving = false;
+                    };
+                }
+
+            };
+            Object.observe(connection, function(changes) {
+                for (var i = 0; i < changes.length; i++) {
+                    var change = changes[i];
+                    if (change.name == "status") {
+                        document.querySelector("#connection-status").setAttribute("data-connection-status", connection.status);
+                    }
+                    if (change.name == "receiving") {
+                        if (connection.receiving) {
+                            document.querySelector("#connection-status").classList.add("receiving");
+                        } else {
+                            document.querySelector("#connection-status").classList.remove("receiving");
+                        }
+                    }
+                }
+            });
+            connection.connect();
+        });
+    </script>
+    <style>
+        .line {
+            white-space: pre;
+        }
+
+        #connection-status {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+        }
+        #connection-status[data-connection-status = '-1'] {
+            background-color: red;
+        }
+
+        #connection-status[data-connection-status = '0'] {
+            background-color: yellow;
+        }
+        #connection-status[data-connection-status = '1'] {
+            background-color: green;
+        }
+
+    </style>
+</head>
+<body>
+<div id="connection-status"></div>
+<div id="line1" class="line"></div>
+<div id="line2" class="line"></div>
+</body>
+</html>
