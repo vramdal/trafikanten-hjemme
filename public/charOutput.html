@@ -5,16 +5,17 @@
     <title></title>
     <script type="text/javascript">
         window.addEventListener("load", function() {
-            var connection = function(table){
+            var connection = function(table, displayId){
                 this.status = -1;
                 this.connectWait = 0;
                 this.table = table;
                 this.receiving = false;
                 this.ws = null;
+                this.displayId = displayId;
                 var _this = this;
-                this.connect = function (id) {
+                this.connect = function () {
                     _this.status = 0;
-                    _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/" + id);
+                    _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/" + _this.displayId);
                     _this.ws.onopen = function (event) {
                         _this.status = 1;
                         _this.connectWait = 0;
@@ -93,10 +94,10 @@
                     return this.getElementsByTagName("tr")[y].getElementsByTagName("td")[x];
                 }
             });
-            var line1connection = new connection(document.querySelectorAll("table")[0]);
-            line1connection.connect("display0");
-            var line2connection = new connection(document.querySelectorAll("table")[1]);
-            line2connection.connect("display1");
+            var line1connection = new connection(document.querySelectorAll("table")[0], "display0");
+            line1connection.connect();
+            var line2connection = new connection(document.querySelectorAll("table")[1], "display1");
+            line2connection.connect();
 
             Object.observe(line1connection, function(changes) {
                 for (var i = 0; i < changes.length; i++) {
