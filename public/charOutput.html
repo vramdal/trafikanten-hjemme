@@ -14,7 +14,7 @@
                 var _this = this;
                 this.connect = function (id) {
                     _this.status = 0;
-                    _this.ws = new WebSocket("ws://localhost:8000/api/ws/" + id);
+                    _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/" + id);
                     _this.ws.onopen = function (event) {
                         _this.status = 1;
                         _this.connectWait = 0;
