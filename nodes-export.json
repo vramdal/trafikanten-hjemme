@@ -1,1 +1,364 @@
-[{"id":"17dbc073.e8244","type":"websocket-listener","path":"ws/display1","wholemsg":"true"},{"id":"8964cc99.769b3","type":"websocket-listener","path":"ws/display0","wholemsg":"true"},{"id":"2b0831b8.d4f7ce","type":"trafikanten-provider","name":"1 Mortensrud (Ensjø [T-bane])","configurationString":"3011430-3-Mortensrud","x":222.88888549804688,"y":225,"z":"40e562eb.bf1a9c","wires":[["dd40fa76.22bf08"]]},{"id":"98201c45.67dfe","type":"debug","name":"","active":true,"console":"false","complete":"true","x":699.8889617919922,"y":566.0001335144043,"z":"40e562eb.bf1a9c","wires":[]},{"id":"901f8459.6fe078","type":"inject","name":"","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"x":123.88888549804688,"y":82,"z":"40e562eb.bf1a9c","wires":[["2b0831b8.d4f7ce","95b8d1d3.6a473","dee0cdb.f211f3"]]},{"id":"5f296873.a0d698","type":"trafikanten-fetcher","x":623.8889465332031,"y":339,"z":"40e562eb.bf1a9c","wires":[["befe90c2.41017"]]},{"id":"95b8d1d3.6a473","type":"trafikanten-provider","name":"1 Sinsen (Helsfyr (område))","configurationString":"3011440-4-Sinsen","x":171.88888549804688,"y":270,"z":"40e562eb.bf1a9c","wires":[["dd40fa76.22bf08"]]},{"id":"dd40fa76.22bf08","type":"buffer","interval":"1000","x":383.8888854980469,"y":340,"z":"40e562eb.bf1a9c","wires":[["5f296873.a0d698"]]},{"id":"befe90c2.41017","type":"sorter","field":"time","order":"descending","x":189.888916015625,"y":406,"z":"40e562eb.bf1a9c","wires":[["7e6fc77c.819038"]]},{"id":"dee0cdb.f211f3","type":"trafikanten-provider","name":"17 Helsfyr T (Jernbanetorget (område))","configurationString":"3010012-37-Helsfyr T","x":294.8888854980469,"y":180,"z":"40e562eb.bf1a9c","wires":[["dd40fa76.22bf08"]]},{"id":"7e6fc77c.819038","type":"trafikantenformatter","field":"time","x":184.88888549804688,"y":471,"z":"40e562eb.bf1a9c","wires":[["6dc9c429.92363c"]]},{"id":"b4f1991c.4b0e68","type":"rastrifier","interval":1000,"x":580.8889465332031,"y":443.8888854980469,"z":"40e562eb.bf1a9c","wires":[["8991fd03.766e"]]},{"id":"8991fd03.766e","type":"websocket out","name":"Display line 0","server":"8964cc99.769b3","x":763.8889465332031,"y":417.8888854980469,"z":"40e562eb.bf1a9c","wires":[]},{"id":"7c8a9d8f.837564","type":"scroller","interval":500,"x":573.8889465332031,"y":759.8889236450195,"z":"40e562eb.bf1a9c","wires":[["9a621791.659de8"]]},{"id":"908655b4.6f79a8","type":"inject","name":"","topic":"interval","payload":"","payloadType":"date","repeat":"0.1","crontab":"","once":false,"x":327.88890075683594,"y":720.8889274597168,"z":"40e562eb.bf1a9c","wires":[["7c8a9d8f.837564"]]},{"id":"1cb03123.e34fcf","type":"arrayslice","from":0,"to":"1","forceArray":false,"x":456.8888702392578,"y":577.8889274597168,"z":"40e562eb.bf1a9c","wires":[["b4f1991c.4b0e68"]]},{"id":"6dc9c429.92363c","type":"xerox","copies":"2","x":266.8888854980469,"y":589.8888854980469,"z":"40e562eb.bf1a9c","wires":[["1cb03123.e34fcf","5aeccaeb.a51334"]]},{"id":"5aeccaeb.a51334","type":"arrayslice","from":"1","to":"","forceArray":true,"x":295.88885498046875,"y":666.888916015625,"z":"40e562eb.bf1a9c","wires":[["e9f7ab11.160858"]]},{"id":"608d90a.f9f727","type":"rastrifier","interval":1000,"x":687.8889465332031,"y":661.888916015625,"z":"40e562eb.bf1a9c","wires":[["7c8a9d8f.837564"]]},{"id":"9a621791.659de8","type":"websocket out","name":"Display line 1","server":"17dbc073.e8244","x":786.1110687255859,"y":711.4444694519043,"z":"40e562eb.bf1a9c","wires":[]},{"id":"e9f7ab11.160858","type":"concatenator","x":524.8889465332031,"y":663.888916015625,"z":"40e562eb.bf1a9c","wires":[["608d90a.f9f727"]]}]
+[
+	{
+		"id": "17dbc073.e8244",
+		"type": "websocket-listener",
+		"path": "ws/display1",
+		"wholemsg": "true"
+	},
+	{
+		"id": "8964cc99.769b3",
+		"type": "websocket-listener",
+		"path": "ws/display0",
+		"wholemsg": "true"
+	},
+	{
+		"id": "1190b8c4.ee6f47",
+		"type": "trafikanten-provider",
+		"name": "1 Mortensrud (Ensjø [T-bane])",
+		"configurationString": "3011430-3-Mortensrud",
+		"x": 322,
+		"y": 217,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["793e8c3b.86c174"]
+		]
+	},
+	{
+		"id": "d6354b3d.29cab8",
+		"type": "debug",
+		"name": "",
+		"active": true,
+		"console": "false",
+		"complete": "true",
+		"x": 799.0000762939453,
+		"y": 558.0001335144043,
+		"z": "e0ac7681.1f5388",
+		"wires": []
+	},
+	{
+		"id": "e1fa943f.1e0568",
+		"type": "inject",
+		"name": "",
+		"topic": "",
+		"payload": "",
+		"payloadType": "date",
+		"repeat": "120",
+		"crontab": "",
+		"once": true,
+		"x": 223,
+		"y": 74,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["1190b8c4.ee6f47", "e0959928.1f6a68", "b16a2773.4e95d8", "6851d47a.97ae2c"]
+		]
+	},
+	{
+		"id": "31736848.ce8c98",
+		"type": "trafikanten-fetcher",
+		"x": 723.0000610351562,
+		"y": 331,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["611c0a98.9ee3f4"]
+		]
+	},
+	{
+		"id": "e0959928.1f6a68",
+		"type": "trafikanten-provider",
+		"name": "1 Sinsen (Helsfyr (område))",
+		"configurationString": "3011440-4-Sinsen",
+		"x": 271,
+		"y": 262,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["793e8c3b.86c174"]
+		]
+	},
+	{
+		"id": "793e8c3b.86c174",
+		"type": "buffer",
+		"interval": "100",
+		"x": 483,
+		"y": 332,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["31736848.ce8c98"]
+		]
+	},
+	{
+		"id": "611c0a98.9ee3f4",
+		"type": "sorter",
+		"field": "time",
+		"order": "descending",
+		"x": 289.0000305175781,
+		"y": 398,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["ba3de425.45c218"]
+		]
+	},
+	{
+		"id": "b16a2773.4e95d8",
+		"type": "trafikanten-provider",
+		"name": "17 Helsfyr T (Jernbanetorget (område))",
+		"configurationString": "3010012-37-Helsfyr T",
+		"x": 394,
+		"y": 172,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["793e8c3b.86c174"]
+		]
+	},
+	{
+		"id": "ba3de425.45c218",
+		"type": "trafikantenformatter",
+		"field": "time",
+		"x": 284,
+		"y": 463,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["2f327f3.fd0cd8"]
+		]
+	},
+	{
+		"id": "ad94796d.526b88",
+		"type": "rastrifier",
+		"interval": 1000,
+		"x": 680.0000610351562,
+		"y": 435.8888854980469,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["5019e67.fafe618"]
+		]
+	},
+	{
+		"id": "5019e67.fafe618",
+		"type": "websocket out",
+		"name": "Display line 0",
+		"server": "8964cc99.769b3",
+		"x": 863.0000610351562,
+		"y": 409.8888854980469,
+		"z": "e0ac7681.1f5388",
+		"wires": []
+	},
+	{
+		"id": "b42a922e.4bd57",
+		"type": "arrayslice",
+		"from": 0,
+		"to": "1",
+		"forceArray": false,
+		"x": 555.9999847412109,
+		"y": 569.8889274597168,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["ad94796d.526b88"]
+		]
+	},
+	{
+		"id": "2f327f3.fd0cd8",
+		"type": "xerox",
+		"copies": "2",
+		"x": 366,
+		"y": 581.8888854980469,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["b42a922e.4bd57", "b54f6521.4ab098"]
+		]
+	},
+	{
+		"id": "b54f6521.4ab098",
+		"type": "arrayslice",
+		"from": "1",
+		"to": "5",
+		"forceArray": true,
+		"x": 394.9999694824219,
+		"y": 658.888916015625,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["da3b0c5.f25c4f"]
+		]
+	},
+	{
+		"id": "1eaee96e.e15117",
+		"type": "websocket out",
+		"name": "Display line 1",
+		"server": "17dbc073.e8244",
+		"x": 997.22216796875,
+		"y": 722.4444580078125,
+		"z": "e0ac7681.1f5388",
+		"wires": []
+	},
+	{
+		"id": "da3b0c5.f25c4f",
+		"type": "concatenator",
+		"x": 424.00006103515625,
+		"y": 729.888916015625,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["cbe378b2.341c88"]
+		]
+	},
+	{
+		"id": "6851d47a.97ae2c",
+		"type": "trafikanten-provider",
+		"name": "60 Tonsenhagen (Kampens park)",
+		"configurationString": "3010665-60-Tonsenhagen",
+		"x": 447,
+		"y": 122,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["793e8c3b.86c174"]
+		]
+	},
+	{
+		"id": "9fd42805.602bd8",
+		"type": "inject",
+		"name": "",
+		"topic": "inject",
+		"payload": "",
+		"payloadType": "date",
+		"repeat": "30",
+		"crontab": "",
+		"once": false,
+		"x": 703,
+		"y": 175,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["31736848.ce8c98"]
+		]
+	},
+	{
+		"id": "b262f49e.4d9d08",
+		"type": "twitter in",
+		"twitter": "",
+		"tags": "#iskrigerne",
+		"user": "false",
+		"name": "#iskrigerne",
+		"topic": "tweets",
+		"x": 143,
+		"y": 806,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["5daf1912.a250e8"]
+		]
+	},
+	{
+		"id": "5daf1912.a250e8",
+		"type": "arrayslice",
+		"from": 0,
+		"to": "1",
+		"forceArray": false,
+		"x": 315,
+		"y": 783,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["f714cd77.08eb3"]
+		]
+	},
+	{
+		"id": "a0ba4635.5f45b8",
+		"type": "inject",
+		"name": "",
+		"topic": "interval",
+		"payload": "",
+		"payloadType": "date",
+		"repeat": "0.05",
+		"crontab": "",
+		"once": false,
+		"x": 507,
+		"y": 892,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["e5597df9.1aa68"]
+		]
+	},
+	{
+		"id": "e5597df9.1aa68",
+		"type": "scroller",
+		"interval": 500,
+		"x": 878,
+		"y": 902,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["1eaee96e.e15117"]
+		]
+	},
+	{
+		"id": "f714cd77.08eb3",
+		"type": "prioritize",
+		"priority": "1",
+		"urgent": true,
+		"x": 526,
+		"y": 799,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["4a5f4513.b5a0bc"]
+		]
+	},
+	{
+		"id": "4a5f4513.b5a0bc",
+		"type": "rastrifier",
+		"interval": 1000,
+		"x": 759,
+		"y": 820,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["e5597df9.1aa68"]
+		]
+	},
+	{
+		"id": "cbe378b2.341c88",
+		"type": "prioritize",
+		"priority": "3",
+		"x": 624,
+		"y": 692,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["4a5f4513.b5a0bc"]
+		]
+	},
+	{
+		"id": "c38f90f9.3c707",
+		"type": "inject",
+		"name": "",
+		"topic": "",
+		"payload": "Ohoi!",
+		"payloadType": "string",
+		"repeat": "",
+		"crontab": "",
+		"once": false,
+		"x": 327,
+		"y": 842,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["f714cd77.08eb3"]
+		]
+	},
+	{
+		"id": "ca4fe517.35b018",
+		"type": "twitter in",
+		"twitter": "",
+		"tags": "@bbcbreaking",
+		"user": "user",
+		"name": "",
+		"topic": "tweets",
+		"x": 287,
+		"y": 908,
+		"z": "e0ac7681.1f5388",
+		"wires": [
+			["f714cd77.08eb3"]
+		]
+	},
+	{
+		"id": "2046caf9.dfb936",
+		"type": "debug",
+		"name": "",
+		"active": true,
+		"console": "false",
+		"complete": "true",
+		"x": 264,
+		"y": 984,
+		"z": "e0ac7681.1f5388",
+		"wires": []
+	}
+]

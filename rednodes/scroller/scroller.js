@@ -4,8 +4,10 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var _this = this;
         var interval = config["interval"];
-        this.scrollDistance = 128;
-        this.bytes = [];
+        this.scrollDistance = 0;
+        this.bytes = undefined;
+		this.msgBytes = [];
+		this.queuedMessagePriority = 10;
         var emptyScreen = [];
         for (var i = 0; i < 128; i++) {
             emptyScreen.push(0);
@@ -18,30 +20,48 @@ module.exports = function(RED) {
                 if (!Array.isArray(payload)) {
                     throw new Error("Non-array received", payload);
                 }
-                this.bytes = payload.slice(0);
+				if (!msg.priority) {
+					msg.priority = 10;
+				}
+				if (msg.priority > this.queuedMessagePriority) {
+					return;
+				} else if (msg.urgent) {
+					this.queuedMessagePriority = 0;
+					this.msgBytes = payload.slice(0);
+					this.bytes = emptyScreen.concat(this.msgBytes, emptyScreen);
+					this.scrollDistance = 0;
+				} else {
+					this.queuedMessagePriority = msg.priority;
+					this.msgBytes = payload.slice(0);
+				}
             }
         });
         this.doScroll = function() {
+			if (this.bytes == undefined) {
+				this.bytes = emptyScreen.concat(this.msgBytes, emptyScreen);
+			}
             var visibleBytes = [];
             if (this.scrollDistance > 0) {
-                visibleBytes = (emptyScreen.slice(0, this.scrollDistance).concat(this.bytes, emptyScreen)).slice(0, 128);
+                visibleBytes = this.bytes.slice(this.scrollDistance, this.scrollDistance + 128);
             } else if (this.scrollDistance == 0) {
-                visibleBytes = this.bytes.concat(emptyScreen).slice(0, 128);
+                visibleBytes = this.bytes.slice(this.scrollDistance, this.scrollDistance + 128);
             } else if (this.scrollDistance < 0) {
-                visibleBytes = (this.bytes.slice(this.scrollDistance * -1, this.bytes.length).concat(emptyScreen)).slice(0, 128);
+                visibleBytes = this.bytes.slice();
             }
 
 
             var msg = {
                 payload: visibleBytes,
-                topic: "scrolled",
+                topic: "bitmap",
                 scrollDistance: this.scrollDistance
             };
             _this.send(msg);
-            this.scrollDistance -= 1;
-            if (this.scrollDistance < Math.min(-128, this.bytes.length * -1)) {
-                this.scrollDistance = 128;
-            }
+            this.scrollDistance += 1;
+            if (this.scrollDistance > this.bytes.length - 128) {
+                this.scrollDistance = 0;
+				this.bytes = emptyScreen.concat(this.msgBytes, emptyScreen);
+				this.queuedMessagePriority = 10;
+			}
 
         }
     }

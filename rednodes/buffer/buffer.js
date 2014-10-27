@@ -32,7 +32,7 @@ module.exports = function(RED) {
             var toSend = this.buffer.slice(0);
             var msg = {
                 payload: toSend,
-                topic: "buffered-messages"
+                topic: this.buffer[0].topic + "-array"
             };
             this.send(msg);
             this.buffer = this.buffer.slice(toSend.length);

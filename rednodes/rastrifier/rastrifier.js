@@ -8,7 +8,6 @@ module.exports = function(RED) {
             var line = msg.payload;
             var lineOut = [];
             var tabs = [];
-            // TODO: Transpose array
             for (var c = 0; c < line.length; c++) {
                 var ch = line[c];
                 // TODO: Tabulators
@@ -35,7 +34,7 @@ module.exports = function(RED) {
                 tabBytes.push(0); // One more for the actual '\t' character
                 lineOut = lineOut.slice(0, tab).concat(tabBytes).concat(lineOut.slice(tab + 1));
             }
-            msg.topic = "rastered-line";
+            msg.topic = "bitmap";
             msg.payload = lineOut;
             _this.send(msg);
         });

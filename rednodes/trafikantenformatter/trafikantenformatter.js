@@ -30,7 +30,9 @@ module.exports = function(RED) {
                 minutes: nowMs / 1000 / 60
             };
             if (departureTime.seconds - now.seconds < 45) {
-                return "nå";
+				return "nå";
+			} else if (departureTime.seconds - now.seconds < 60) {
+				return "1 min";
             } else if (departureTime.minutes - now.minutes < 10) {
                 return (Math.floor(departureTime.minutes - now.minutes)) + " min";
             } else {

@@ -27,9 +27,12 @@
                         setTimeout(_this.connect.bind(_this), _this.connectWait * 1000);
                     };
                     _this.ws.onmessage = function (event) {
-                        _this.receiving = true;
                         var jsonData = JSON.parse(event.data);
+                        _this.receiving = true;
                         console.log("Mottok melding:", jsonData);
+                        if (jsonData.topic != "bitmap") {
+                            return;
+                        }
                         var payload = jsonData.payload;
 /*
                         if (!Array.isArray(payload)) {
