@@ -5,33 +5,49 @@
     <title></title>
     <script type="text/javascript">
         window.addEventListener("load", function() {
-            var connection = {
-                status: -1,
-                connectWait: 0,
-                receiving: false,
-                ws: null,
-                connect: function () {
-                    this.status = 0;
-                    var _this = this;
-                    this.ws = new WebSocket("ws://localhost:8000/api/ws/display");
-                    this.ws.onopen = function (event) {
+            var connection = function(table){
+                this.status = -1;
+                this.connectWait = 0;
+                this.table = table;
+                this.receiving = false;
+                this.ws = null;
+                var _this = this;
+                this.connect = function (id) {
+                    _this.status = 0;
+                    _this.ws = new WebSocket("ws://localhost:8000/api/ws/" + id);
+                    _this.ws.onopen = function (event) {
                         _this.status = 1;
+                        _this.connectWait = 0;
                         console.log("Opprettet forbindelse");
                     };
-                    this.ws.onclose = function (event) {
+                    _this.ws.onclose = function (event) {
                         _this.status = -1;
                         console.error("Mistet forbindelsen");
-                        _this.connectWait += 10;
+                        _this.connectWait += 1;
                         setTimeout(_this.connect.bind(_this), _this.connectWait * 1000);
                     };
-                    this.ws.onmessage = function (event) {
+                    _this.ws.onmessage = function (event) {
                         _this.receiving = true;
                         var jsonData = JSON.parse(event.data);
                         console.log("Mottok melding:", jsonData);
                         var payload = jsonData.payload;
+/*
                         if (!Array.isArray(payload)) {
                             payload = [payload];
                         }
+*/
+                        for (var x = 0; x < payload.length && x < 128; x++) {
+                            var byte = payload[x];
+                            var mask = 0x80;
+                            var y = 0;
+                            while (y < 8) {
+                                var bit = byte & mask;
+                                _this.table.getPixel(x, y).setOn(bit > 0);
+                                y = y+1;
+                                mask = mask / 2;
+                            }
+                        }
+/*
                         if (payload.length == 0) {
                             document.querySelector("#line1").innerText = "";
                         }
@@ -43,19 +59,50 @@
                         } else {
                             document.querySelector("#line2").innerText = "";
                         }
+*/
                         _this.receiving = false;
                     };
                 }
 
             };
-            Object.observe(connection, function(changes) {
+
+            Array.prototype.slice.call(document.querySelectorAll(".line")).forEach(function(line) {
+                var table = document.createElement("table");
+                for (var y = 0; y < 8; y++) {
+                    var tr = document.createElement("tr");
+                    for (var x = 0; x < 128; x++) {
+                        var td = document.createElement("td");
+                        td.setOn = function(bool) {
+                            if (bool) {
+                                this.classList.add("on");
+                            } else {
+                                this.classList.remove("on");
+                            }
+
+                        };
+                        tr.appendChild(td);
+                    }
+                    table.appendChild(tr);
+                }
+                line.appendChild(table);
+                line.table = table;
+                table.getPixel = function(x, y) {
+                    return this.getElementsByTagName("tr")[y].getElementsByTagName("td")[x];
+                }
+            });
+            var line1connection = new connection(document.querySelectorAll("table")[0]);
+            line1connection.connect("display0");
+            var line2connection = new connection(document.querySelectorAll("table")[1]);
+            line2connection.connect("display1");
+
+            Object.observe(line1connection, function(changes) {
                 for (var i = 0; i < changes.length; i++) {
                     var change = changes[i];
                     if (change.name == "status") {
-                        document.querySelector("#connection-status").setAttribute("data-connection-status", connection.status);
+                        document.querySelector("#connection-status").setAttribute("data-connection-status", line1connection.status);
                     }
                     if (change.name == "receiving") {
-                        if (connection.receiving) {
+                        if (line1connection.receiving) {
                             document.querySelector("#connection-status").classList.add("receiving");
                         } else {
                             document.querySelector("#connection-status").classList.remove("receiving");
@@ -63,7 +110,7 @@
                     }
                 }
             });
-            connection.connect();
+
         });
     </script>
     <style>
@@ -87,6 +134,23 @@
         }
         #connection-status[data-connection-status = '1'] {
             background-color: green;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: black;
+        }
+
+        td {
+            border: 1px solid #333333;
+            border-radius: 0.5em;
+            height: 10px;
+
+        }
+
+        td.on {
+            background-color: yellow;
         }
 
     </style>

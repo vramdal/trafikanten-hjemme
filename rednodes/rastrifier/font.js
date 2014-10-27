@@ -13,6 +13,16 @@ function init() {
 		var args = Array.prototype.slice.call(arguments);
 		var lines = args.slice(2);
 		var bytes = [];
+        for (var i = 0; i < width; i++) {
+            var str = "";
+            for (var l = 0; l < lines.length; l++) {
+                var line = lines[l];
+                str += line[i];
+            }
+            var byte = parseInt(str.replace(/X/g, '1').replace(/\s/g, '0'), 2);
+            bytes.push(byte);
+        }
+/*
 		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
 			if (line.length != width) {
@@ -22,6 +32,7 @@ function init() {
 			var byte = parseInt(line, 2);
 			bytes.push(byte);
 		}
+*/
 		_this.map[ch] = {bytes: bytes, width: width};
 	}
 

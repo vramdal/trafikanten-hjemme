@@ -5,25 +5,39 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var _this = this;
         this.on("input", function(msg) {
-			var lines = msg.payload;
-			if (!Array.isArray(lines)) {
-				lines = [lines];
-			}
-			var payloadOut = [];
-			for (var i = 0; i < lines.length; i++) {
-				var line = lines[i];
-				var lineOut = [];
-				// TODO: Transpose array
-				for (var c = 0; c < line.length; c++) {
-					var ch = line[c];
-					if (font[ch]) {
-						lineOut.push(font[ch].bytes);
-					}
-				}
-				payloadOut.push(lineOut);
-			}
-			msg.payload = payloadOut;
-			_this.send(msg);
+            var line = msg.payload;
+            var lineOut = [];
+            var tabs = [];
+            // TODO: Transpose array
+            for (var c = 0; c < line.length; c++) {
+                var ch = line[c];
+                // TODO: Tabulators
+                if (font[ch]) {
+                    lineOut = lineOut.concat(font[ch].bytes);
+                } else if (ch == '\t') {
+                    tabs.push(lineOut.length);
+                } else {
+                    console.warn("Ukjent tegn: " + ch);
+                }
+                if (c < line.length - 1) {
+                    lineOut.push(0);
+                }
+                //lineOut.push(font[ch].bytes);
+            }
+            // TODO: Supports only one tab per now
+            if (tabs.length > 0) {
+                var tab = tabs[0];
+                var tabBytes = [];
+                var tabSpace = 128 - lineOut.length;
+                for (var t = 0; t < tabSpace; t++) {
+                    tabBytes.push(0);
+                }
+                tabBytes.push(0); // One more for the actual '\t' character
+                lineOut = lineOut.slice(0, tab).concat(tabBytes).concat(lineOut.slice(tab + 1));
+            }
+            msg.topic = "rastered-line";
+            msg.payload = lineOut;
+            _this.send(msg);
         });
     }
     RED.nodes.registerType("rastrifier", rastrifier);
