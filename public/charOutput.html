@@ -5,6 +5,12 @@
     <title></title>
     <script type="text/javascript">
         window.addEventListener("load", function() {
+            var debugMessages = {
+                waitingForData: [124, 2, 12, 2, 124, 0, 6, 42, 42, 42, 30, 0, 18, 94, 2, 0, 32, 32, 124, 34, 34, 0, 18, 94, 2, 0, 62, 16, 32, 32, 30, 0, 24, 41, 41, 63, 0, 0, 0, 0, 0, 8, 62, 72, 72, 64, 0, 28, 34, 34, 34, 28, 0, 62, 16, 32, 32, 0, 0, 0, 0, 0, 12, 18, 18, 126, 0, 6, 42, 42, 42, 30, 0, 32, 32, 124, 34, 34, 0, 6, 42, 42, 42, 30],
+                connecting: [60, 66, 66, 66, 36, 0, 28, 34, 34, 34, 28, 0, 62, 16, 32, 32, 30, 0, 62, 16, 32, 32, 30, 0, 28, 42, 42, 42, 24, 0, 28, 34, 34, 34, 0, 0, 32, 32, 124, 34, 34, 0, 18, 94, 2, 0, 62, 16, 32, 32, 30, 0, 24, 41, 41, 63, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 0, 6, 6, 0, 0, 0, 0, 6, 6, 0 ],
+                notConnected: [126, 32, 16, 8, 126, 0, 28, 34, 34, 34, 28, 0, 32, 32, 124, 34, 34, 0, 0, 0, 0, 0, 28, 34, 34, 34, 0, 0, 28, 34, 34, 34, 28, 0, 62, 16, 32, 32, 30, 0, 62, 16, 32, 32, 30, 0, 28, 42, 42, 42, 24, 0, 28, 34, 34, 34, 0, 0, 32, 32, 124, 34, 34, 0, 28, 42, 42, 42, 24, 0, 12, 18, 18, 126],
+                empty: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            };
             var connection = function(table, displayId){
                 this.status = -1;
                 this.connectWait = 0;
@@ -13,16 +19,41 @@
                 this.ws = null;
                 this.displayId = displayId;
                 var _this = this;
+
+                function outputMessage(payload) {
+                    for (var x = 0; x < payload.length && x < 128; x++) {
+                        var byte = payload[x];
+                        var mask = 0x80;
+                        var y = 0;
+                        while (y < 8) {
+                            var bit = byte & mask;
+                            _this.table.getPixel(x, y).setOn(bit > 0);
+                            y = y + 1;
+                            mask = mask / 2;
+                        }
+                    }
+                }
+
+                function clearDisplay() {
+                    outputMessage(debugMessages.empty);
+                }
+
                 this.connect = function () {
+                    clearDisplay();
+                    outputMessage(debugMessages.connecting);
                     _this.status = 0;
                     _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/" + _this.displayId);
-                    _this.ws.onopen = function (event) {
+                    _this.ws.onopen = function () {
                         _this.status = 1;
                         _this.connectWait = 0;
                         console.log("Opprettet forbindelse");
+                        clearDisplay();
+                        outputMessage(debugMessages.waitingForData);
                     };
-                    _this.ws.onclose = function (event) {
+                    _this.ws.onclose = function () {
                         _this.status = -1;
+                        clearDisplay();
+                        outputMessage(debugMessages.notConnected);
                         console.error("Mistet forbindelsen");
                         _this.connectWait += 1;
                         setTimeout(_this.connect.bind(_this), _this.connectWait * 1000);
@@ -30,7 +61,10 @@
                     _this.ws.onmessage = function (event) {
                         var jsonData = JSON.parse(event.data);
                         _this.receiving = true;
-                        console.log("Mottok melding:", jsonData);
+                        if (!jsonData.scrollDistance) {
+                            console.log("Mottok melding:", jsonData);
+                            console.log(jsonData.payload.toString());
+                        }
                         if (jsonData.topic != "bitmap") {
                             return;
                         }
@@ -40,30 +74,20 @@
                             payload = [payload];
                         }
 */
-                        for (var x = 0; x < payload.length && x < 128; x++) {
-                            var byte = payload[x];
-                            var mask = 0x80;
-                            var y = 0;
-                            while (y < 8) {
-                                var bit = byte & mask;
-                                _this.table.getPixel(x, y).setOn(bit > 0);
-                                y = y+1;
-                                mask = mask / 2;
-                            }
-                        }
-/*
-                        if (payload.length == 0) {
-                            document.querySelector("#line1").innerText = "";
-                        }
-                        if (payload.length > 0) {
-                            document.querySelector("#line1").innerText = payload[0];
-                        }
-                        if (payload.length > 1) {
-                            document.querySelector("#line2").innerText = payload[1];
-                        } else {
-                            document.querySelector("#line2").innerText = "";
-                        }
-*/
+                        outputMessage(payload);
+                        /*
+                                                if (payload.length == 0) {
+                                                    document.querySelector("#line1").innerText = "";
+                                                }
+                                                if (payload.length > 0) {
+                                                    document.querySelector("#line1").innerText = payload[0];
+                                                }
+                                                if (payload.length > 1) {
+                                                    document.querySelector("#line2").innerText = payload[1];
+                                                } else {
+                                                    document.querySelector("#line2").innerText = "";
+                                                }
+                        */
                         _this.receiving = false;
                     };
                 }
@@ -95,48 +119,49 @@
                 }
             });
             var line1connection = new connection(document.querySelectorAll("table")[0], "display0");
-            line1connection.connect();
             var line2connection = new connection(document.querySelectorAll("table")[1], "display1");
-            line2connection.connect();
 
-            Object.observe(line1connection, function(changes) {
+            var observeConnectionChange = function (changes) {
                 for (var i = 0; i < changes.length; i++) {
                     var change = changes[i];
+                    var statusIndicator = document.querySelector("#" + change.object.displayId + "status.connection-status");
                     if (change.name == "status") {
-                        document.querySelector("#connection-status").setAttribute("data-connection-status", line1connection.status);
+                        statusIndicator.setAttribute("data-connection-status", change.object.status);
                     }
                     if (change.name == "receiving") {
-                        if (line1connection.receiving) {
-                            document.querySelector("#connection-status").classList.add("receiving");
+                        if (change.object.receiving) {
+                            statusIndicator.classList.add("receiving");
                         } else {
-                            document.querySelector("#connection-status").classList.remove("receiving");
+                            statusIndicator.classList.remove("receiving");
                         }
                     }
                 }
-            });
+            };
+            Object.observe(line1connection, observeConnectionChange);
+            Object.observe(line2connection, observeConnectionChange);
+            line1connection.connect();
+            line2connection.connect();
 
         });
     </script>
     <style>
-        .line {
-            white-space: pre;
-        }
-
-        #connection-status {
-            position: fixed;
-            top: 0;
+        .connection-status {
+            position: absolute;
             right: 0;
             width: 10px;
             height: 10px;
         }
-        #connection-status[data-connection-status = '-1'] {
+        .line {
+            margin-bottom: 2px;
+        }
+        .connection-status[data-connection-status = '-1'] {
             background-color: red;
         }
 
-        #connection-status[data-connection-status = '0'] {
+        .connection-status[data-connection-status = '0'] {
             background-color: yellow;
         }
-        #connection-status[data-connection-status = '1'] {
+        .connection-status[data-connection-status = '1'] {
             background-color: green;
         }
 
@@ -153,6 +178,7 @@
 
         }
 
+        /*noinspection CssUnusedSymbol*/
         td.on {
             background-color: yellow;
         }
@@ -160,8 +186,11 @@
     </style>
 </head>
 <body>
-<div id="connection-status"></div>
-<div id="line1" class="line"></div>
-<div id="line2" class="line"></div>
+<div id="line1" class="line">
+    <div class="connection-status" id="display0status"></div>
+</div>
+<div id="line2" class="line">
+    <div class="connection-status" id="display1status"></div>
+</div>
 </body>
 </html>
