@@ -1,0 +1,34 @@
+<script type="text/javascript">
+    RED.nodes.registerType('wiringPiDisplaySection',{
+        category: 'function',
+        color: '#a6bbcf',
+        inputs:2,
+        outputs:1,
+        interval: 1000,
+        icon: "sort.png",
+        defaults: {
+            start: {value: 0, required: true},
+            end: {value: 128, required: true}
+        },
+
+        label: function() {
+            return this.name||"LED display (" + this.start + " - " + this.end + ")";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="wiringPiDisplaySection">
+     <div class="form-row">
+        <label for="node-input-start"><i class="icon-tag"></i>Start X position (inclusive)</label>
+        <input type="number" id="node-input-start" name="start" >
+    </div>
+     <div class="form-row">
+        <label for="node-input-end"><i class="icon-tag"></i>End X position (inclusive)</label>
+        <input type="number" id="node-input-end" name="end" >
+    </div>
+
+</script>
+
+<script type="text/x-red" data-help-name="wiringPiDisplaySection">
+    <p>Section of a LED display</p>
+</script>

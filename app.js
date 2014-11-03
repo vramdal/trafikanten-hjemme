@@ -19,7 +19,7 @@ app.use("/bower_components", express.static(path.join(__dirname, 'bower_componen
 var nodeRedSettings = {
     httpAdminRoot:"/red",
     httpNodeRoot: "/api",
-//    userDir:"/Users/vramdal/.nodered/",
+    userDir: path.join(__dirname, 'usernodes'),
     nodesDir: path.join(__dirname, 'rednodes'),
     verbose: true
 };

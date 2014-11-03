@@ -1,13 +1,14 @@
-var RED = require("pi-led");
-var led = new Led();
+var Led = require('pi-led').PiLed;
+var ledDisplay = new Led();
 module.exports = function(RED) {
-    function wiringPiDisplay(config) {
+    function wiringPiDisplaySection(config) {
         RED.nodes.createNode(this, config);
         var _this = this;
-//        var limit = config["limit"];
+        var start = parseInt(config["start"]);
+        var end = parseInt(config["end"]);
         this.on("input", function(msg) {
             if (msg.topic == "bitmap") {
-                led.WriteBytes(msg.payload);
+                ledDisplay.WriteBytes(msg.payload.slice(0, end - start), start);
                 _this.send(msg);
             } else {
                 console.log("Not supported message topic");
@@ -15,5 +16,5 @@ module.exports = function(RED) {
             }
         });
     }
-    RED.nodes.registerType("wiringPiDisplay", wiringPiDisplay);
+    RED.nodes.registerType("wiringPiDisplaySection", wiringPiDisplaySection);
 };
