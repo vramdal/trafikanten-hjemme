@@ -61,7 +61,9 @@ module.exports = function(RED) {
             }
 */
             msg.topic = "bitmap";
+            msg.msgString = msg.payload;
 			msg.payload = Array.prototype.slice.call(bufferView);
+            msg.tabs = tabs;
             _this.send(msg);
         });
     }

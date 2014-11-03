@@ -7,6 +7,7 @@ module.exports = function(RED) {
         this.scrollDistance = 0;
         this.bytes = undefined;
 		this.msgBytes = [];
+        this.msgString = undefined;
 		this.queuedMessagePriority = 10;
         var emptyScreen = [];
         for (var i = 0; i < 128; i++) {
@@ -34,6 +35,7 @@ module.exports = function(RED) {
 					this.queuedMessagePriority = msg.priority;
 					this.msgBytes = payload.slice(0);
 				}
+                this.msgString = msg.msgString;
             }
         });
         this.doScroll = function() {
@@ -53,7 +55,8 @@ module.exports = function(RED) {
             var msg = {
                 payload: visibleBytes,
                 topic: "bitmap",
-                scrollDistance: this.scrollDistance
+                scrollDistance: this.scrollDistance,
+                msgString: this.msgString
             };
             _this.send(msg);
             this.scrollDistance += 1;
