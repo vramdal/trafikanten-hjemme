@@ -15,9 +15,11 @@ module.exports = function(RED) {
             empty[i] = 0;
         }
         var waitingForData = [124, 2, 12, 2, 124, 0, 6, 42, 42, 42, 30, 0, 18, 94, 2, 0, 32, 32, 124, 34, 34, 0, 18, 94, 2, 0, 62, 16, 32, 32, 30, 0, 24, 41, 41, 63, 0, 0, 0, 0, 0, 8, 62, 72, 72, 64, 0, 28, 34, 34, 34, 28, 0, 62, 16, 32, 32, 0, 0, 0, 0, 0, 12, 18, 18, 126, 0, 6, 42, 42, 42, 30, 0, 32, 32, 124, 34, 34, 0, 6, 42, 42, 42, 30];
-        ledDisplay.ClearMatrix();
-        ledDisplay.WriteBytes(waitingForData, 0);
-        ledDisplay.WriteBytes(waitingForData, 128);
+        if (ledDisplay) {
+            ledDisplay.ClearMatrix();
+            ledDisplay.WriteBytes(waitingForData, 0);
+            ledDisplay.WriteBytes(waitingForData, 128);
+        }
         this.on("input", function(msg) {
             if (msg.topic == "bitmap") {
 				if (isNaN(msg.start)) {
