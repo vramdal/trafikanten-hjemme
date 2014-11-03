@@ -20,14 +20,16 @@
                 this.displayId = displayId;
                 var _this = this;
 
-                function outputMessage(payload) {
-                    for (var x = 0; x < payload.length && x < 128; x++) {
+                function outputMessage(payload, start, end) {
+                    start = start | 0;
+                    end = end | 256;
+                    for (var x = 0; x < payload.length && x < end - start; x++) {
                         var byte = payload[x];
                         var mask = 0x80;
                         var y = 0;
                         while (y < 8) {
                             var bit = byte & mask;
-                            _this.table.getPixel(x, y).setOn(bit > 0);
+                            _this.table.getPixel(x + start, y).setOn(bit > 0);
                             y = y + 1;
                             mask = mask / 2;
                         }
@@ -42,7 +44,7 @@
                     clearDisplay();
                     outputMessage(debugMessages.connecting);
                     _this.status = 0;
-                    _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/" + _this.displayId);
+                    _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/display");
                     _this.ws.onopen = function () {
                         _this.status = 1;
                         _this.connectWait = 0;
@@ -74,7 +76,7 @@
                             payload = [payload];
                         }
 */
-                        outputMessage(payload);
+                        outputMessage(payload, jsonData.start, jsonData.end);
                         /*
                                                 if (payload.length == 0) {
                                                     document.querySelector("#line1").innerText = "";
@@ -94,6 +96,7 @@
 
             };
 
+            var display = document.querySelectorAll(".display")[0];
             Array.prototype.slice.call(document.querySelectorAll(".line")).forEach(function(line) {
                 var table = document.createElement("table");
                 for (var y = 0; y < 8; y++) {
@@ -118,8 +121,11 @@
                     return this.getElementsByTagName("tr")[y].getElementsByTagName("td")[x];
                 }
             });
-            var line1connection = new connection(document.querySelectorAll("table")[0], "display0");
-            var line2connection = new connection(document.querySelectorAll("table")[1], "display1");
+            display.getPixel = function(x, y) {
+                var table = this.querySelectorAll("table")[x/128|0];
+                return table.getPixel(x % 128, y);
+            };
+            var line1connection = new connection(display);
 
             var observeConnectionChange = function (changes) {
                 for (var i = 0; i < changes.length; i++) {
@@ -138,9 +144,7 @@
                 }
             };
             Object.observe(line1connection, observeConnectionChange);
-            Object.observe(line2connection, observeConnectionChange);
             line1connection.connect();
-            line2connection.connect();
 
         });
     </script>
@@ -186,11 +190,13 @@
     </style>
 </head>
 <body>
-<div id="line1" class="line">
-    <div class="connection-status" id="display0status"></div>
-</div>
-<div id="line2" class="line">
-    <div class="connection-status" id="display1status"></div>
+<div class="display">
+    <div id="line1" class="line">
+        <div class="connection-status" id="display0status"></div>
+    </div>
+    <div id="line2" class="line">
+        <div class="connection-status" id="display1status"></div>
+    </div>
 </div>
 </body>
 </html>
