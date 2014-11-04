@@ -8,7 +8,9 @@
         icon: "sort.png",
         defaults: {
             start: {value: 0, required: true},
-            end: {value: 128, required: true}
+            end: {value: 128, required: true},
+            mode: {value: "tabify", required: true},
+            scrollSpeed: {value: 10, required: true}
         },
 
         label: function() {
@@ -25,6 +27,17 @@
      <div class="form-row">
         <label for="node-input-end"><i class="icon-tag"></i>End X position (exclusive)</label>
         <input type="number" id="node-input-end" name="end" >
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="icon-tag"></i>Display mode</label>
+       <select name="mode" id="node-input-mode">
+         <option value="tabify">Full length, tabified</option>
+         <option value="scroll-rtl">Scroll, right to left</option>
+       </select>
+    </div>
+     <div class="form-row">
+        <label for="node-input-scrollSpeed"><i class="icon-tag"></i>Scroll speed (milliseconds - lower number, faster scrolling)</label>
+        <input type="number" id="node-input-scrollSpeed" name="scrollSpeed" min="10"/>
     </div>
 
 </script>
