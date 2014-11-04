@@ -37,6 +37,7 @@ module.exports = function(RED) {
                     if (intervalId == undefined) {
                         intervalId = setInterval(scroller.doScroll.bind(scroller), scrollSpeed);
                     }
+                    return;
                 }
                 if (msg.payload.length > length) {
                     msg.payload = msg.payload.slice(0, length);
