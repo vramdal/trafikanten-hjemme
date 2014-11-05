@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
 <html>
 <head lang="en">
     <meta charset="UTF-8"/>
@@ -9,31 +10,42 @@
     <link rel="stylesheet" href="/red/style.css" />
     <script>
         $(function(){
-            var configString = "3010665\"Kampens park\"-60-Tonsenhagen|3010012-37-Helsfyr T|3011430-3-Mortensrud";
-            var config = [
+            var configs = [
                 {"stationName": "Kampens park", "stationId": "3010665", "line": "60", "destination": "Tonsenhagen"},
                 {"stationName": "Jernbanetorget", "stationId": "3010012", "line": "37", "destination": "Helsfyr T"},
                 {"stationName": "Ensjø T-bane", "stationId": "3011430", "line": "3", "destination": "Mortensrud"}
             ];
-            var $tbody = $("#departureSpec-table").find("tbody");
-            $.each(config, function(idx, departureSpec) {
-                var $row = $tbody.append("<tr></tr>");
+
+            function parseConfigsToTable() {
+                var $tbody = $("#departureSpec-table").find("tbody");
+                $tbody.find("tr:not(#template-row)").remove();
                 var $templateRow = $tbody.find("#template-row");
-                $row.append("<td>" + departureSpec.stationName + "</td>");
-                $row.append("<td>" + departureSpec.line + "</td>");
-                $row.append("<td>" + departureSpec.destination + "</td>");
-                $tbody.insertBefore($row, $templateRow);
-            });
+                $.each(configs, function (idx, departureSpec) {
+                    var $row = $("<tr></tr>");
+                    $tbody.append($row);
+                    $row.append("<td>" + departureSpec.stationName + "</td>");
+                    $row.append("<td>" + departureSpec.line + "</td>");
+                    $row.append("<td>" + departureSpec.destination + "</td>");
+                    $row.append("<td><button type=\"button\">Delete</button></td>");
+                    $templateRow.after($row);
+                });
+            }
+            parseConfigsToTable();
             $("#stationSearch").autocomplete({
                 "source": function(request, responseCb) {
                     var searchTerm = request.term;
+                    $("#stationSearch").addClass("searching");
                     jQuery.ajax("/ruter/Place/GetPlaces/" + searchTerm, {
                         "dataType": "json",
                         "success": function(data, textStatus, xhr) {
+                            $("#stationSearch").removeClass("searching");
                             var suggestions = [];
                             for (var i = 0; i < data.length; i++) {
-                                var lineResponse = data[i];
-                                suggestions.push({label: lineResponse.Name, value: lineResponse.ID})
+                                var placesResponse = data[i];
+                                if (placesResponse.PlaceType != "Stop") {
+                                    continue;
+                                }
+                                suggestions.push({label: placesResponse.Name, value: placesResponse.ID})
                             }
                             responseCb(suggestions);
                             //lineNumberField.suggestions = suggestions;
@@ -46,6 +58,22 @@
                 "select": function(event, ui) {
                     $("#stationSearch").val( ui.item.label );
                     console.log("Valgte ", ui, event);
+                    $("#stationId").val(ui.item.value);
+                    $("#lineSelect").addClass("searching");
+                    jQuery.ajax("/ruter/Line/GetLinesByStopId/" + ui.item.value, {
+                        "dataType": "json",
+                        "success": function(data, textStatus, xhr) {
+                            var $lineSelect = $("#lineSelect");
+                            $lineSelect.removeClass("searching");
+                            $lineSelect.empty();
+                            $lineSelect.attr("disabled", false);
+                            for (var i = 0; i < data.length; i++) {
+                                $lineSelect.append("<option transportation=\"" + data[i].Transportation + "\" value=\"" + data[i].Name + "\">Line " + data[i].Name + "</option>");
+                            }
+                            $("#destinationSearch").attr("disabled", false).val("");
+                            $("#destinationSearch").autocomplete("search", "" )
+                        }
+                    });
                     return false;
                 },
                 focus: function( event, ui ) {
@@ -53,11 +81,65 @@
                     return false;
                 }
             });
+            $("#lineSelect").change(function() {
+                $("#destinationSearch").val("").autocomplete("search", "");
+            });
+            $("#destinationSearch").autocomplete({
+                "source": function(request, responseCb) {
+                    var searchTerm = request.term;
+                    $("#destinationSearch").addClass("searching");
+                    jQuery.ajax("/ruter/StopVisit/GetDepartures/" + $("#stationId").val(), {
+                        "dataType": "json",
+                        "success": function(data, textStatus, xhr) {
+                            $("#destinationSearch").removeClass("searching");
+                            var destinations = [];
+                            visits: for (var monitoredStopVisitIdx = 0; monitoredStopVisitIdx < data.length; monitoredStopVisitIdx++) {
+                                var monitoredVehicleJourney = data[monitoredStopVisitIdx].MonitoredVehicleJourney;
+                                var destinationName = monitoredVehicleJourney.DestinationName;
+                                var line = monitoredVehicleJourney.LineRef;
+                                if (line == $("#lineSelect").val()) {
+                                    for (var j = 0; j < destinations.length; j++) {
+                                        if (destinations[j].value == destinationName) {
+                                            continue visits;
+                                        }
+                                    }
+                                    destinations.push({label: destinationName, value: destinationName});
+                                }
+                            }
+                            responseCb(destinations);
+                        }
+                    });
+                },
+                "minLength": 0,
+                "select": function() {
+                    $("#addDepartureButton").attr("disabled", false);
+                }
+            });
+            $("#destinationSearch").on("autocompletechange", function(evt) {
+                $("#addDepartureButton").attr("disabled", $(this).val() == "");
+            });
+            $("#addDepartureButton").click(function(evt) {
+                var config = {
+                    "stationName": $("#stationSearch").val(),
+                    "stationId": $("#stationId").val(),
+                    "line": $("#lineSelect").val(),
+                    "destination": $("#destinationSearch").val()
+                };
+                configs.push(config);
+                parseConfigsToTable();
+            });
         });
     </script>
     <style>
         th {
             text-align: left;
+        }
+
+        /*noinspection CssUnknownTarget*/
+        input.searching {
+            background-image: url("/images/ajax-loader.gif");
+            background-position: center right;
+            background-repeat: no-repeat;
         }
     </style>
     <title></title>
@@ -65,15 +147,28 @@
 <body>
 
 <div class="form-row">
-    <table id="departureSpec-table">
+    <table id="departureSpec-table" style="width: 100%">
         <thead>
         <tr>
-            <th>Station</th><th>Line</th><th>Destination</th>
+            <th>Station</th><th>Line</th><th>Destination</th><th></th>
         </tr>
         </thead>
         <tbody>
         <tr id="template-row">
-            <input id="stationSearch" size="15"/>
+            <td>
+                <input id="stationSearch" size="15" style="width: 100%" placeholder="Enter station name"/><input id="stationId" name="stationId" style="display: none"/>
+            </td>
+            <td>
+            <select id="lineSelect" disabled>
+                <option>Select line</option>
+            </select>
+            </td>
+            <td>
+                <input id="destinationSearch" size="15" disabled style="width: 100%" placeholder="Enter destination name"/>
+            </td>
+            <td>
+                <button type="button" id="addDepartureButton" disabled>Add</button>
+            </td>
         </tr>
         </tbody>
         <thead>
