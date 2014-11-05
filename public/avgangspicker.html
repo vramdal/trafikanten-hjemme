@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8"/>
+
+    <script type="text/javascript" src="/red/jquery/js/jquery-1.11.1.min.js"></script>
+    <script src="/red/jquery/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="/red/style.css" />
+    <script>
+        $(function(){
+            var configString = "3010665\"Kampens park\"-60-Tonsenhagen|3010012-37-Helsfyr T|3011430-3-Mortensrud";
+            var config = [
+                {"stationName": "Kampens park", "stationId": "3010665", "line": "60", "destination": "Tonsenhagen"},
+                {"stationName": "Jernbanetorget", "stationId": "3010012", "line": "37", "destination": "Helsfyr T"},
+                {"stationName": "Ensjø T-bane", "stationId": "3011430", "line": "3", "destination": "Mortensrud"}
+            ];
+            var $tbody = $("#departureSpec-table").find("tbody");
+            $.each(config, function(idx, departureSpec) {
+                var $row = $tbody.append("<tr></tr>");
+                var $templateRow = $tbody.find("#template-row");
+                $row.append("<td>" + departureSpec.stationName + "</td>");
+                $row.append("<td>" + departureSpec.line + "</td>");
+                $row.append("<td>" + departureSpec.destination + "</td>");
+                $tbody.insertBefore($row, $templateRow);
+            });
+            $("#stationSearch").autocomplete({
+                "source": function(request, responseCb) {
+                    var searchTerm = request.term;
+                    jQuery.ajax("/ruter/Place/GetPlaces/" + searchTerm, {
+                        "dataType": "json",
+                        "success": function(data, textStatus, xhr) {
+                            var suggestions = [];
+                            for (var i = 0; i < data.length; i++) {
+                                var lineResponse = data[i];
+                                suggestions.push({label: lineResponse.Name, value: lineResponse.ID})
+                            }
+                            responseCb(suggestions);
+                            //lineNumberField.suggestions = suggestions;
+
+                        }
+                    });
+                    //responseCb([{label: "Ensjø T-bane", value: 3011430}]);
+                },
+                "minLength": 2,
+                "select": function(event, ui) {
+                    $("#stationSearch").val( ui.item.label );
+                    console.log("Valgte ", ui, event);
+                    return false;
+                },
+                focus: function( event, ui ) {
+                    $("#stationSearch").val( ui.item.label );
+                    return false;
+                }
+            });
+        });
+    </script>
+    <style>
+        th {
+            text-align: left;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+
+<div class="form-row">
+    <table id="departureSpec-table">
+        <thead>
+        <tr>
+            <th>Station</th><th>Line</th><th>Destination</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr id="template-row">
+            <input id="stationSearch" size="15"/>
+        </tr>
+        </tbody>
+        <thead>
+        </thead>
+    </table>
+</div>
+
+
+</body>
+</html>
