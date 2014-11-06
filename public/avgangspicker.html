@@ -9,28 +9,71 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="/red/style.css" />
     <script>
-        $(function(){
-            var configs = [
-                {"stationName": "Kampens park", "stationId": "3010665", "line": "60", "destination": "Tonsenhagen"},
-                {"stationName": "Jernbanetorget", "stationId": "3010012", "line": "37", "destination": "Helsfyr T"},
-                {"stationName": "Ensjø T-bane", "stationId": "3011430", "line": "3", "destination": "Mortensrud"}
-            ];
-
-            function parseConfigsToTable() {
-                var $tbody = $("#departureSpec-table").find("tbody");
-                $tbody.find("tr:not(#template-row)").remove();
-                var $templateRow = $tbody.find("#template-row");
-                $.each(configs, function (idx, departureSpec) {
-                    var $row = $("<tr></tr>");
-                    $tbody.append($row);
-                    $row.append("<td>" + departureSpec.stationName + "</td>");
-                    $row.append("<td>" + departureSpec.line + "</td>");
-                    $row.append("<td>" + departureSpec.destination + "</td>");
-                    $row.append("<td><button type=\"button\">Delete</button></td>");
-                    $templateRow.after($row);
-                });
-            }
+        var configs = [
+            {idx: 0, "stationName": "Kampens park", "stationId": "3010665", "line": "60", "destination": "Tonsenhagen"},
+            {idx: 1, "stationName": "Jernbanetorget", "stationId": "3010012", "line": "37", "destination": "Helsfyr T"},
+            {idx: 2, "stationName": "Ensjø T-bane", "stationId": "3011430", "line": "3", "destination": "Mortensrud"}
+        ];
+        function deleteButtonClicked(evt) {
+            var button = evt.target;
+            var configIdx = $(button).attr("idx");
+            configs.splice(configIdx, 1);
             parseConfigsToTable();
+        }
+
+        function parseStringToArray() {
+            var str = $("#node-input-configs").val();
+            var strParts = str.split("#");
+            for (var i = 0; i < strParts.length; i++) {
+                var configStr = strParts[i];
+                var configParts = configStr.split("|");
+                // {idx: 0, "stationName": "Kampens park", "stationId": "3010665", "line": "60", "destination": "Tonsenhagen"}
+                var config = {
+                    idx: i,
+                    stationName: configParts[0],
+                    stationId: configParts[1],
+                    line: configParts[2],
+                    destination: configParts[3]
+                };
+                configs.push(config);
+            }
+        }
+
+        function arrayToString() {
+            var configStrings = [];
+            for (var i = 0; i < configs.length; i++) {
+                var config = configs[i];
+                configStrings.push(config.idx + "|" + config.stationName + "|" + config.stationId + "|" + config.line + "|" + config.destination);
+            }
+            $("#node-input-configs").val(configStrings.join("#"));
+        }
+
+        function parseConfigsToTable() {
+            var $tbody = $("#departureSpec-table").find("tbody");
+            $tbody.find("tr:not(#template-row)").remove();
+            var $templateRow = $tbody.find("#template-row");
+            $.each(configs, function (idx, departureSpec) {
+                var $row = $("<tr></tr>");
+                $tbody.append($row);
+                $row.append("<td>" + departureSpec.stationName + "</td>");
+                $row.append("<td>" + departureSpec.line + "</td>");
+                $row.append("<td>" + departureSpec.destination + "</td>");
+                var $button = $("<button type=\"button\" idx=\"" + idx + "\">Delete</button>");
+                $button.click(function() {
+                    var configIdx = $(this).attr("idx");
+                    configs.splice(configIdx, 1);
+                    parseConfigsToTable();
+                });
+                var $buttonTd = $("<td></td>");
+                $buttonTd.append($button);
+                $row.append($buttonTd);
+                $templateRow.before($row);
+            });
+        }
+        $(function(){
+
+            parseConfigsToTable();
+
             $("#stationSearch").autocomplete({
                 "source": function(request, responseCb) {
                     var searchTerm = request.term;
@@ -174,6 +217,7 @@
         <thead>
         </thead>
     </table>
+    <input type="text" name="configs" id="node-input-configs"/>
 </div>
 
 

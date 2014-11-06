@@ -5,8 +5,11 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var _this = this;
 		this.url = undefined;
+        this.interval = parseInt(config["interval"], 10);
+        this.intervalHandle = undefined;
+        _this.status({fill:"yellow",shape:"dot",text:"Waiting for specs"});
         this.on("input", function(msgArr) {
-			if (msgArr.topic == "trafikanten-favourite-config-array") {
+			if (msgArr.topic == "trafikanten-favourite-configs-array") {
 				if (!msgArr.payload) {
 					_this.warn("No payload in incoming message", msgArr);
 					return;
@@ -16,32 +19,32 @@ module.exports = function(RED) {
 				}
 				_this.url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=";
 				_this.favouriteConfigs = [];
-				for (var i = 0; i < msgArr.payload.length; i++) {
-					var msg = msgArr.payload[i];
-					if (msg.payload.config) {
-						_this.favouriteConfigs.push(msg.payload.config);
-					}
-				}
-				if (_this.favouriteConfigs.length > 0) {
-					_this.fetch(_this.url + _this.favouriteConfigs.join(","));
-				} else {
-					_this.send({});
-				}
-			} else if (msgArr.topic == "inject") {
-				if (_this.favouriteConfigs.length > 0) {
-					_this.fetch(_this.url + _this.favouriteConfigs.join(","));
-				} else {
-					_this.send({});
-				}
+                for (var outer = 0; outer < msgArr.payload.length; outer++) {
+                    var favouriteConfigArr = msgArr.payload[outer].payload;
+                    for (var inner = 0; inner < favouriteConfigArr.length; inner++) {
+                        var favourite = favouriteConfigArr[inner];
+                        _this.favouriteConfigs.push(favourite.stationId + "-" + favourite.line + "-" + favourite.destination);
+                    }
+                }
+                if (_this.intervalHandle == undefined) {
+                    _this.status({fill:"yellow",shape:"ring",text:"Waiting to fetch"});
+                    _this.intervalHandle = setTimeout(function() {
+                        var fetchClosure = function () {
+                            _this.fetch(_this.url + _this.favouriteConfigs.join(","));
+                        };
+                        fetchClosure();
+                        _this.intervalHandle = setInterval(fetchClosure, _this.interval * 1000);
+                    }, 500);
+                }
 			}
         });
         this.fetch = function(url) {
-            this.status({fill:"green",shape:"ring",text:"Fetching data"});
+            this.status({fill:"blue",shape:"ring",text:"Fetching data"});
             var msg = {};
             msg.url = url;
             msg.topic = "trafikanten-departures";
             var _this = this;
-            request({url:url, json:true}, function(error, response, body) {
+            request({url:url, json:true, timeout: Math.floor(this.interval * 1000 / 2)}, function(error, response, body) {
                 if (!error  && response.statusCode == 200) {
                     var departures = [];
                     for (var i = 0; i < body.length; i++) {
@@ -57,10 +60,13 @@ module.exports = function(RED) {
                             departures.push(departure);
                         }
                     }
+                    departures.sort(function(a, b) {
+                        return a.time - b.time;
+                    });
                     msg.payload = departures;
-                    _this.status({fill:"green",shape:"dot",text:"Done"});
+                    _this.status({fill:"green",shape:"dot",text:"Idle"});
                 } else {
-                    _this.status({fill:"red",shape:"dot",text:"Error"});
+                    _this.status({fill:"red",shape:"dot",text:"Error: " + error.code});
                     msg.payload = {};
                     msg.error = error;
                     msg.statusCode = response ? response.statusCode : undefined

@@ -4,10 +4,8 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         this.on("input", function(msg) {
-            msg.topic = "trafikanten-favourite-config";
-            msg.payload = {
-                config : config["configurationString"]
-            };
+            msg.topic = "trafikanten-favourite-configs";
+            msg.payload = config["configs"];
             node.send(msg);
         });
     }
