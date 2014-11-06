@@ -39,6 +39,7 @@ module.exports = function(RED) {
                         _this.status({fill: "yellow", shape: "ring", text: "Waiting to fetch"});
                         _this.intervalHandle = setTimeout(function () {
                             var fetchClosure = function () {
+                                // TODO: Merge favourites into one request
                                 _this.status({fill:"blue",shape:"ring",text:"Fetching data"});
                                 async.mapLimit(_this.favouriteConfigs, 1,  _this.fetch.bind(_this), function (error, departuresArrArr) {
                                     if (error) {
