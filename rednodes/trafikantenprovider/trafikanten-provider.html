@@ -4,7 +4,10 @@
         color: '#E60000',
         defaults: {
             name: {value:"Ruter sanntid"},
-            configs: {value: [], required: true}
+            configs: {value: [], required: true},
+            lastModified: {value: 0, required: false}
+        },
+        oneditsave: function() {
         },
         oneditprepare: function() {
             var _this = this;
@@ -12,6 +15,7 @@
                 var button = evt.target;
                 var configIdx = $(button).attr("idx");
                 _this.configs.splice(configIdx, 1);
+                _this.lastModified = new Date().getTime();
                 parseConfigsToTable();
             }
 
@@ -95,6 +99,7 @@
             });
             $("#lineSelect").change(function() {
                 $("#destinationSearch").val("").autocomplete("search", "");
+
             });
             $("#destinationSearch").autocomplete({
                 "source": function(request, responseCb) {
@@ -138,6 +143,7 @@
                     "destination": $("#destinationSearch").val()
                 };
                 _this.configs.push(config);
+                _this.lastModified = new Date().getTime();
                 parseConfigsToTable();
             });
         },
@@ -164,6 +170,7 @@
             background-repeat: no-repeat;
         }
      </style>
+     <input type="hidden" id="node-input-lastModified" name="lastModified"/>
      <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i>Node name (anything)</label>
         <input type="text" id="node-input-name" name="name" >
