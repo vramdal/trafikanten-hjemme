@@ -8,9 +8,11 @@ module.exports = function(RED) {
         http.globalAgent.maxSockets = 200;
         var _this = this;
         this.url = undefined;
-        this.interval = parseInt(config["interval"], 10);
+        this.interval = parseInt(config["interval"], 10) * 1000;
         this.intervalHandle = undefined;
         this.favouriteConfigs = [];
+        this.lastFetch = 0;
+        this.departureCache = [];
         this.url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=";
         _this.status({fill:"yellow",shape:"dot",text:"Waiting for specs"});
         this.on('close', function() {
@@ -22,7 +24,14 @@ module.exports = function(RED) {
             _this.status({fill: "yellow", shape: "ring", text: "Waiting to fetch (" + _this.favouriteConfigs.length + " requests)"});
             _this.intervalHandle = setTimeout(function () {
                 _this.fetch();
-                _this.intervalHandle = setInterval(_this.fetch, _this.interval * 1000);
+                _this.formatAndSendDepartures();
+                _this.intervalHandle = setInterval(function() {
+                    var now = new Date().getTime();
+                    if (_this.lastFetch + _this.interval < now) {
+                        _this.fetch();
+                    }
+                    _this.formatAndSendDepartures();
+                }, 5000);
             }, 1000);
         }
 
@@ -39,6 +48,23 @@ module.exports = function(RED) {
                 console.error("Configuration error", e);
             }
         });
+
+        this.formatAndSendDepartures = function() {
+            async.map(_this.departureCache, function (departure, cb) {
+                cb(null, _this.formatDeparture(departure));
+            }, function (error, formatted) {
+                var msg = {
+                    payload: formatted,
+                    topic:   "trafikanten-departures"
+                };
+                var outgoingNum = _this.wires[0].length;
+                var msgArr = [];
+                for (var i = 0; i < outgoingNum; i++) {
+                    msgArr.push(msg);
+                }
+                _this.send(msgArr);
+            });
+        };
 
         this.fetch = function() {
             // TODO: Merge favourites into one request
@@ -68,20 +94,7 @@ module.exports = function(RED) {
                 departures.sort(function (a, b) {
                     return a.time - b.time;
                 });
-                async.map(departures, function (departure, cb) {
-                    cb(null, _this.formatDeparture(departure));
-                }, function (error, formatted) {
-                    var msg = {
-                        payload: formatted,
-                        topic:   "trafikanten-departures"
-                    };
-                    var outgoingNum = _this.wires[0].length;
-                    var msgArr = [];
-                    for (var i = 0; i < outgoingNum; i++) {
-                        msgArr.push(msg);
-                    }
-                    _this.send(msgArr);
-                });
+                _this.departureCache = departures;
             });
         };
 
@@ -91,7 +104,7 @@ module.exports = function(RED) {
             msg.url = url;
             msg.topic = "trafikanten-departures";
             var _this = this;
-            request({url:url, json:true, timeout: Math.floor(this.interval * 1000 / 2), forever: true}, function(error, response, body) {
+            request({url:url, json:true, timeout: Math.floor(this.interval / 2), forever: true}, function(error, response, body) {
                 if (!error  && response.statusCode == 200) {
                     var departures = [];
                     for (var i = 0; i < body.length; i++) {
