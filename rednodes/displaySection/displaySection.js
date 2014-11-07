@@ -1,4 +1,5 @@
 var scrollerLib = require("./scroller");
+var rastrifier = require("./rastrifier");
 
 module.exports = function(RED) {
     function displaySection(config) {
@@ -26,6 +27,9 @@ module.exports = function(RED) {
         };
 
 		this.on("input", function(msg) {
+            if (msg.topic != "bitmap") {
+                msg = rastrifier.rastrify(msg);
+            }
             if (msg.topic == "bitmap") {
 				msg.start = start;
 				msg.end = end;
