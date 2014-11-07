@@ -28,6 +28,7 @@ module.exports = function(RED) {
                 _this.intervalHandle = setInterval(function() {
                     var now = new Date().getTime();
                     if (_this.lastFetch + _this.interval < now) {
+                        _this.lastFetch = now;
                         _this.fetch();
                     }
                     _this.formatAndSendDepartures();
