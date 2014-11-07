@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script>
+        window.addEventListener("load", function() {
+            var resultArea = document.querySelector("#result");
+            document.querySelector("input[name='width']").addEventListener("change", function(evt) {
+                var input = evt.target;
+                window.gridWidth = parseInt(evt.target.value);
+                resultArea.setAttribute("cols", window.gridWidth);
+                createGrid();
+            });
+            document.querySelector("#importButton").addEventListener("click", importGrid);
+            createGrid();
+        });
+        window.gridWidth = 8;
+        var cols = new Array(128);
+        var col = new Array(8);
+        for (var colIdx = 0; colIdx < cols.length; colIdx++) {
+            cols[colIdx] = col.slice(0);
+        }
+        function importGrid() {
+            var str = document.querySelector("#result").value;
+            var lines = str.split("\n");
+            var maxWidth = 0;
+            for (var lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+                var line = lines[lineIdx];
+                maxWidth = Math.max(maxWidth, line.length);
+                for (var colIdx = 0; colIdx < 128; colIdx++) {
+                    cols[colIdx][lineIdx] = line.length > colIdx && line[colIdx] != " ";
+                }
+                window.gridWidth = maxWidth;
+            }
+            while (lineIdx < 8) {
+                for (var colIdx = 0; colIdx < 128; colIdx++) {
+                    cols[colIdx][lineIdx] = false;
+                }
+                lineIdx++;
+            }
+            document.querySelector("input[name='width']").value = maxWidth;
+            createGrid();
+        }
+        function updateResult() {
+            var result = "";
+            for (var rowIdx = 0; rowIdx < 8; rowIdx++) {
+                for (var colIdx = 0; colIdx < window.gridWidth; colIdx++) {
+                    result += (cols[colIdx][rowIdx] ? "X" : " ");
+                }
+                result += "\n";
+            }
+            document.querySelector("#result").value = result;
+        }
+        function createGrid() {
+            var grid = document.querySelector("#grid");
+            var existingRows = document.querySelectorAll("#grid tr");
+            for (var i = 0; i < existingRows.length; i++) {
+                grid.removeChild(existingRows[i]);
+            }
+            for (var rowIdx = 0; rowIdx < 8; rowIdx++) {
+                var tr = document.createElement("tr");
+                for (var colIdx = 0; colIdx < window.gridWidth; colIdx++) {
+                    var td = document.createElement("td");
+                    td.setAttribute("row", rowIdx + "");
+                    td.setAttribute("col", colIdx + "");
+                    td.rowIdx = rowIdx;
+                    td.colIdx = colIdx;
+                    if (cols[colIdx][rowIdx]) {
+                        td.classList.add("on");
+                    }
+                    td.addEventListener("click", function(evt) {
+                        var td = evt.target;
+                        td.classList.toggle("on");
+                        cols[td.colIdx][td.rowIdx] = !cols[td.colIdx][td.rowIdx];
+                        evt.preventDefault();
+                        updateResult();
+                        return false;
+                    });
+                    td.addEventListener("mouseenter", function(evt) {
+                        console.log("buttons", evt.buttons);
+                        if (evt.button == 1) {
+                            var td = evt.target;
+                            td.classList.toggle("on");
+                            cols[td.colIdx][td.rowIdx] = !cols[td.colIdx][td.rowIdx];
+                            updateResult();
+                        }
+
+                    });
+                    tr.appendChild(td);
+                }
+                grid.appendChild(tr);
+            }
+        }
+    </script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid black;
+            width: 10px;
+            height: 10px;
+        }
+        td.on {
+            background-color: black;
+        }
+        td.hidden {
+            display: none;
+        }
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+<input type="number" min="1" max="128" name="width" value="8"/>
+<table>
+    <tbody id="grid"></tbody>
+</table>
+<button id="importButton">Import &uarr;</button>
+<button id="exportButton">Export &darr;</button><br/>
+<textarea id="result" rows="8" cols="8" style="height: 200px" wrap="hard"></textarea><br/>
+
+</body>
+</html>

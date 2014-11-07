@@ -2,15 +2,14 @@
     RED.nodes.registerType('yrProvider',{
         category: 'weather',
         color: '#E60000',
-        inputs:0,
+        inputs:1,
         outputs:1,
         defaults: {
-            postcode: {value: "", required: true},
-            name: {value:"Værvarsel for " + this.postcode, required: false}
+            postcode: {value: "", required: true}
         },
         icon: "hash.png",
         label: function() {
-            return this.name||"Værvarsel";
+            return this.postcode ? "Værvarsel for " + this.postcode : "Værvarsel";
         }
     });
 </script>
