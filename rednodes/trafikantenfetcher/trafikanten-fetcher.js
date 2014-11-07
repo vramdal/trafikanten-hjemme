@@ -10,77 +10,82 @@ module.exports = function(RED) {
         this.url = undefined;
         this.interval = parseInt(config["interval"], 10);
         this.intervalHandle = undefined;
+        this.favouriteConfigs = [];
+        this.url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=";
         _this.status({fill:"yellow",shape:"dot",text:"Waiting for specs"});
         this.on('close', function() {
             if (_this.intervalHandle != undefined) {
                 clearInterval(_this.intervalHandle);
             }
         });
-        this.on("input", function(msgArr) {
+        if (_this.intervalHandle == undefined) {
+            _this.status({fill: "yellow", shape: "ring", text: "Waiting to fetch (" + _this.favouriteConfigs.length + " requests)"});
+            _this.intervalHandle = setTimeout(function () {
+                _this.fetch();
+                _this.intervalHandle = setInterval(_this.fetch, _this.interval * 1000);
+            }, 1000);
+        }
+
+        this.on("input", function(msg) {
             try {
-                if (msgArr.topic == "trafikanten-favourite-configs-array") {
-                    if (!msgArr.payload) {
-                        _this.warn("No payload in incoming message", msgArr);
+                if (msg.topic == "trafikanten-favourite-config") {
+                    if (!msg.payload) {
+                        _this.warn("No payload in incoming message", msg);
                         return;
                     }
-                    if (!Array.isArray(msgArr.payload)) {
-                        msgArr.payload = [msgArr.payload];
-                    }
-                    _this.url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=";
-                    _this.favouriteConfigs = [];
-                    for (var outer = 0; outer < msgArr.payload.length; outer++) {
-                        var favouriteConfigArr = msgArr.payload[outer].payload;
-                        for (var inner = 0; inner < favouriteConfigArr.length; inner++) {
-                            var favourite = favouriteConfigArr[inner];
-                            _this.favouriteConfigs.push(favourite.stationId + "-" + favourite.line + "-" + favourite.destination);
-                        }
-                    }
-                    if (_this.intervalHandle == undefined) {
-                        _this.status({fill: "yellow", shape: "ring", text: "Waiting to fetch"});
-                        _this.intervalHandle = setTimeout(function () {
-                            var fetchClosure = function () {
-                                // TODO: Merge favourites into one request
-                                _this.status({fill:"blue",shape:"ring",text:"Fetching data"});
-                                async.mapLimit(_this.favouriteConfigs, 1,  _this.fetch.bind(_this), function (error, departuresArrArr) {
-                                    if (error) {
-                                        console.error(error);
-                                        return;
-                                    }
-                                    _this.status({fill:"green",shape:"dot",text:"Idle"});
-                                    var departures = [];
-                                    for (var i = 0; i < departuresArrArr.length; i++) {
-                                        var departuresArr = departuresArrArr[i];
-                                        if (departuresArr instanceof Error) {
-                                            console.error(departuresArr);
-                                            _this.status({fill: "red", shape: "dot", text: "Error " + departuresArr.code + ": " + departuresArr.url});
-                                        } else if (departuresArr != null) {
-                                            departures = departures.concat(departuresArr);
-                                        }
-                                    }
-                                    departures.sort(function(a, b) {
-                                        return a.time - b.time;
-                                    });
-                                    async.map(departures, function(departure, cb) {
-                                        cb(null, _this.formatDeparture(departure));
-                                    }, function(error, formatted) {
-                                        var msg = {
-                                            payload: formatted,
-                                            topic: "trafikanten-departures"
-                                        };
-                                        _this.send(msg);
-                                    });
-                                });
-                            };
-                            fetchClosure();
-                            _this.intervalHandle = setInterval(fetchClosure, _this.interval * 1000);
-                        }, 1000);
-                    }
+                    _this.favouriteConfigs.push(msg.payload["stationId"] + "-" + msg.payload["line"] + "-" + msg.payload["destination"]);
                 }
             } catch (e) {
                 console.error("Configuration error", e);
             }
         });
-        this.fetch = function(favourite, callback) {
+
+        this.fetch = function() {
+            // TODO: Merge favourites into one request
+            var numErrors = 0;
+            _this.status({fill: "blue", shape: "ring", text: "Fetching data (" + _this.favouriteConfigs.length + " requests)"});
+            async.mapLimit(_this.favouriteConfigs, 1, _this.request.bind(_this), function (error, departuresArrArr) {
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+                _this.status({fill: "green", shape: "dot", text: "Idle ("  + _this.favouriteConfigs.length + " requests)"});
+                var departures = [];
+                for (var i = 0; i < departuresArrArr.length; i++) {
+                    var departuresArr = departuresArrArr[i];
+                    if (departuresArr instanceof Error) {
+                        numErrors++;
+                        console.error(departuresArr);
+                        _this.status({
+                            fill:  "red",
+                            shape: "dot",
+                            text:  "Error (" + numErrors + ") "  + departuresArr.code + ": " + departuresArr.url
+                        });
+                    } else if (departuresArr != null) {
+                        departures = departures.concat(departuresArr);
+                    }
+                }
+                departures.sort(function (a, b) {
+                    return a.time - b.time;
+                });
+                async.map(departures, function (departure, cb) {
+                    cb(null, _this.formatDeparture(departure));
+                }, function (error, formatted) {
+                    var msg = {
+                        payload: formatted,
+                        topic:   "trafikanten-departures"
+                    };
+                    var outgoingNum = _this.wires[0].length;
+                    var msgArr = [];
+                    for (var i = 0; i < outgoingNum; i++) {
+                        msgArr.push(msg);
+                    }
+                    _this.send(msgArr);
+                });
+            });
+        };
+
+        this.request = function(favourite, callback) {
             var msg = {};
             var url = "http://reisapi.ruter.no/Favourites/GetFavourites?favouritesRequest=" + encodeURIComponent(favourite);
             msg.url = url;
@@ -104,6 +109,7 @@ module.exports = function(RED) {
                     }
                     callback(null, departures);
                 } else {
+                    error = error != undefined ? error : new Error();
                     error.url = url;
                     callback(null, error);
                 }

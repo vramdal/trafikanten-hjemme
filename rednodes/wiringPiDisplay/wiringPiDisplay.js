@@ -10,6 +10,7 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var _this = this;
         this.isOutputting = false;
+        _this.status({});
         var empty = [];
         for (var i = 0; i < 256; i++) {
             empty[i] = 0;

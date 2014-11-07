@@ -1,4 +1,4 @@
-module.exports = function scroller(caller) {
+module.exports = function scroller(caller, length) {
     var _this = this;
     this.scrollDistance = 0;
     this.bytes = undefined;
@@ -6,6 +6,7 @@ module.exports = function scroller(caller) {
     this.msgString = undefined;
     this.queuedMessagePriority = 10;
     this.msg = undefined;
+    this.length = length;
     var emptyScreen = [];
     for (var i = 0; i < 128; i++) {
         emptyScreen.push(0);
@@ -40,9 +41,9 @@ module.exports = function scroller(caller) {
         }
         var visibleBytes = [];
         if (this.scrollDistance > 0) {
-            visibleBytes = this.bytes.slice(this.scrollDistance, this.scrollDistance + 128);
+            visibleBytes = this.bytes.slice(this.scrollDistance, this.scrollDistance + this.length);
         } else if (this.scrollDistance == 0) {
-            visibleBytes = this.bytes.slice(this.scrollDistance, this.scrollDistance + 128);
+            visibleBytes = this.bytes.slice(this.scrollDistance, this.scrollDistance + this.length);
         } else if (this.scrollDistance < 0) {
             visibleBytes = this.bytes.slice();
         }
@@ -53,7 +54,7 @@ module.exports = function scroller(caller) {
         this.msg.scrollDistance = this.scrollDistance;
         caller.send(this.msg);
         this.scrollDistance += 1;
-        if (this.scrollDistance > this.bytes.length - 128) {
+        if (this.scrollDistance > this.bytes.length - this.length) {
             this.scrollDistance = 0;
             this.bytes = emptyScreen.concat(this.msgBytes, emptyScreen);
             this.queuedMessagePriority = 10;
