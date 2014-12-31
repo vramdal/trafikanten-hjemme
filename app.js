@@ -76,6 +76,12 @@ poller.startAll();
 
 server.listen(8000, "0.0.0.0");
 
+process.on('uncaughtException', function(err) {
+    // handle the error safely
+    console.log(err);
+});
+
+
 // Start the runtime
 RED.start();
 

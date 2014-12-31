@@ -1,5 +1,6 @@
 var scrollerLib = require("./scroller");
 var rastrifier = require("./rastrifier");
+var eventEmitter = require('events').EventEmitter;
 
 module.exports = function(RED) {
     function displaySection(config) {
@@ -17,6 +18,10 @@ module.exports = function(RED) {
         }
         var intervalId = undefined;
 
+        this.emitMessageDisplayCompleteEvent = function() {
+            eventEmitter.emit("messageDisplayComplete", this);
+        };
+
         this.tabify = function(bytes, tabs) {
             // TODO: Support multiple tabs
             if (bytes.length >= length) {
@@ -24,6 +29,14 @@ module.exports = function(RED) {
             }
             var tab = tabs[0];
             return Array.prototype.concat(bytes.slice(0, tab), empty.slice(0, length - bytes.length), bytes.slice(tab, bytes.length));
+        };
+
+        this.reInit = function() {
+            var msg = {
+                "topic": "init",
+                "payload": undefined
+            };
+            this.send(msg);
         };
 
 		this.on("input", function(msg) {
@@ -42,6 +55,8 @@ module.exports = function(RED) {
                         intervalId = setInterval(scroller.doScroll.bind(scroller), scrollSpeed);
                     }
                     return;
+                } else {
+                    setTimeout()
                 }
                 if (msg.payload.length > length) {
                     msg.payload = msg.payload.slice(0, length);

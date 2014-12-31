@@ -23,19 +23,19 @@ module.exports = function(RED) {
         }
         this.on("input", function(msg) {
             if (msg.topic == "bitmap") {
-				if (isNaN(msg.start)) {
-					msg.start = 0;
-				}
-				var start = msg.start;
-				var end = msg.start + msg.payload.length;
-				var bytesToWrite = msg.payload.slice(0, end - start);
+                if (isNaN(msg.start)) {
+                    msg.start = 0;
+                }
+                var start = msg.start;
+                var end = msg.start + msg.payload.length;
+                var bytesToWrite = msg.payload.slice(0, end - start);
                 if (start + bytesToWrite.length > 256) {
                     console.error("Attempting to write off-screen.", "start: ", start, "end: ", end, "bytes length: ", bytesToWrite.length);
                     console.error("Full message: ", msg);
-                    _this.status({fill:"red",shape:"dot",text:"Attempting to write off-screen, check logs"});
+                    _this.status({fill: "red", shape: "dot", text: "Attempting to write off-screen, check logs"});
                     return;
                 }
-				if (ledDisplay) {
+                if (ledDisplay) {
                     try {
                         if (_this.isOutputting) {
                             console.warn("Outputting too fast");
@@ -49,8 +49,12 @@ module.exports = function(RED) {
                         console.error("Full message: ", msg);
                         throw e;
                     }
-				}
+                }
                 _this.send(msg);
+            } else if (msg.topic == "init") {
+                if (ledDisplay) {
+                    ledDisplay.Init();
+                }
             } else {
                 console.log("Not supported message topic");
                 _this.send(msg);

@@ -58,6 +58,7 @@ module.exports = function scroller(caller, length) {
             this.scrollDistance = 0;
             this.bytes = emptyScreen.concat(this.msgBytes, emptyScreen);
             this.queuedMessagePriority = 10;
+            caller.reInit();
         }
 
     }

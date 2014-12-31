@@ -58,7 +58,7 @@ module.exports = function(RED) {
                     });
                 } else {
                     error = error != undefined ? error : new Error();
-                    error.url = url;
+                    error.url = node.url;
                     callback(null, error);
                 }
             });
