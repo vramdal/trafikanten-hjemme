@@ -966,5 +966,14 @@ function init() {
             " X  X  X ",
             "X  X  X  "
     );
+    registerCharacter(9829, 7,
+          " XX XX ",
+          "XXXXXXX",
+          "XXXXXXX",
+          "XXXXXXX",
+          " XXXXX ",
+          "  XXX  ",
+          "   X   "
+    );
     return _this.map;
 }

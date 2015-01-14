@@ -14,6 +14,9 @@ module.exports =  {
                 offset += font[ch].width;
             } else if (ch == '\t') {
                 tabs.push(offset);
+            } else if (font[ch.charCodeAt(0)]) {
+                bufferView.set(font[ch.charCodeAt(0)].bytes, offset);
+                offset += font[ch.charCodeAt(0)].width;
             } else {
                 console.warn("Ukjent tegn: " + ch);
             }
@@ -34,7 +37,9 @@ function findRequiredBufferSize(line) {
 		var ch = line[c];
 		if (font[ch]) {
 			bufferSize += font[ch].width;
-		}
+		} else if (font[ch.charCodeAt(0)]) {
+            bufferSize += font[ch.charCodeAt(0)].width;
+        }
 		if (c < line.length - 1) {
 			bufferSize += 1;
 		}
