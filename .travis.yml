@@ -1,11 +1,12 @@
 language: node_js
 node_js:
 - '0.11'
-- '0.10'
+before_deploy: "tar -zcvf trafikanten-hjemme.tar.gz .'"
 deploy:
   provider: releases
   api_key:
     secure: PNg+ABrB2L+EbSVP9xhJwKkUR9V2WSCQY3+l7A4/pnnzIuP65jtQrtdHbijmRIz4b2uQFB3f8ubN7qRiQ26N8D2SVDxKRTsrhqeas8ZLPv1afHXeyYvZ693bCDhE7YP8DCQOJ8+YP8hOVwyUh7Kwu0RbuIxxH/+3RS4wAgXXrR4=
-  file: package.json
+  file: trafikanten-hjemme.tar.gz
+  skip_cleanup: true
   on:
     repo: vramdal/trafikanten-hjemme
