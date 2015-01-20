@@ -10,3 +10,5 @@ deploy:
   skip_cleanup: true
   on:
     repo: vramdal/trafikanten-hjemme
+    all_branches: true
+    tags: true
