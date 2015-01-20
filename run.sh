@@ -1,4 +1,5 @@
 #!/bin/sh
+#Should check for updates
 cd /home/pi/trafikanten-hjemme
 if [ -f pidfile ];
 then
