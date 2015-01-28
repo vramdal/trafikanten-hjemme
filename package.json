@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "mocha test/*"
   },
   "dependencies": {
     "async": "~0.9.0",
@@ -17,7 +18,29 @@
     "express": "4.9.x",
     "morgan": "1.3.0"
   },
+  "devDependencies": {
+    "mockery": "~1.4.0",
+    "chai": "~1.10.0",
+    "mocha": "2.1.0",
+    "sinon": "1.12.2",
+    "test": ">=0.0.5",
+    "jasmine-node": "*",
+    "tape": "*"
+  },
   "optionalDependencies": {
     "pi-led": "vramdal/pi-led"
-  }
+  },
+  "bundleDependencies": [
+    "async",
+    "debug",
+    "express",
+    "hyperquest",
+    "morgan",
+    "node-red",
+    "pi-led",
+    "request",
+    "serve-favicon",
+    "through2",
+    "xml2js"
+  ]
 }

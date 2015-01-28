@@ -47,6 +47,10 @@
           </option>
           <option name="myCustomValuesEnabled" value="true" />
         </inspection_tool>
+        <inspection_tool class="LoggerInitializedWithForeignClass" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="loggerClassName" value="org.apache.log4j.Logger,org.slf4j.LoggerFactory,org.apache.commons.logging.LogFactory,java.util.logging.Logger" />
+          <option name="loggerFactoryMethodName" value="getLogger,getLogger,getLog,getLogger" />
+        </inspection_tool>
       </profile>
     </profiles>
     <option name="PROJECT_PROFILE" value="Project Default" />
@@ -56,6 +60,73 @@
   <component name="JRebel Project data">
     <option name="privateKey" value="3082025c02010002818100b0860c12ae67abb25c210fe16f4c5286b824493721c2aab4e78e1ae5d6de28fd64d21defcc612350df80b84344b18d973108165d712b4043c17cb81aead6017fe1add7462c52175deb57547cae8d9356f4d6f69e344c5e60a16ad03d5394ea767bc476251aafc0cfa19c48c9252c389ef267b80d6a0d5af1741568909b0756af0203010001028180681c97704936d1d85f680c92bc6efa5984afba12ef317e37363ee4f45c17297bd203ef2e288fbe218bc0c26cc24e2a215b04d71403942bd20a83419e769503ca69c5c147f8fa60003053e49a8a74d001218bbbcdd5735fb14e49d8667245ef50c7ee904f6e5637bede7378b29ea603453835fdfc02dbdfb144d8a4d3271780c1024100eb50eaaf0c6609ba67e2943d226974a7785f033389d489623c64f40d3f8479051333dc6dae4d235ff5e86bb05150485f6139d128e990ad1978e5b1cdef6411cf024100c00a2eab8c644b66c06ba6c0d9344f64421814857ccb5741f31cc56f8e3fffcce0a35af337eb7e1bd4166b849d777452c036f44de0175b36bbbb50faa2b80521024100b21332f63340c89ddaddd96686331dc75a4d3483fd0aecc87d81bc3a8655beab7b83a48d0ff96a0ac5721484829469a05c583f9361654dc957f722de000a4f7b024062f75c61cff207e1a61c544d6222511fcbe7f8fb69faa8b7360087c71bb9e3abc3c0aba858132664550250da8104049078ba5960a0b1a8b226413c544df323c10240582a9c0e2505f9e6f9c8726fff440924170ff71ee5835cefefda5e8e37a1d288eb9d43cd41cbdc2ca88f0cdb7744eafd3736e67fa2894c66acfdc00daa38c630" />
     <option name="publicKey" value="30818902818100b0860c12ae67abb25c210fe16f4c5286b824493721c2aab4e78e1ae5d6de28fd64d21defcc612350df80b84344b18d973108165d712b4043c17cb81aead6017fe1add7462c52175deb57547cae8d9356f4d6f69e344c5e60a16ad03d5394ea767bc476251aafc0cfa19c48c9252c389ef267b80d6a0d5af1741568909b0756af0203010001" />
+  </component>
+  <component name="JSHintConfiguration" version="2.5.10" use-config-file="false">
+    <option asi="false" />
+    <option bitwise="true" />
+    <option boss="false" />
+    <option browser="true" />
+    <option camelcase="true" />
+    <option couch="false" />
+    <option curly="true" />
+    <option debug="false" />
+    <option devel="false" />
+    <option dojo="false" />
+    <option eqeqeq="true" />
+    <option eqnull="false" />
+    <option es3="false" />
+    <option esnext="false" />
+    <option evil="false" />
+    <option expr="false" />
+    <option forin="true" />
+    <option freeze="true" />
+    <option funcscope="false" />
+    <option gcl="false" />
+    <option globalstrict="false" />
+    <option immed="true" />
+    <option iterator="false" />
+    <option jquery="false" />
+    <option lastsemic="false" />
+    <option latedef="nofunc" />
+    <option laxbreak="false" />
+    <option laxcomma="false" />
+    <option loopfunc="false" />
+    <option maxerr="50" />
+    <option mootools="false" />
+    <option moz="false" />
+    <option multistr="false" />
+    <option newcap="true" />
+    <option noarg="true" />
+    <option node="true" />
+    <option noempty="true" />
+    <option nomen="false" />
+    <option nonbsp="true" />
+    <option nonew="true" />
+    <option nonstandard="false" />
+    <option notypeof="false" />
+    <option noyield="false" />
+    <option onevar="false" />
+    <option passfail="false" />
+    <option phantom="false" />
+    <option plusplus="false" />
+    <option proto="false" />
+    <option prototypejs="false" />
+    <option quotmark="false" />
+    <option rhino="false" />
+    <option scripturl="false" />
+    <option shadow="false" />
+    <option smarttabs="false" />
+    <option strict="true" />
+    <option sub="false" />
+    <option supernew="false" />
+    <option trailing="false" />
+    <option undef="true" />
+    <option unused="false" />
+    <option validthis="false" />
+    <option white="false" />
+    <option worker="false" />
+    <option wsh="false" />
+    <option yui="false" />
   </component>
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$" libraries="{trafikanten-node node_modules}" />

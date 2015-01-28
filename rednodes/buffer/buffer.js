@@ -15,6 +15,7 @@ module.exports = function(RED) {
         this.resetInterval = function() {
             if (_this.intervalRef) {
                 clearInterval(_this.intervalRef);
+                _this.intervalRef = undefined;
             }
         };
 
@@ -22,7 +23,10 @@ module.exports = function(RED) {
             _this.setupInterval();
             _this.buffer.push(msg);
             _this.status({fill:"green",shape:"dot",text:"Buffer: " + _this.buffer.length});
+        });
 
+        this.on("close", function() {
+            _this.resetInterval();
         });
         this.sendBuffer = function() {
             if (this.buffer.length == 0) {

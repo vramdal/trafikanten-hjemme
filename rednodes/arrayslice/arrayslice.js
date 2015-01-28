@@ -9,11 +9,21 @@ module.exports = function(RED) {
         this.on("input", function(msg) {
             if (!Array.isArray(msg.payload)) {
                 if (forceArray) {
-                    msg.payload = [msg.payload];
+                    if (msg.payload == undefined) {
+                        msg.payload = [];
+                    } else {
+                        msg.payload = [msg.payload];
+                    }
                 }
             } else {
                 if (from <= msg.payload.length) {
                     msg.payload = msg.payload.slice(from, isNaN(to) ? msg.payload.length : Math.min(to, msg.payload.length));
+                }
+                if (from == undefined && to < msg.payload.length) {
+                    msg.payload = msg.payload.slice(0, to);
+                }
+                if (from <= msg.payload.length && to < msg.payload.length) {
+                    msg.payload = msg.payload.slice(from, to);
                 }
                 if (msg.payload.length == 1 && !forceArray) {
                     msg.payload = msg.payload[0];
