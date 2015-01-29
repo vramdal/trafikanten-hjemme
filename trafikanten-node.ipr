@@ -265,7 +265,7 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="app" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="app.js" application-parameters="-v" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="app" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files (x86)/nodejs/node" path-to-js-file="app.js" application-parameters="-v" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="DEBUG" value="trafikanten-node" />
       </envs>

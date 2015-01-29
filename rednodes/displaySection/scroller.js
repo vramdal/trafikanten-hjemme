@@ -1,4 +1,5 @@
-module.exports = function scroller(caller, length) {
+
+var scroller = function scroller(caller, length) {
     var _this = this;
     this.scrollDistance = 0;
     this.bytes = undefined;
@@ -55,11 +56,12 @@ module.exports = function scroller(caller, length) {
         caller.send(this.msg);
         this.scrollDistance += 1;
         if (this.scrollDistance > this.bytes.length - this.length) {
+            caller.emitMessageDisplayCompleteEvent(this.msg);
             this.scrollDistance = 0;
             this.bytes = emptyScreen.concat(this.msgBytes, emptyScreen);
             this.queuedMessagePriority = 10;
             caller.reInit();
         }
-
     }
 };
+module.exports = scroller;

@@ -1,6 +1,6 @@
 var scrollerLib = require("./scroller");
 var rastrifier = require("./rastrifier");
-var eventEmitter = require('events').EventEmitter;
+var events = require("../../modules/redevents");
 
 module.exports = function(RED) {
     function displaySection(config) {
@@ -18,8 +18,8 @@ module.exports = function(RED) {
         }
         var intervalId = undefined;
 
-        this.emitMessageDisplayCompleteEvent = function() {
-            eventEmitter.emit("messageDisplayComplete", this);
+        this.emitMessageDisplayCompleteEvent = function(msg) {
+            events.emit("messageDisplayComplete", msg["_messageUuid"], this);
         };
 
         this.tabify = function(bytes, tabs) {
