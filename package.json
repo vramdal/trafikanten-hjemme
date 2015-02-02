@@ -32,16 +32,6 @@
     "ofe": "0.1.x"
   },
   "bundleDependencies": [
-    "async",
-    "debug",
-    "express",
-    "hyperquest",
-    "morgan",
-    "node-red",
-    "pi-led",
-    "request",
-    "serve-favicon",
-    "through2",
-    "xml2js"
+    "pi-led"
   ]
 }
