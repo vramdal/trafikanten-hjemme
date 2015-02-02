@@ -9,9 +9,11 @@ var request = require('request');
 
 
 var app = express();
+/*
 if (app.get('env') === 'development') {
   require('ofe').call(); // Uncomment to enable heap dumps on
 }
+*/
 
 app.use(logger('dev'));
 app.use(favicon(__dirname + '/public/images/favicon.gif'));
