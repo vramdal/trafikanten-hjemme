@@ -58,9 +58,15 @@ module.exports = function(RED) {
         });
         this.sendNextMsg = function() {
             for (var i = 0; i < prioritizedMessages.length; i++) {
-                if (prioritizedMessages[i] != undefined) {
-                    prioritizedMessages[i].sent = new Date();
-                    _this.send(prioritizedMessages[i]);
+                var msg = prioritizedMessages[i];
+                if (msg != undefined) {
+                    msg.sent = new Date();
+                    var outgoingNum = _this.wires[0].length;
+                    var msgArr = [];
+                    for (var j = 0; i < outgoingNum; j++) {
+                        msgArr.push(msg);
+                    }
+                    _this.send(msgArr);
                     break;
                 }
             }

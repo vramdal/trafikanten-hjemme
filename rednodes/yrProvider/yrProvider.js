@@ -65,9 +65,10 @@ module.exports = function(RED) {
         };
 
         this.on("input", function(msg) {
-            this.fetch();
+            //this.fetch();
         });
 
+/*
         setTimeout(node.fetch.bind(this), 1000);
         this.intervalId = setInterval(node.fetch.bind(this), 10*60*1000);
         this.on('close', function() {
@@ -75,6 +76,7 @@ module.exports = function(RED) {
                 clearInterval(node.intervalId);
             }
         });
+*/
     }
     RED.nodes.registerType("yrProvider", yrProvider);
 };
