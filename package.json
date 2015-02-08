@@ -33,6 +33,6 @@
   },
   "bundledDependencies": [
     "async", "debug", "hyperquest", "node-red", "request",
-    "service-favicon", "through2", "xml2js", "express", "morgan"
+    "serve-favicon", "through2", "xml2js", "express", "morgan"
   ]
 }
