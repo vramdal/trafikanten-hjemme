@@ -40,6 +40,17 @@
                     outputMessage(debugMessages.empty);
                 }
 
+                this.send = function(text) {
+                    var lines = text.split("\n");
+                    for (var i = 0; i < lines.length; i++) {
+                        lines[i] = lines[i].replace("    ", "\t", "g");
+                    }
+                    var msg = {
+                        payload: lines
+                    };
+                    _this.ws.send(JSON.stringify(msg));
+                };
+
                 this.connect = function () {
                     clearDisplay();
                     outputMessage(debugMessages.connecting);
@@ -146,6 +157,8 @@
             Object.observe(line1connection, observeConnectionChange);
             line1connection.connect();
 
+            window.displayWebsocketConnection = line1connection;
+
         });
     </script>
     <style>
@@ -197,6 +210,8 @@
     <div id="line2" class="line">
         <div class="connection-status" id="display1status"></div>
     </div>
+    <textarea placeholder="Post to websocket" id="input" rows="5" cols="40"></textarea>
+    <button type="button" onclick="window.displayWebsocketConnection.send(document.getElementById('input').value)">Send</button>
 </div>
 </body>
 </html>
