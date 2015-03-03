@@ -64,4 +64,18 @@ describe("arrayslice", function() {
             done();
         });
     });
+    it("should obey rules if a non-array was received", function(done) {
+        arraysliceTest({from: 1, to: 2, forceArray: true}).trigger("input", {"payload": [1]}, function(msg) {
+            assert.isArray(msg.payload);
+            assert.equal(msg.payload.length, 0);
+            done();
+        });
+    });
+    it("should just pass the message on if the payload is not an array and force array is false", function(done) {
+        arraysliceTest({from: 1, to: 2, forceArray: false}).trigger("input", {"payload": "abc"}, function(msg) {
+            assert.isNotArray(msg.payload);
+            assert.equal(msg.payload, "abc");
+            done();
+        });
+    });
 });

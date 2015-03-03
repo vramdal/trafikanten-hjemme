@@ -14,20 +14,22 @@ module.exports = function(RED) {
                     } else {
                         msg.payload = [msg.payload];
                     }
+                } else {
+                    _this.send(msg);
+                    return;
                 }
-            } else {
-                if (from <= msg.payload.length) {
-                    msg.payload = msg.payload.slice(from, isNaN(to) ? msg.payload.length : Math.min(to, msg.payload.length));
-                }
-                if (from == undefined && to < msg.payload.length) {
-                    msg.payload = msg.payload.slice(0, to);
-                }
-                if (from <= msg.payload.length && to < msg.payload.length) {
-                    msg.payload = msg.payload.slice(from, to);
-                }
-                if (msg.payload.length == 1 && !forceArray) {
-                    msg.payload = msg.payload[0];
-                }
+            }
+            if (from <= msg.payload.length) {
+                msg.payload = msg.payload.slice(from, isNaN(to) ? msg.payload.length : Math.min(to, msg.payload.length));
+            }
+            if (from == undefined && to < msg.payload.length) {
+                msg.payload = msg.payload.slice(0, to);
+            }
+            if (from <= msg.payload.length && to < msg.payload.length) {
+                msg.payload = msg.payload.slice(from, to);
+            }
+            if (msg.payload.length == 1 && !forceArray) {
+                msg.payload = msg.payload[0];
             }
             _this.send(msg);
         });

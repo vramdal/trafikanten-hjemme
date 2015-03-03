@@ -16,7 +16,8 @@
     "through2": "~0.6.3",
     "xml2js": "^0.4.4",
     "express": "4.9.x",
-    "morgan": "1.3.0"
+    "morgan": "1.3.0",
+    "wordwrap": "0.0.2"
   },
   "devDependencies": {
     "mockery": "~1.4.0",

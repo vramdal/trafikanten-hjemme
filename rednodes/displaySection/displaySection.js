@@ -40,35 +40,37 @@ module.exports = function(RED) {
         };
 
 		this.on("input", function(msg) {
+            if (Array.isArray(msg.payload)) {
+                console.warn("Can not pass array to displaySection. Message: ", msg);
+                return;
+            }
             if (msg.topic != "bitmap") {
                 msg = rastrifier.rastrify(msg);
             }
-            if (msg.topic == "bitmap") {
-				msg.start = start;
-				msg.end = end;
-                if (mode == "tabify" && msg.tabs && msg.tabs.length > 0) {
-                    msg.payload = _this.tabify(msg.payload, msg.tabs);
-                }
-                if (mode == "scroll-rtl") {
-                    scroller.setMsg(msg);
-                    if (intervalId == undefined) {
-                        intervalId = setInterval(scroller.doScroll.bind(scroller), scrollSpeed);
-                    }
-                    return;
-                } else {
-                    setTimeout()
-                }
-                if (msg.payload.length > length) {
-                    msg.payload = msg.payload.slice(0, length);
-                }
-				while (msg.payload.length < end - start) {
-					msg.payload.push(0);
-				}
-				_this.send(msg);
-            } else {
-                console.log("Unsupported message topic: ", msg.topic);
-                _this.send(msg);
+            msg.start = start;
+            msg.end = end;
+            if (mode == "tabify" && msg.tabs && msg.tabs.length > 0) {
+                msg.payload = _this.tabify(msg.payload, msg.tabs);
             }
+            if (mode == "tabify") {
+                setTimeout(function() {
+                    _this.emitMessageDisplayCompleteEvent(msg);
+                }, msg.ttl != undefined ? msg.ttl : 1000);
+            }
+            if (mode == "scroll-rtl") {
+                scroller.setMsg(msg);
+                if (intervalId == undefined) {
+                    intervalId = setInterval(scroller.doScroll.bind(scroller), scrollSpeed);
+                }
+                return;
+            }
+            if (msg.payload.length > length) {
+                msg.payload = msg.payload.slice(0, length);
+            }
+            while (msg.payload.length < end - start) {
+                msg.payload.push(0);
+            }
+            _this.send(msg);
         });
         this.on('close', function() {
             if (intervalId != undefined) {
