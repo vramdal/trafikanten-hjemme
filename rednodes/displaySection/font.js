@@ -975,5 +975,67 @@ function init() {
           "  XXX  ",
           "   X   "
     );
+    registerCharacter(11365, 11, // ⱥ
+            "  X     X  ",
+            "   X   X   ",
+            "  XXXXXXX  ",
+            " XX XXX XX ",
+            "XXXXXXXXXXX",
+            "X XXXXXXX X",
+            "X X     X X",
+            "   XX XX   "
+    );
+    registerCharacter(11366, 11, // ⱦ
+            "  X     X  ",
+            "X  X   X  X",
+            "X XXXXXXX X",
+            " XX XXX XX ",
+            "XXXXXXXXXXX",
+            "  XXXXXXX  ",
+            "  X     X  ",
+            " XXX   XXX "
+    );
+    registerCharacter(11362, 10, // Ɫ
+            "   XXXX   ",
+            "  XXXXXX  ",
+            " XXXXXXXX ",
+            "XX XXXX XX",
+            "XXXXXXXXXX",
+            "   X  X   ",
+            "  X XX X  ",
+            "XX X  X XX"
+    );
+    registerCharacter(11371, 16, // Ⱬ
+            "                ",
+            "     XXXXXX     ",
+            "   XXXXXXXXXX   ",
+            "  XXXXXXXXXXXX  ",
+            " XX XX XX XX XX ",
+            "XXXXXXXXXXXXXXXX",
+            "  XXX  XX  XXX  ",
+            "   X        X   "
+    );
+    registerCharacter(11378, 14, // Ⱳ
+            "     XXXX     ",
+            " XXXXXXXXXXXX ",
+            "XXXXXXXXXXXXXX",
+            "XXXX  XX  XXXX",
+            "XXXXXXXXXXXXXX",
+            "    XX  XX    ",
+            "   XX XX XX   ",
+            "XXX        XXX"
+    );
+    registerCharacter(11363, 9, // Ᵽ
+            "  XXXXX  ",
+            " XXXXXXX ",
+            "XX  X  XX",
+            "XX XX XXX",
+            "XXXXXXXXX",
+            "XXXXXXXXX",
+            "XXXXXXXXX",
+            "XX X X XX"
+    );
     return _this.map;
+
+
 }
