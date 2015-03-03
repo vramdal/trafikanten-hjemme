@@ -2,6 +2,9 @@ var font = require("./font");
 module.exports =  {
     rastrify: function(msg) {
         var text = msg.payload;
+        if (text == null) {
+            text = "";
+        }
         var tabs = [];
         var bufferSize = findRequiredBufferSize(text);
         var arrayBuffer = new ArrayBuffer(bufferSize);
