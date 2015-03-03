@@ -19,6 +19,12 @@ module.exports = function(RED) {
                     return;
                 }
             }
+            if (Array.isArray(msg.payload) && msg.payload.length == 0 && !forceArray) {
+                msg.payload = null;
+                _this.send(msg);
+                return;
+            }
+
             if (from <= msg.payload.length) {
                 msg.payload = msg.payload.slice(from, isNaN(to) ? msg.payload.length : Math.min(to, msg.payload.length));
             }

@@ -78,4 +78,11 @@ describe("arrayslice", function() {
             done();
         });
     });
+    it("should return null when receiving an empty array and force array is false", function(done) {
+        arraysliceTest({from: 0, to: 1, forceArray: false}).trigger("input", {"payload": []}, function(msg) {
+            assert.isNotArray(msg.payload);
+            assert.isNull(msg.payload);
+            done();
+        });
+    });
 });
