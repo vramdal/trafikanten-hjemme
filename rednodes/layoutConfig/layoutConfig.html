@@ -1,0 +1,43 @@
+<script type="text/javascript">
+    RED.nodes.registerType('layoutConfig',{
+        category: 'config',
+        defaults: {
+            row1from: {value: 0, required: true, validate:RED.validators.number()},
+            row1to: {value: 0, required: true, validate:RED.validators.number()},
+            row1style: {value: "tabify", required: true},
+            row2from: {value: 0, required: true, validate:RED.validators.number()},
+            row2to: {value: 0, required: true, validate:RED.validators.number()},
+            row2style: {value: "scroll", required: true},
+            name: {value: "", required: true}
+
+        },
+        label: function() {
+            return this.name;
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="layoutConfig">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-bookmark"></i> Name</label>
+        <input type="text" id="node-config-input-name"/>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-row1from"><i class="icon-bookmark"></i> First row</label>
+        From: <input type="number" id="node-config-input-row1from" min="0" max="128"><br/>
+        To: <input type="number" id="node-config-input-row1to" min="0" max="128"><br/>
+        Style: <select id="node-config-input-row1style">
+           <option value="tabify">Tabify</option>
+           <option value="scroll">Scroll left-to-right</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-row2from"><i class="icon-bookmark"></i> Second row</label>
+        From: <input type="number" id="node-config-input-row2from" min="0" max="128"><br/>
+        To: <input type="number" id="node-config-input-row2to" min="0" max="128"><br/>
+        Style: <select id="node-config-input-row2style">
+           <option value="tabify">Tabify</option>
+           <option value="scroll">Scroll left-to-right</option>
+        </select>
+    </div>
+</script>
