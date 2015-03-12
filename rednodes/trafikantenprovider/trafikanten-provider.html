@@ -113,14 +113,22 @@
                             visits: for (var monitoredStopVisitIdx = 0; monitoredStopVisitIdx < data.length; monitoredStopVisitIdx++) {
                                 var monitoredVehicleJourney = data[monitoredStopVisitIdx].MonitoredVehicleJourney;
                                 var destinationName = monitoredVehicleJourney.DestinationName;
+                                var directionRef = monitoredVehicleJourney.DirectionRef;
                                 var line = monitoredVehicleJourney.LineRef;
+                                if (directionRef == null) {
+                                    continue visits;
+                                }
                                 if (line == $("#lineSelect").val()) {
                                     for (var j = 0; j < destinations.length; j++) {
-                                        if (destinations[j].value == destinationName) {
+                                        if (destinations[j].directionRef == directionRef) {
+                                            if (destinations[j].label.indexOf(destinationName) == -1) {
+                                                destinations[j].label += "/" + destinationName;
+                                                destinations[j].value += "/" + destinationName;
+                                            }
                                             continue visits;
                                         }
                                     }
-                                    destinations.push({label: destinationName, value: destinationName});
+                                    destinations.push({label: destinationName, value: destinationName, directionRef: directionRef});
                                 }
                             }
                             responseCb(destinations);
@@ -128,8 +136,12 @@
                     });
                 },
                 "minLength": 0,
-                "select": function() {
+                "select": function(event, ui) {
                     $("#addDepartureButton").attr("disabled", false);
+                    var $destinationSearch = $("#destinationSearch");
+                    $destinationSearch.val(ui.item.label);
+                    $destinationSearch.attr("directionRef", ui.item.directionRef);
+
                 }
             });
             $("#destinationSearch").on("autocompletechange", function(evt) {
@@ -140,7 +152,8 @@
                     "stationName": $("#stationSearch").val(),
                     "stationId": $("#stationId").val(),
                     "line": $("#lineSelect").val(),
-                    "destination": $("#destinationSearch").val()
+                    "destination": $("#destinationSearch").val(),
+                    "directionRef": $("#destinationSearch").attr("directionRef")
                 };
                 _this.configs.push(config);
                 _this.lastModified = new Date().getTime();
@@ -148,7 +161,7 @@
             });
         },
 
-        inputs:0,
+        inputs:1,
         outputs:1,
         icon: "hash.png",
         label: function() {
