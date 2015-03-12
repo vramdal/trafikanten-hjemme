@@ -1,21 +1,18 @@
 <script type="text/javascript">
-    RED.nodes.registerType('stage',{
-        category: 'output',
+    RED.nodes.registerType('layoutResolver',{
+        category: 'function',
         color: '#a6bbcf',
         inputs:1,
         outputs:1,
-        icon: "stage.png",
-        defaults: {
-            layout: {value: "", type: "layoutConfig"}
-        },
+        icon: "layoutResolver.png",
 
         label: function() {
-            return this.name||"Stage";
+            return this.name||"layoutResolver";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="stage">
+<script type="text/x-red" data-template-name="layoutResolver">
     <div class="form-row">
         <label for="node-input-layout"><i class="icon-tag"></i>Layout</label>
         <select id="node-input-layout">
@@ -25,6 +22,6 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="stage">
+<script type="text/x-red" data-help-name="layoutResolver">
     <p>Configuration for output on a visual screen (and LED panel)</p>
 </script>
