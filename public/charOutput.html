@@ -56,6 +56,7 @@
                     outputMessage(debugMessages.connecting);
                     _this.status = 0;
                     _this.ws = new WebSocket("ws://" + window.location.hostname + ":8000/api/ws/display");
+                    alert("ReadyState: " + _this.ws.readyState);
                     _this.ws.onopen = function () {
                         _this.status = 1;
                         _this.connectWait = 0;
@@ -74,7 +75,7 @@
                     _this.ws.onmessage = function (event) {
                         var jsonData = JSON.parse(event.data);
                         _this.receiving = true;
-                        if (!jsonData.scrollDistance) {
+                        if (!jsonData.scrollDistance && jsonData.payload) {
                             console.log("Mottok melding:", jsonData);
                             console.log(jsonData.payload.toString());
                         }
@@ -154,7 +155,7 @@
                     }
                 }
             };
-            Object.observe(line1connection, observeConnectionChange);
+            //Object.observe(line1connection, observeConnectionChange);
             line1connection.connect();
 
             window.displayWebsocketConnection = line1connection;
