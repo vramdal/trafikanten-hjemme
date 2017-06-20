@@ -1,7 +1,7 @@
 // @flow
 import type {Bitmap} from "./BitmapWithControlCharacters";
 
-function logBitmap(bitmap : Bitmap) {
+function bitmapTo8Lines(bitmap : Bitmap) {
     let lines : Array<Array<string>> = [[], [], [], [], [], [], [], []];
     for (let x = 0; x < bitmap.length; x++) {
         const byte = bitmap[x];
@@ -14,11 +14,28 @@ function logBitmap(bitmap : Bitmap) {
             mask = mask / 2;
         }
     }
+    let result : Array<string> = [];
     for (let l = 0; l < lines.length; l++) {
-        console.log(lines[l].join(""));
+        let line = lines[l].join("");
+        result.push(line);
+        console.log(line);
     }
+    return result.join("\n");
 }
 
+function printRuler() {
+    let ruler = "";
+    let i = 0;
+    while (i < 135) {
+        let str;
+        str = i % 10 === 0 ? "|" + i + "" : " ";
+        i += str.length;
+        ruler += str;
+    }
+    console.log(ruler);
+}
+
+
 module.exports = {
-    logBitmap
+    bitmapTo8Lines, printRuler
 };
