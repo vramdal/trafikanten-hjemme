@@ -55,7 +55,7 @@ function rastrifyText(text : string) : BitmapWithControlCharacters  {
     let offset = 0;
     processLine(text,
         (fontCharSpec : FontCharSpec, isFirstCharacter, isLastCharacter) => {
-            bufferView.set(fontCharSpec.bytes, offset);
+            bufferView.set(fontCharSpec.uint8Array, offset);
             offset += fontCharSpec.width;
             if (!isLastCharacter) {
                 offset += 1;
@@ -94,10 +94,10 @@ function processLine(line, fontCharacterHandler: FontCharacterHandler, controlCh
         if (isControlCharacter(ch)) {
             controlCharacterHandler(ch, c === 0, c >= line.length - 1);
         } else if (ch) {
-            let fontBitMap = font[ch] || font[ch.charCodeAt(0)];
-            fontCharacterHandler(fontBitMap, c === 0, c >= line.length - 1);
+            let fontCharSpec = font[ch] || font[ch.charCodeAt(0)];
+            fontCharacterHandler(fontCharSpec, c === 0, c >= line.length - 1);
         } else {
-            console.warn("Ukjent tegn: ", ch);
+            window.console.warn("Ukjent tegn: ", ch);
         }
     }
 }

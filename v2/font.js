@@ -1,13 +1,14 @@
 // @flow
 
+export type FontCharSpec = {char: string | number, width : number, uint8Array: Uint8Array}
+export type FontMap = {[string | number] : FontCharSpec, byteArray: Uint8Array, bytes: {[string | number] : Uint8Array}}
+
 module.exports = init();
 
-export type FontCharSpec = {bytes: Array<number>, width : number}
-export type FontMap = {[string | number] : FontCharSpec}
 
 function init() {
 
-    let map : FontMap = {};
+    let characters : Array<FontCharSpec> = [];
 
     function registerCharacter(ch : string | number, width : number, ...lines) {
         const bytes = [];
@@ -20,7 +21,9 @@ function init() {
             let byte = parseInt(str.replace(/X/g, '1').replace(/\s/g, '0'), 2);
             bytes.push(byte);
         }
-        map[ch] = {bytes: bytes, width: width};
+        let uint8Array = Uint8Array.from(bytes);
+        let fontCharSpec = {char: ch, width: width, uint8Array: uint8Array};
+        characters.push(fontCharSpec);
     }
 
     registerCharacter('!', 5,
@@ -293,6 +296,7 @@ function init() {
             "  X  ",
             " X   ",
             "     ");
+/*
     registerCharacter('X', 5,
             "     ",
             " XXX ",
@@ -302,6 +306,7 @@ function init() {
             "     ",
             "  X  ",
             "     ");
+*/
     registerCharacter('@', 5,
             "     ",
             " XXX ",
@@ -905,6 +910,7 @@ function init() {
             "   ",
             "   ",
             "   ");
+/*
     registerCharacter('X', 9,
             "    X    ",
             " X XXX X ",
@@ -914,6 +920,7 @@ function init() {
             " X XXX X ",
             "  X X X  ",
             " X XXX X ");
+*/
     registerCharacter('☼', 8,  // Sol
             "X      X",
             " X    X ",
@@ -1022,6 +1029,28 @@ function init() {
             "XXXXXXXXX",
             "XX X X XX"
     );
+
+    let requiredWidth = 0;
+    let positions : {[string | number] : number} = {};
+    for (let i = 0; i < characters.length; i++) {
+        let fontCharSpec = characters[i];
+        positions[fontCharSpec.char] = requiredWidth;
+        requiredWidth += fontCharSpec.width;
+    }
+    // Create a mother Uint8Array, that will hold all character sprites
+    let map : FontMap = {byteArray: new Uint8Array(requiredWidth), bytes: {}};
+    for (let i = 0; i < characters.length; i++) {
+        let fontCharSpec = characters[i];
+        let ch = fontCharSpec.char;
+        let position = positions[ch];
+        map.byteArray.set(fontCharSpec.uint8Array, position);
+        map[ch] = fontCharSpec;
+        let subarrayGetter = () => map.byteArray.subarray(position, position + fontCharSpec.width);
+        Object.defineProperty(map.bytes, ch, {get: subarrayGetter});
+        const propNavn = "uint8Array";
+        // We can now disregard the existing uint8Array property value, and redirect it to our mother Uint8Array:
+        Object.defineProperty(fontCharSpec, propNavn, {get: subarrayGetter});
+    }
     return map;
 
 
