@@ -2,21 +2,13 @@
 const font = require("./font");
 const BitmapWithControlCharacters = require("./BitmapWithControlCharacters");
 import type {Bitmap, ControlCharacterMap} from './BitmapWithControlCharacters';
+import type {FontCharSpec} from './font';
 
 function isControlCharacter(str : string) {
     "use strict";
     if (str === '\t') {
         return true;
     }
-}
-
-function parseControlCharacters(str : string) : ?string {
-    "use strict";
-    let result = "";
-    for (let c = 0; c < str.length && isControlCharacter(str[c]); c++) {
-        result += str[c];
-    }
-    return result;
 }
 
 module.exports =  {
@@ -38,7 +30,7 @@ function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlC
         throw new Error("Only none or a single control character is supported by now.");
     }
     let ctrl = bitmapWithControlCharacters.controlCharacters[0];
-    if (ctrl.character !== "\t" && ctrl.character !== "\t\t") {
+    if (ctrl.character !== "\t") {
         throw new Error("Only tab (\\t) control characters are supported by now");
     }
     let arrayBuffer = new ArrayBuffer(width);
@@ -61,49 +53,51 @@ function rastrifyText(text : string) : BitmapWithControlCharacters  {
     let arrayBuffer = new ArrayBuffer(bufferSize);
     let bufferView = new Uint8Array(arrayBuffer);
     let offset = 0;
-    let numControlCharacters = 0;
-    for (let c = 0; c < text.length; c++) {
-        let ch : string = text[c];
-        let controlCharacterString = parseControlCharacters(text.substring(c));
-        if (controlCharacterString) {
-            ctrl.push({position: offset, character: controlCharacterString});
-            numControlCharacters += controlCharacterString.length;
-            c += numControlCharacters - 1;
-        } else if (font[ch]) {
-            bufferView.set(font[ch].bytes, offset);
-            offset += font[ch].width;
-        } else if (font[ch.charCodeAt(0)]) {
-            bufferView.set(font[ch.charCodeAt(0)].bitmap, offset);
-            offset += font[ch.charCodeAt(0)].width;
-        } else {
-            window.console.warn("Ukjent tegn: " + ch);
-        }
-        if ((c < text.length - 1) && !controlCharacterString) {
-            offset += 1;
-        }
-    }
+    processLine(text,
+        (fontCharSpec : FontCharSpec, isFirstCharacter, isLastCharacter) => {
+            bufferView.set(fontCharSpec.bytes, offset);
+            offset += fontCharSpec.width;
+            if (!isLastCharacter) {
+                offset += 1;
+            }
+        },
+        ch => {
+            ctrl.push({position: offset, character: ch});
+        });
     return new BitmapWithControlCharacters(bufferView, ctrl);
-
 }
 
+type ControlCharacterHandler = (ch: string, isFirstCharacter: boolean, isLastCharacter: boolean) => void;
+type FontCharacterHandler = (fontCharSpec : FontCharSpec, isFirstCharacter: boolean, isLastCharacter: boolean) => void;
 
-
-function findRequiredBufferSize(line : string) : number {
+function findRequiredBufferSize(line : string) {
+    "use strict";
     let bufferSize : number = 0;
-    for (let c = 0; c < line.length; c++) {
-        let controlCharacters = parseControlCharacters(line.substring(c));
-        let ch = line[c];
-        if (controlCharacters) {
-            c += controlCharacters.length - 1;
-            bufferSize += 0;
-        } else if (font[ch]) {
-            bufferSize += font[ch].width;
-        } else if (font[ch.charCodeAt(0)]) {
-            bufferSize += font[ch.charCodeAt(0)].width;
-        }
-        if (c < line.length - 1 && !controlCharacters) {
+    let fontCharacterHandler = (fontCharSpec : FontCharSpec, isFirstCharacter : boolean, isLastCharacter : boolean) => {
+        "use strict";
+        bufferSize += fontCharSpec.width;
+        if (!isLastCharacter) {
             bufferSize += 1;
         }
-    }
+    };
+    let controlCharacterHandler = () => {
+        "use strict";
+        bufferSize += 0;
+    };
+    processLine(line, fontCharacterHandler, controlCharacterHandler);
     return bufferSize;
+}
+
+function processLine(line, fontCharacterHandler: FontCharacterHandler, controlCharacterHandler: ControlCharacterHandler) : void {
+    for (let c = 0; c < line.length; c++) {
+        let ch = line[c];
+        if (isControlCharacter(ch)) {
+            controlCharacterHandler(ch, c === 0, c >= line.length - 1);
+        } else if (ch) {
+            let fontBitMap = font[ch] || font[ch.charCodeAt(0)];
+            fontCharacterHandler(fontBitMap, c === 0, c >= line.length - 1);
+        } else {
+            console.warn("Ukjent tegn: ", ch);
+        }
+    }
 }

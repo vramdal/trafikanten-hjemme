@@ -30,7 +30,7 @@ describe('Rastrifier', () => {
         expect(bitmapTo8Lines(result)).to.equal(expectedResult);
     });
 
-    it('should expand a double tab', () => {
+    it('should expand a \t tab', () => {
         let expectedResult =
 `································································································································
 █···█·······██··██································································································██·····█···█··
@@ -41,7 +41,7 @@ describe('Rastrifier', () => {
 █···█··███··███·███··███··········································································█·█···███··█····███··███···█··
 ································································································································`;
         "use strict";
-        let message = "Hello\t\tworld!";
+        let message = "Hello\tworld!";
         let result = Rastrifier.rastrify(message);
         let hex = Buffer.from(result).toString('hex');
         //console.log(hex);

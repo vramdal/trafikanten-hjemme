@@ -2,9 +2,12 @@
 
 module.exports = init();
 
+export type FontCharSpec = {bytes: Array<number>, width : number}
+export type FontMap = {[string | number] : FontCharSpec}
+
 function init() {
 
-    let map = {};
+    let map : FontMap = {};
 
     function registerCharacter(ch : string | number, width : number, ...lines) {
         const bytes = [];
