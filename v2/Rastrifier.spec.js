@@ -50,4 +50,9 @@ describe('Rastrifier', () => {
         expect(result[126]).to.equal(0x00);
         expect(result[127]).to.equal(0x00);
     });
+    it('should center text following a \01', () => {
+        let message = "\01Hello world!";
+        let result = Rastrifier.rastrify(message);
+        bitmapTo8Lines(result);
+    });
 });
