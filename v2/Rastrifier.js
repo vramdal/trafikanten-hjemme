@@ -22,26 +22,25 @@ function isControlCharacter(str : string) {
 
 module.exports =  {
     rastrify: function(text : string) : Bitmap {
-        let bitmapWithControlCharacters = rastrifyText(text);
-        return expandControlCharacters(bitmapWithControlCharacters, 128);
+        let arrayBuffer = new ArrayBuffer(128);
+        let bitmap : Bitmap = new Uint8Array(arrayBuffer);
+        let bitmapWithControlCharacters = rastrifyText(text, bitmap);
+        return expandControlCharacters(bitmapWithControlCharacters);
     },
     _testing: {
         rastrifyText
     }
 };
 
-function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlCharacters, width: number) : Bitmap {
+function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlCharacters) : Bitmap {
     "use strict";
-    let arrayBuffer = new ArrayBuffer(width);
-    let bufferView : Uint8Array = new Uint8Array(arrayBuffer);
-    bufferView.set(bitmapWithControlCharacters.bitmap);
     for (let renderControlAtPosition of bitmapWithControlCharacters.renderControls) {
-        renderModifiers[renderControlAtPosition.character].render(bufferView, renderControlAtPosition, bitmapWithControlCharacters.bitmap.length);
+        renderModifiers[renderControlAtPosition.character].render(bitmapWithControlCharacters.bitmap, renderControlAtPosition, bitmapWithControlCharacters.clip);
     }
-    return bufferView;
+    return bitmapWithControlCharacters.bitmap;
 }
 
-function rastrifyText(text : string) : BitmapWithControlCharacters  {
+function rastrifyText(text : string, bitmap: Bitmap) : BitmapWithControlCharacters  {
     "use strict";
     let glyphs : Array<FontCharSpec> = [];
     let controlCharacterMap : ControlCharacterMap = [];
@@ -59,7 +58,7 @@ function rastrifyText(text : string) : BitmapWithControlCharacters  {
     let renderControlsAtPositions : RenderControlMap = [];
     let glyphsAtPosition : Array<GlyphAtPosition> = [];
 
-    let glyphBufferSize = glyphs.map(glyph => glyph.width).reduce((accumulator, currentValue, currentIndex, array) => {
+    let glyphsCombinedWidth = glyphs.map(glyph => glyph.width).reduce((accumulator, currentValue, currentIndex, array) => {
         let controlCharacterAtPosition = controlCharacterMap.find(controlCharacterAtPosition => controlCharacterAtPosition.position === currentIndex);
         if (controlCharacterAtPosition) {
             renderControlsAtPositions.push({x: accumulator, character: controlCharacterAtPosition.character});
@@ -69,12 +68,9 @@ function rastrifyText(text : string) : BitmapWithControlCharacters  {
         return accumulator + currentValue + (isLast ? 0 : 1);
     }, 0);
 
-    let arrayBuffer = new ArrayBuffer(glyphBufferSize);
-    let bufferView = new Uint8Array(arrayBuffer);
+    glyphsAtPosition.forEach(glyphAtPosition => bitmap.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x));
 
-    glyphsAtPosition.forEach(glyphAtPosition => bufferView.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x));
-
-    return new BitmapWithControlCharacters(bufferView, renderControlsAtPositions);
+    return new BitmapWithControlCharacters(bitmap, renderControlsAtPositions, glyphsCombinedWidth);
 }
 
 type ControlCharacterAtPosition = {position: number, character: string};
