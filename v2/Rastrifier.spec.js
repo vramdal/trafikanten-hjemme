@@ -74,4 +74,33 @@ describe('Rastrifier', () => {
             expect(bitmapTo8Lines(result)).to.equal(expectedResult);
         });
     });
+    describe('cutoff', () => {
+        it('should cut off a message after a number of pixels', () => {
+            let expectedResult = `································································································································
+█···█·······██··██··············································································································
+█···█··███···█···█···███······█···█··███························································································
+█████·█···█··█···█··█···█·····█···█·█···························································································
+█···█·█████··█···█··█···█·····█·█·█·█···························································································
+█···█·█······█···█··█···█·····█·█·█·█···························································································
+█···█··███··███·███··███·······█·█···███························································································
+································································································································`;
+           let message = "\x11\50Hello world!";
+           let result = Rastrifier.rastrify(message);
+           expect(bitmapTo8Lines(result)).to.equal(expectedResult);
+        });
+    });
+
+    describe('isControlSequenceStart', () => {
+        describe('how it decides how many characters a renderModifier specification takes', () => {
+            it('should return 0 when first nibble is 0', () => {
+               expect(Rastrifier._testing.isControlSequenceStart("\x01")).to.equal(1);
+            });
+            it('should return 1 when first nibble is 1', () => {
+                expect(Rastrifier._testing.isControlSequenceStart("\x11")).to.equal(2);
+            });
+            it('should return undefined when on unsupported control character', () => {
+                expect(Rastrifier._testing.isControlSequenceStart("\x09")).to.equal(undefined);
+            });
+        });
+    });
 });

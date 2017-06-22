@@ -2,8 +2,10 @@
 /**
  * An X by 8 pixel bitmap
  */
+//import type {RenderModifier} from './Rastrifier.js';
+import type {Char} from './SimpleTypes.js';
 export type Bitmap = Uint8Array;
-export type RenderControlAtPosition = {x: number, character: string};
+export type RenderControlAtPosition = {x: number, character: Char, parameters: string};
 
 export type RenderControlMap = Array<RenderControlAtPosition>;
 
