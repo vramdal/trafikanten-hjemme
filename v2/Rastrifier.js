@@ -4,7 +4,7 @@ const BitmapWithControlCharacters = require("./BitmapWithControlCharacters");
 import type {Bitmap, RenderControlAtPosition, RenderControlMap} from './BitmapWithControlCharacters';
 import type {FontCharSpec} from './font';
 import type {Char} from './SimpleTypes';
-const TabRenderModifier = require("./rendermodifiers/TabRenderModifier");
+const TabRenderModifier = require("./rendermodifiers/AlignRightRenderModifier");
 const AlignCenterRenderModifier = require("./rendermodifiers/AlignCenterRenderModifier");
 
 export interface RenderModifier {
@@ -12,7 +12,8 @@ export interface RenderModifier {
 }
 
 const renderModifiers : {[Char] : RenderModifier} = {
-    "\t": new TabRenderModifier(), "\x01": new AlignCenterRenderModifier()
+    "\x01": new TabRenderModifier(),
+    "\x02": new AlignCenterRenderModifier()
 };
 
 function isControlCharacter(str : string) {
