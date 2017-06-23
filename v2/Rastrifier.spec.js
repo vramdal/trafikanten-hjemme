@@ -24,7 +24,7 @@ describe('Rastrifier', () => {
         let message = "Hello world!";
         let result = Rastrifier.rastrify(message);
         let hex = Buffer.from(result).toString('hex');
-
+        console.log("hex = ", hex);
         expect(result[0]).to.equal(0x7e);
         expect(bitmapTo8Lines(result)).to.equal(expectedResult);
     });
