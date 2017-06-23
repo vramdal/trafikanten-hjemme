@@ -20,11 +20,9 @@ class Frame {
     }
 
     _updateView() {
-        let start = this._source.byteOffset + this._scrollOffset;
-        let end = start + this._width;
+        let start = this._source.byteOffset - this._scrollOffset;
         // TODO: What to do when scrolling out of buffer;
-        // TODO: Why does length of the Uint8Array become 1819?
-        this._bitmap = new Uint8Array(this._source.buffer, start, end);
+        this._bitmap = new Uint8Array(this._source.buffer, start, this._width);
     }
 
     get bitmap(): Bitmap {
