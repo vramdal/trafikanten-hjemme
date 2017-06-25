@@ -62,8 +62,36 @@ describe('Frame', () => {
             expect(bitmapTo8Lines(frame.bitmap)).to.equal(expected);
             let hex = Buffer.from(frame.bitmap).toString('hex');
             expect(hex).to.equal(expectedHex);
-
         });
+        it('should have a blank screen when completed scrolling left', () => {
+            let frame = new Frame(128, bitmap);
+            frame.scroll(-128);
+            bitmapTo8Lines(frame.bitmap);
+            let hex = Buffer.from(frame.bitmap).toString('hex');
+            expect(hex).to.equal("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+        });
+        it('should have a blank screen when completed scrolling right', () => {
+            let frame = new Frame(128, bitmap);
+            frame.scroll(128);
+            bitmapTo8Lines(frame.bitmap);
+            let hex = Buffer.from(frame.bitmap).toString('hex');
+            expect(hex).to.equal("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+        });
+/*
+        it('should scroll', (done) => {
+            let frame = new Frame(128, bitmap);
+            let count = 0;
+            setInterval(() => {
+                "use strict";
+                count++;
+                frame.scroll(-1);
+                bitmapTo8Lines(frame.bitmap);
+                if (count >= 1000) {
+                    done();
+                }
+            }, 100);
+        }).timeout(60000);
+*/
     });
 
 });

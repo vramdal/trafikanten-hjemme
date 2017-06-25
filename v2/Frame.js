@@ -22,6 +22,8 @@ class Frame {
                 }
                 if (idx !== undefined) {
                     return this.getByIdx(idx);
+                } else if (propertyKey === "length") {
+                    return _this.width;
                 } else {
                     return Reflect.get(target, propertyKey, target);
                 }
@@ -50,7 +52,18 @@ class Frame {
     }
 
     scroll(delta : number) {
+        let min = -1 * this._source.length;
+        let max = this._width;
         this._scrollOffset += delta;
+        if (this._scrollOffset < min) {
+            this._scrollOffset = max;
+        } else if (this._scrollOffset > max) {
+            this._scrollOffset = min;
+        }
+    }
+
+    get width(): number {
+        return this._width;
     }
 
     get bitmap(): Bitmap {
