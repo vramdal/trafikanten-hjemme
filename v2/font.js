@@ -26,6 +26,15 @@ function init() {
         characters.push(fontCharSpec);
     }
 
+    registerCharacter('…', 5,
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "X X X",
+            "     ");
     registerCharacter('!', 5,
             "     ",
             "  X  ",
