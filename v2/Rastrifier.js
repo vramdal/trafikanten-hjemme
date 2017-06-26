@@ -38,10 +38,8 @@ function isControlSequenceStart(ch : Char) {
 }
 
 module.exports =  {
-    rastrify: function(text : string) : Bitmap {
-        let arrayBuffer = new ArrayBuffer(128);
-        let bitmap : Bitmap = new Uint8Array(arrayBuffer);
-        let bitmapWithControlCharacters = rastrifyText(text, bitmap);
+    rastrify: function(text : string, frameWidth: number = 128) : Bitmap { // TODO: Don't assume 128
+        let bitmapWithControlCharacters = rastrifyText(text, frameWidth);
         return expandControlCharacters(bitmapWithControlCharacters);
     },
     _testing: {
@@ -59,7 +57,7 @@ function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlC
     return bitmapWithControlCharacters.bitmap;
 }
 
-function rastrifyText(text : string, bitmap: Bitmap) : BitmapWithControlCharacters  {
+function rastrifyText(text : string, frameWidth : number) : BitmapWithControlCharacters  {
     "use strict";
     let glyphs : Array<FontCharSpec> = [];
     let controlCharacterMap : ControlCharacterMap = [];
@@ -93,6 +91,9 @@ function rastrifyText(text : string, bitmap: Bitmap) : BitmapWithControlCharacte
         let isLast = currentIndex >= array.length - 1;
         return accumulator + currentValue + (isLast ? 0 : 1);
     }, 0);
+    let arrayBuffer = new ArrayBuffer(Math.max(glyphsCombinedWidth, frameWidth));
+    let bitmap : Bitmap = new Uint8Array(arrayBuffer);
+
 
     glyphsAtPosition.forEach(glyphAtPosition => bitmap.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x));
 

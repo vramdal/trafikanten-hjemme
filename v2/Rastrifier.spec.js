@@ -42,7 +42,7 @@ describe('Rastrifier', () => {
 ································································································································`;
             "use strict";
             let message = "Hello\x01world!";
-            let result = Rastrifier.rastrify(message);
+            let result = Rastrifier.rastrify(message, 128);
             let hex = Buffer.from(result).toString('hex');
             //console.log(hex);
             expect(bitmapTo8Lines(result)).to.equal(expectedResult);
@@ -50,14 +50,6 @@ describe('Rastrifier', () => {
             expect(result[126]).to.equal(0x00);
             expect(result[127]).to.equal(0x00);
         });
-        /*
-         it('should cut the left part when there\'s not enough space', () => {
-         "use strict";
-         let message = "So long and thanks for all the\tfish";
-         let result = Rastrifier.rastrify(message);
-         bitmapTo8Lines(result);
-         });
-         */
         it('should center a short message', () => {
             "use strict";
             let expectedResult =
