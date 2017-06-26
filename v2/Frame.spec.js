@@ -75,23 +75,31 @@ describe('Frame', () => {
             frame.scroll(128);
             bitmapTo8Lines(frame.bitmap);
             let hex = Buffer.from(frame.bitmap).toString('hex');
-            expect(hex).to.equal("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+            expect(hex).to.equal("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+            expect(frame.bitmap.length).to.equal(128);
         });
-/*
-        it('should scroll', (done) => {
+        it('should fill with whitespace when the source is smaller than the frame', () => {
+            let imageHex = "7e1010107e001c2a2a2a1800427e0200427e02001c2222221c00000000003c020c023c001c2222221c003e10202000427e02000c12127e0000007a";
+            let bitmap = Buffer.from(imageHex, "hex");
             let frame = new Frame(128, bitmap);
-            let count = 0;
-            setInterval(() => {
+            frame.scroll(+1);
+            expect(frame.bitmap.length).to.equal(128);
+            bitmapTo8Lines(frame.bitmap);
+        });
+        it('should scroll around', () => {
+            let imageHex = "7e1010107e001c2a2a2a1800427e0200427e02001c2222221c00000000003c020c023c001c2222221c003e10202000427e02000c12127e0000007a";
+            let bitmap = Buffer.from(imageHex, "hex");
+            let frame = new Frame(128, bitmap);
+            frame.scroll(-1 * bitmap.length - 1);
+            frame.scroll(-1);
+            bitmapTo8Lines(frame.bitmap);
+            expect(frame.bitmap[127]).to.equal(0x7e);
+            let sum = frame.bitmap.subarray(0,127).reduce((previousValue, currentValue) => {
                 "use strict";
-                count++;
-                frame.scroll(-1);
-                bitmapTo8Lines(frame.bitmap);
-                if (count >= 1000) {
-                    done();
-                }
-            }, 100);
-        }).timeout(60000);
-*/
+                return previousValue + currentValue;
+            }, 0);
+            expect(sum).to.equal(0);
+        });
     });
 
 });

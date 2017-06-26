@@ -13,6 +13,13 @@ class Frame {
         this._source = source;
         this._scrollOffset = 0;
         this._bitmap = new Proxy(new Uint8Array(this._source.buffer, this._source.byteOffset, this._source.length), {
+            subarray: function(begin = 0, end = _this._width) {
+                let result = new Array(end - begin);
+                for (let i = begin; i < end; i++) {
+                    result[i] = _this._getAdjustedByScrollOffset(i);
+                }
+                return result;
+            },
             get: function(target, propertyKey) {
                 let idx;
                 if (typeof propertyKey === "string" && !isNaN(parseInt(propertyKey))) {
@@ -22,8 +29,16 @@ class Frame {
                 }
                 if (idx !== undefined) {
                     return this.getByIdx(idx);
+                } else if (propertyKey === "toString") {
+                    return () => {
+                        let leftPads = Math.min(_this._scrollOffset, 0);
+                        let rightPads = Math.max(_this._width, _this._width - _this._source.length);
+                        return new Array(leftPads).join(",") + target.join(", ") + new Array(rightPads).join(",");
+                    }
                 } else if (propertyKey === "length") {
                     return _this.width;
+                } else if (this[propertyKey]) {
+                    return this[propertyKey];
                 } else {
                     return Reflect.get(target, propertyKey, target);
                 }
