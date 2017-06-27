@@ -2,16 +2,27 @@
 
 import type {Bitmap} from "./BitmapWithControlCharacters";
 
+/**
+ * When the returned number is 0, the scroll has completed a full cycle
+ */
+export type ScrollPromise = Promise<number>;
+
 class Frame {
     _width : number;
     _scrollOffset: number;
     _source: Bitmap;
     _bitmap: Bitmap;
+    _x: number;
 
-    constructor(width : number, source : Bitmap) {
+    constructor(x: number, width : number) {
+        this._x = x;
         this._width = width;
+    }
+
+    setBitmap(source: Bitmap) {
         this._source = source;
         this._scrollOffset = 0;
+        let _this = this;
         this._bitmap = new Proxy(new Uint8Array(this._source.buffer, this._source.byteOffset, this._source.length), {
             subarray: function(begin = 0, end = _this._width) {
                 let result = new Array(end - begin);
@@ -47,7 +58,6 @@ class Frame {
                 return _this._getAdjustedByScrollOffset(idx);
             }
         });
-        let _this = this;
     }
 
     _getAdjustedByScrollOffset(idx : number) {
@@ -75,6 +85,13 @@ class Frame {
         } else if (this._scrollOffset > max) {
             this._scrollOffset = min;
         }
+    }
+
+    tick() : ScrollPromise {
+        return new Promise((resolve) => {
+            this.scroll(-1);
+            resolve(this._width + this._source.length + this._width + this._scrollOffset);
+        });
     }
 
     get width(): number {
