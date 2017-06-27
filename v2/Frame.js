@@ -6,6 +6,7 @@ import type {Bitmap} from "./BitmapWithControlCharacters";
  * When the returned number is 0, the scroll has completed a full cycle
  */
 export type ScrollPromise = Promise<number>;
+export type Layout = Array<Frame>;
 
 class Frame {
     _width : number;
