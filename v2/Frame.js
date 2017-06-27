@@ -78,6 +78,9 @@ class Frame {
     }
 
     scroll(delta : number) {
+        if (!this._source) {
+            throw new Error("No source bitmap set for frame");
+        }
         let min = -1 * this._source.length;
         let max = this._width;
         this._scrollOffset += delta;
@@ -89,9 +92,13 @@ class Frame {
     }
 
     tick() : ScrollPromise {
-        return new Promise((resolve) => {
-            this.scroll(-1);
-            resolve(this._width + this._source.length + this._width + this._scrollOffset);
+        return new Promise((resolve, reject) => {
+            try {
+                this.scroll(-1);
+                return resolve(this._width + this._source.length + this._width + this._scrollOffset);
+            } catch (e) {
+                return reject(e);
+            }
         });
     }
 

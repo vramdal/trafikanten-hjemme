@@ -6,7 +6,6 @@ import type {FontCharSpec} from './font';
 import type {Char} from './SimpleTypes';
 const TabRenderModifier = require("./rendermodifiers/AlignRightRenderModifier");
 const AlignCenterRenderModifier = require("./rendermodifiers/AlignCenterRenderModifier");
-const CutoffRenderModifier =  require("./rendermodifiers/CutoffRenderModifier");
 
 export interface RenderModifier {
     render(bufferView: Uint8Array, renderControlAtPosition: RenderControlAtPosition, contentPixelLength: number) : void
@@ -16,14 +15,7 @@ type RenderModifierFactory = (parameters : ?string) => RenderModifier;
 
 const renderModifiers : {[Char] : RenderModifierFactory} = {
     "\x01": () => new TabRenderModifier(),
-    "\x02": () => new AlignCenterRenderModifier(),
-    "\x11": (parameters) => {
-        if (parameters) {
-            return new CutoffRenderModifier((parameters: string).charCodeAt(0))
-        } else {
-            throw new Error("Missing parameters");
-        }
-    }
+    "\x02": () => new AlignCenterRenderModifier()
 };
 
 /**
@@ -38,7 +30,7 @@ function isControlSequenceStart(ch : Char) {
 }
 
 module.exports =  {
-    rastrify: function(text : string, frameWidth: number = 128) : Bitmap { // TODO: Don't assume 128
+    rastrify: function(text : string, frameWidth: number = 128) : Array<Bitmap> { // TODO: Don't assume 128
         let bitmapWithControlCharacters = rastrifyText(text, frameWidth);
         return expandControlCharacters(bitmapWithControlCharacters);
     },
@@ -47,14 +39,14 @@ module.exports =  {
     }
 };
 
-function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlCharacters) : Bitmap {
+function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlCharacters) : Array<Bitmap> {
     "use strict";
     for (let renderControlAtPosition of bitmapWithControlCharacters.renderControls) {
         let renderModifierFactory : RenderModifierFactory = renderModifiers[renderControlAtPosition.character];
         let renderModifier : RenderModifier = renderModifierFactory(renderControlAtPosition.parameters);
         renderModifier.render(bitmapWithControlCharacters.bitmap, renderControlAtPosition, bitmapWithControlCharacters.clip);
     }
-    return bitmapWithControlCharacters.bitmap;
+    return [bitmapWithControlCharacters.bitmap];
 }
 
 function rastrifyText(text : string, frameWidth : number) : BitmapWithControlCharacters  {
