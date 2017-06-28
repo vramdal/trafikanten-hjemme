@@ -167,6 +167,14 @@ describe('Frame', () => {
                 }
                 expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""))
             });
+            it('should display the end padding when scrolled past message', () => {
+               frame.scroll(-frameWidth-messageLength);
+               let result = getOffsetArray(frame);
+                expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""));
+            });
+        });
+        describe('when message is longer than frame width', () => {
+            // TODO
         });
 
     });
