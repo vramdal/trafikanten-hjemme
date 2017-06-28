@@ -5,10 +5,10 @@ import type {Bitmap} from "./BitmapWithControlCharacters";
 /**
  * When the returned number is 0, the scroll has completed a full cycle
  */
-export type ScrollPromise = Promise<number>;
+export type ScrollPromise = Promise<void>;
 export type Layout = Array<Frame>;
 
-class Frame {
+class Frame { // TODO: this should really be called ScrollFrame. Make abstract class.
     _width : number;
     _scrollOffset: number;
     _source: Bitmap;
@@ -81,25 +81,33 @@ class Frame {
         if (!this._source) {
             throw new Error("No source bitmap set for frame");
         }
-        let min = -1 * this._source.length;
-        let max = this._width;
-        this._scrollOffset += delta;
-        if (this._scrollOffset < min) {
-            this._scrollOffset = max;
-        } else if (this._scrollOffset > max) {
-            this._scrollOffset = min;
+        if (this.remainingScrollWidth > 0) {
+            this._scrollOffset += delta;
         }
+    }
+
+    get scrollWidth() : number {
+        return this._width * 2 + this._source.length;
+    }
+
+    //noinspection JSUnusedGlobalSymbols
+    resetScroll() {
+        this._scrollOffset = 0;
     }
 
     tick() : ScrollPromise {
         return new Promise((resolve, reject) => {
             try {
                 this.scroll(-1);
-                return resolve(this._width + this._source.length + this._width + this._scrollOffset);
+                return resolve();
             } catch (e) {
                 return reject(e);
             }
         });
+    }
+
+    get remainingScrollWidth() : number { // TODO: Only supports scrolling left for now
+        return Math.max(this.scrollWidth - Math.abs(this._scrollOffset), 0);
     }
 
     get width(): number {

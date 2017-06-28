@@ -20,6 +20,10 @@ class Message {
     get layout(): ?Layout {
         return this._layout;
     }
+
+    toString() {
+        return this._text;
+    }
 }
 
 module.exports = Message;

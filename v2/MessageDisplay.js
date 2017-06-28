@@ -13,7 +13,6 @@ class MessageDisplay {
     _renderedMessage: RenderedMessage;
     _framesThatArePlaying: Array<Frame>;
     _stop: boolean;
-    _error: Error;
 
     constructor(renderedMessage : RenderedMessage, layout : Layout) {
         this._renderedMessage = renderedMessage;
@@ -33,30 +32,18 @@ class MessageDisplay {
     scrollFrames() : CountdownPromise {
         return new Promise((resolve, reject) => {
             let frames = this._framesThatArePlaying.slice();
-            for (let i = 0; i < frames.length; i++) {
-                bitmapTo8Lines(frames[i].bitmap);
-            }
-            let maxUnitsRemaining = 0;
-            for (let i = 0; i < frames.length && !this._stop && !this._error; i++) {
-                let frame = frames[i];
-                maxUnitsRemaining = Math.max(maxUnitsRemaining, Math.abs(frame._scrollOffset));
-                frame.tick().then(unitsRemaining => {
-                    if (unitsRemaining <= 0) {
-                        let index = this._framesThatArePlaying.indexOf(frame);
-                        this._framesThatArePlaying.splice(index, 1);
-                    }
-                    maxUnitsRemaining = Math.max(maxUnitsRemaining, unitsRemaining);
-                }).catch(err => {
-                    this._error = err;
-                });
-            }
-            if (this._error) {
-                return reject(this._error);
-            } else if (this._stop) {
-                return reject(maxUnitsRemaining);
-            } else {
-                return resolve(maxUnitsRemaining);
-            }
+            let findMax = (acc, currentValue) => Math.max(acc, currentValue);
+            //let maxScrollWidth = frames.map(frame => frame.scrollWidth).reduce(findMax, 0);
+            let promises = frames.map(frame => frame.tick());
+            Promise.all(promises).then(() => {
+                this._framesThatArePlaying = frames.filter(frame => frame.remainingScrollWidth > 0);
+                let maxRemainingScrollWidth = frames.map(frame => frame.remainingScrollWidth).reduce(findMax, 0);
+                let dots = new Array(Math.abs(frames[0]._scrollOffset)).fill(".").join("");
+                process.stdout.write("Progress: " + dots + "\r");
+                resolve(maxRemainingScrollWidth);
+            }).catch((err) => {
+                return reject(err);
+            });
         });
     }
 }
