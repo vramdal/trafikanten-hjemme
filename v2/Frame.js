@@ -62,6 +62,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     _getAdjustedByScrollOffset(idx : number) {
+        // TODO: Fishy
         let max = this._width;
         let offsetIdx = idx - this._scrollOffset;
         if (idx < 0) {
@@ -116,6 +117,11 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
 
     get bitmap(): Bitmap {
         return this._bitmap;
+    }
+
+
+    get x(): number {
+        return this._x;
     }
 }
 

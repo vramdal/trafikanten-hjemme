@@ -1,9 +1,19 @@
 // @flow
+//export type EventTypes = $Keys<typeof EventTypeNames>;
 
 export type Char = string;
 //noinspection JSUnusedGlobalSymbols
-export const NEWLINE : Char = '\n';
+const NEWLINE : Char = '\n';
 //noinspection JSUnusedGlobalSymbols
-export const TAB : Char = '\t';
+const TAB : Char = '\t';
 //noinspection JSUnusedGlobalSymbols
-export const MESSAGE_PART_SEPARATOR : Char = '\0x1D';
+const MESSAGE_PART_SEPARATOR : Char = '\0x1D';
+
+
+const EventTypeNames = {
+    EVENT_BITMAP_UPDATED: "EVENT_BITMAP_UPDATED"
+};
+
+module.exports = {NEWLINE, TAB, MESSAGE_PART_SEPARATOR, EventTypeNames};
+
+

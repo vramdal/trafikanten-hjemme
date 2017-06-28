@@ -4,6 +4,8 @@ const MessageDisplay = require("./MessageDisplay");
 const Message = require("./Message.js");
 const rastrify = require("./Rastrifier.js").rastrify; // TODO: Inject rastrifier
 const Frame = require("./Frame.js");
+const Display = require("./Display.js");
+const DisplayEventEmitter = require("./DisplayEventEmitter.js");
 import type {Layout} from "./Frame.js";
 import type {RenderedMessage} from "./RenderedMessage";
 
@@ -12,8 +14,10 @@ class Playlist {
     _messages: Array<Message>;
     _playlistItemIdx: number ;
     _currentlyPlayingMessage : ?MessageDisplay;
+    _displayEventEmitter: DisplayEventEmitter;
 
-    constructor() {
+    constructor(displayEventEmitter : DisplayEventEmitter) {
+        this._displayEventEmitter = displayEventEmitter;
         this._playlistItemIdx = 0;
     }
 
@@ -26,7 +30,10 @@ class Playlist {
                     return preparedMessage.play()
                 })
                 .catch((err) => {throw err})
-                .then(() => {console.log("Done playing message")});
+                .then(() => {
+                    console.log("Done playing message");
+                }
+            );
         });
         return promise; // A promise that be resolved when all messages have been played
     }
@@ -34,11 +41,11 @@ class Playlist {
     //noinspection JSMethodCanBeStatic
     prepareMessage(message : Message) : MessageDisplay {
         let renderedMessage : RenderedMessage = rastrify(message.text);
-        let layout : Layout = [new Frame(0, 10)]; // TODO: Extract from message
+        let layout : Layout = [new Frame(0, 20)]; // TODO: Extract from message
         for (let i = 0; i < layout.length; i++) {
             layout[i].setBitmap(renderedMessage[i]);
         }
-        return new MessageDisplay(renderedMessage, layout);
+        return new MessageDisplay(renderedMessage, layout, this._displayEventEmitter);
 
     }
 

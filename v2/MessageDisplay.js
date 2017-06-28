@@ -2,10 +2,10 @@
 const Ticker = require("./Ticker.js");
 const Frame = require("./Frame.js");
 import type {CountdownPromise} from "./Ticker";
-const bitmapTo8Lines = require("./BitmapUtil").bitmapTo8Lines;
+const DisplayEventEmitter = require("./DisplayEventEmitter.js");
+const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
 import type {Layout} from "./Frame.js";
 import type {RenderedMessage} from "./RenderedMessage.js";
-
 
 class MessageDisplay {
 
@@ -13,9 +13,11 @@ class MessageDisplay {
     _renderedMessage: RenderedMessage;
     _framesThatArePlaying: Array<Frame>;
     _stop: boolean;
+    _displayEventEmitter: DisplayEventEmitter;
 
-    constructor(renderedMessage : RenderedMessage, layout : Layout) {
+    constructor(renderedMessage : RenderedMessage, layout : Layout, display : DisplayEventEmitter) {
         this._renderedMessage = renderedMessage;
+        this._displayEventEmitter = display;
         this._ticker = new Ticker(100, this.scrollFrames.bind(this));
         this._framesThatArePlaying = layout.map(frame => frame);
         this._stop = false;
@@ -40,6 +42,7 @@ class MessageDisplay {
                 let maxRemainingScrollWidth = frames.map(frame => frame.remainingScrollWidth).reduce(findMax, 0);
                 let dots = new Array(Math.abs(frames[0]._scrollOffset)).fill(".").join("");
                 process.stdout.write("Progress: " + dots + "\r");
+                this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_UPDATED, frames);
                 resolve(maxRemainingScrollWidth);
             }).catch((err) => {
                 return reject(err);
