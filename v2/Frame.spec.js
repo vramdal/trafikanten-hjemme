@@ -114,4 +114,61 @@ describe('Frame', () => {
         });
     });
 
+    describe('getAdjustedByScrollOffset', () => {
+        function getOffsetArray(frame) {
+            let array = new Array(frame.width);
+            for (let i = 0; i < array.length; i++) {
+                array[i] = frame._getAdjustedByScrollOffset(i);
+            }
+            return {array, hex: array.map(byte => numToPaddedHex(byte)).join("")};
+        }
+
+        function numToPaddedHex(num) {
+            "use strict";
+            let h = (num).toString(16);
+            return h.length % 2 ? '0' + h : h;
+        }
+
+        describe('when message is shorter than frame width', () => {
+
+            let imageHex = "";
+            let expectedArray;
+            const messageLength = 1;
+            for (let i = 1; i < messageLength + 1; i++) {
+                imageHex += numToPaddedHex(i);
+            }
+            let bitmap = Buffer.from(imageHex, "hex");
+            let frame;
+            const frameWidth = 3;
+            beforeEach(() => {
+                "use strict";
+                frame = new Frame(0, frameWidth);
+                frame.setBitmap(bitmap);
+                expectedArray = new Array(frameWidth).fill(0);
+            });
+
+
+            it('should display only padding when not scrolled', () => {
+                "use strict";
+                let result = getOffsetArray(frame);
+                expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""));
+            });
+            it('should start displaying content from the right when scrolling', () => {
+                frame.scroll(-1);
+                let result = getOffsetArray(frame);
+                expectedArray[expectedArray.length - 1] = 1;
+                expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""))
+            });
+            it('should display the entire message when scrolled to content start', () => {
+                frame.scroll(-frameWidth);
+                let result = getOffsetArray(frame);
+                for (let i = 0; i < bitmap.length; i++) {
+                    expectedArray[i] = bitmap[i];
+                }
+                expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""))
+            });
+        });
+
+    });
+
 });

@@ -62,19 +62,18 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     _getAdjustedByScrollOffset(idx : number) {
-        // TODO: Fishy
-        let max = this._width;
-        let offsetIdx = idx - this._scrollOffset;
-        if (idx < 0) {
-            throw new RangeError("Out of range: " + idx);
-        } else if (idx > max) {
-            throw new RangeError(`Out of range: ${idx}, max is ${max}`);
-        } else if (offsetIdx < 0) {
+        let contentStart = this._width;
+        let contentEnd = contentStart + this._source.length;
+        let end = contentEnd + this._width;
+
+        let offsetIdx = idx + this._scrollOffset * -1;
+
+        if (offsetIdx < contentStart) {
             return 0;
-        } else if (offsetIdx > this._width) {
+        } else if (offsetIdx < contentEnd) {
+            return this._source[offsetIdx - contentStart];
+        } else if (offsetIdx < end) {
             return 0;
-        } else {
-            return this._source[offsetIdx];
         }
     }
 
