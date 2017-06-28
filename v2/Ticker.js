@@ -4,10 +4,11 @@ export type CountdownPromise = Promise<number>;
 
 class Ticker {
     _interval: number;
-    _timer: number;
+    _timer: ?number;
     _func: () => CountdownPromise;
     _promise: Promise<any>;
     _resolver: () => void;
+    _rejecter: (err: Error) => void;
 
     constructor(interval: number, func: () => CountdownPromise) {
         this._interval = interval;
@@ -15,23 +16,43 @@ class Ticker {
     }
 
     countdown() : Promise<any> {
-        this._promise = new Promise(resolve => {
+        this._promise = new Promise((resolve, reject) => {
             this._resolver = resolve;
+            this._rejecter = reject;
         });
         this._timer = setInterval(this.tick.bind(this), this._interval);
         return this._promise;
     }
 
     stop() {
-        clearInterval(this._timer);
+        if (this._timer) {
+            clearInterval(this._timer);
+        }
+        this._timer = undefined;
+    }
+
+    _resolve() {
+        this.stop();
+        this._resolver();
+    }
+
+    _reject(err : Error) {
+        this.stop();
+        this._rejecter(err);
     }
 
     tick() {
-        this._func().then(remainingUnits => {
-            if (remainingUnits <= 0) {
-                this._resolver();
-            }
-        }).catch(err => Promise.reject(err));
+        try {
+            this._func().then(remainingUnits => {
+                if (remainingUnits <= 0) {
+                    this._resolve();
+                }
+            }).catch(err => {
+                this._reject(err);
+            });
+        } catch (err) {
+            this._reject(err);
+        }
     }
 
 }
