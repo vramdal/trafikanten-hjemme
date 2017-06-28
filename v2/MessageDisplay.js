@@ -39,6 +39,7 @@ class MessageDisplay {
             let maxUnitsRemaining = 0;
             for (let i = 0; i < frames.length && !this._stop && !this._error; i++) {
                 let frame = frames[i];
+                maxUnitsRemaining = Math.max(maxUnitsRemaining, Math.abs(frame._scrollOffset));
                 frame.tick().then(unitsRemaining => {
                     if (unitsRemaining <= 0) {
                         let index = this._framesThatArePlaying.indexOf(frame);
