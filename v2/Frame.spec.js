@@ -100,18 +100,18 @@ describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
             let bitmap = Buffer.from(imageHex, "hex");
             let frame = new Frame(0, 128);
             frame.setBitmap(bitmap);
-            let startingRemainingScrollWidth = bitmap.length + 128 * 2;
+            let startingRemainingScrollWidth = bitmap.length + 128;
             expect(frame.scrollWidth).to.equal(startingRemainingScrollWidth);
             expect(frame.remainingScrollWidth).to.equal(startingRemainingScrollWidth); // 315
             frame.scroll(-1);
             expect(frame._scrollOffset).to.equal(-1);
-            expect(frame.remainingScrollWidth).to.equal(314);
+            expect(frame.remainingScrollWidth).to.equal(186);
             expect(frame.scrollWidth).to.equal(startingRemainingScrollWidth);
             frame.scroll(-314);
             expect(frame.remainingScrollWidth).to.equal(0);
             frame.scroll(-1);
             expect(frame.remainingScrollWidth).to.equal(0);
-            expect(frame._scrollOffset).to.equal(-startingRemainingScrollWidth);
+            expect(frame._scrollOffset).to.equal(-startingRemainingScrollWidth - 128) ;
 
         });
     });

@@ -107,7 +107,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get remainingScrollWidth() : number { // TODO: Only supports scrolling left for now
-        return this.scrollWidth - Math.abs(this._scrollOffset);
+        return Math.max(this.scrollWidth - Math.abs(this._scrollOffset), 0);
     }
 
     get animationComplete() : boolean {
