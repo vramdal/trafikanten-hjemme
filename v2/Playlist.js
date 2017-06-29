@@ -6,7 +6,10 @@ const rastrify = require("./Rastrifier.js").rastrify; // TODO: Inject rastrifier
 const Frame = require("./Frame.js");
 const Display = require("./Display.js");
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
+const Scrolling = require("./animations/Scrolling.js");
+const NoAnimation = require("./animations/NoAnimation.js");
 import type {Layout} from "./Frame.js";
+import type {Animation} from "./animations/Animation";
 import type {RenderedMessage} from "./RenderedMessage";
 
 class Playlist {
@@ -42,8 +45,10 @@ class Playlist {
     prepareMessage(message : Message) : MessageDisplay {
         let frameStart = 0; // TODO: Extract from message
         let frameWidth = 20; // TODO: Extract from message
+        let animation : Animation = new Scrolling(); // TODO: Extract from message
+        //let animation : Animation = new NoAnimation(10); // TODO: Extract from message
         let renderedMessage : RenderedMessage = rastrify(message.text, frameWidth);
-        let layout : Layout = [new Frame(frameStart, frameWidth)];
+        let layout : Layout = [new Frame(frameStart, frameWidth, animation)];
         for (let i = 0; i < layout.length; i++) {
             layout[i].setBitmap(renderedMessage[i]);
         }
