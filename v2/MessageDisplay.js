@@ -36,7 +36,7 @@ class MessageDisplay {
             let frames = this._framesThatArePlaying.slice();
             let promises = frames.map(frame => frame.tick());
             Promise.all(promises).then(() => {
-                this._framesThatArePlaying = frames.filter(frame => frame.animationComplete);
+                this._framesThatArePlaying = frames.filter(frame => !frame.animationComplete);
                 this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_UPDATED, frames);
                 resolve(this._framesThatArePlaying.length);
             }).catch((err) => {
