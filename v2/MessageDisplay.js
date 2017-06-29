@@ -34,16 +34,11 @@ class MessageDisplay {
     scrollFrames() : CountdownPromise {
         return new Promise((resolve, reject) => {
             let frames = this._framesThatArePlaying.slice();
-            let findMax = (acc, currentValue) => Math.max(acc, currentValue);
-            //let maxScrollWidth = frames.map(frame => frame.scrollWidth).reduce(findMax, 0);
             let promises = frames.map(frame => frame.tick());
             Promise.all(promises).then(() => {
-                this._framesThatArePlaying = frames.filter(frame => frame.remainingScrollWidth > 0);
-                let maxRemainingScrollWidth = frames.map(frame => frame.remainingScrollWidth).reduce(findMax, 0);
-                let dots = new Array(Math.abs(frames[0]._scrollOffset)).fill(".").join("");
-                process.stdout.write("Progress: " + dots + "\r");
+                this._framesThatArePlaying = frames.filter(frame => frame.animationComplete);
                 this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_UPDATED, frames);
-                resolve(maxRemainingScrollWidth);
+                resolve(this._framesThatArePlaying.length);
             }).catch((err) => {
                 return reject(err);
             });

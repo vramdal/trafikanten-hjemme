@@ -110,6 +110,10 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
         return this.scrollWidth - Math.abs(this._scrollOffset);
     }
 
+    get animationComplete() : boolean {
+        return this.remainingScrollWidth > 0;
+    }
+
     get width(): number {
         return this._width;
     }
