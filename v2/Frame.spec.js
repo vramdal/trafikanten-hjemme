@@ -3,7 +3,7 @@ const bitmapTo8Lines = require('./BitmapUtil').bitmapTo8Lines;
 const Frame = require("./Frame.js");
 const printRuler = require('./BitmapUtil').printRuler;
 
-describe('Frame', () => {
+describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
 
     beforeEach(() => {
         "use strict";
@@ -16,6 +16,7 @@ describe('Frame', () => {
     it('should display a bitmap when there is enough space', () => {
         let frame = new Frame(0, 128);
         frame.setBitmap(bitmap);
+        frame.scroll(-128);
         bitmapTo8Lines(frame.bitmap);
         let hex = Buffer.from(frame.bitmap).toString('hex');
         expect(hex).to.equal(imageHex);
@@ -25,6 +26,7 @@ describe('Frame', () => {
         it('should crop a bitmap to the desired length', () => {
             let frame = new Frame(0, 40);
             frame.setBitmap(bitmap);
+            frame.scroll(-40);
             let expectedHex = "7e1010107e001c2a2a2a1800427e0200427e02001c2222221c00000000003c020c023c001c222222";
             bitmapTo8Lines(frame.bitmap);
             let hex = Buffer.from(frame.bitmap).toString("hex");
@@ -33,7 +35,7 @@ describe('Frame', () => {
     });
 
     describe('scrolling', () => {
-        it('should scroll 10 left', () => {
+        it('should scroll 10 + width left', () => {
             let expected = `································································································································
 ··██··██·····························██·····█···█···············································································
 ···█···█···███······█···█··███··█·██··█·····█···█···············································································
@@ -45,7 +47,7 @@ describe('Frame', () => {
             let expectedHex = "1800427e0200427e02001c2222221c00000000003c020c023c001c2222221c003e10202000427e02000c12127e0000007a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
             let frame = new Frame(0, 128);
             frame.setBitmap(bitmap);
-            frame.scroll(-10);
+            frame.scroll(-10 - 128);
             expect(bitmapTo8Lines(frame.bitmap)).to.equal(expected);
             let hex = Buffer.from(frame.bitmap).toString('hex');
             expect(hex).to.equal(expectedHex);
@@ -62,7 +64,7 @@ describe('Frame', () => {
             let expectedHex = "000000000000000000007e1010107e001c2a2a2a1800427e0200427e02001c2222221c00000000003c020c023c001c2222221c003e10202000427e02000c12127e0000007a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
             let frame = new Frame(0, 128);
             frame.setBitmap(bitmap);
-            frame.scroll(10);
+            frame.scroll(10 - 128);
             expect(bitmapTo8Lines(frame.bitmap)).to.equal(expected);
             let hex = Buffer.from(frame.bitmap).toString('hex');
             expect(hex).to.equal(expectedHex);
@@ -70,7 +72,7 @@ describe('Frame', () => {
         it('should have a blank screen when completed scrolling left', () => {
             let frame = new Frame(0, 128);
             frame.setBitmap(bitmap);
-            frame.scroll(-128);
+            frame.scroll(-128 - bitmap.length);
             bitmapTo8Lines(frame.bitmap);
             let hex = Buffer.from(frame.bitmap).toString('hex');
             expect(hex).to.equal("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
@@ -129,24 +131,24 @@ describe('Frame', () => {
             return h.length % 2 ? '0' + h : h;
         }
 
-        describe('when message is shorter than frame width', () => {
-
+        let createBitmap = function (messageLength) {
             let imageHex = "";
-            let expectedArray;
-            const messageLength = 1;
             for (let i = 1; i < messageLength + 1; i++) {
                 imageHex += numToPaddedHex(i);
             }
-            let bitmap = Buffer.from(imageHex, "hex");
+            return Buffer.from(imageHex, "hex");
+        };
+
+        let runTests = function (messageLength, frameWidth) {
+            let expectedArray;
+            let bitmap = createBitmap(messageLength);
             let frame;
-            const frameWidth = 3;
             beforeEach(() => {
                 "use strict";
                 frame = new Frame(0, frameWidth);
                 frame.setBitmap(bitmap);
                 expectedArray = new Array(frameWidth).fill(0);
             });
-
 
             it('should display only padding when not scrolled', () => {
                 "use strict";
@@ -159,22 +161,32 @@ describe('Frame', () => {
                 expectedArray[expectedArray.length - 1] = 1;
                 expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""))
             });
-            it('should display the entire message when scrolled to content start', () => {
+            it('should display the beginning of message when scrolled to content start', () => {
                 frame.scroll(-frameWidth);
                 let result = getOffsetArray(frame);
-                for (let i = 0; i < bitmap.length; i++) {
+                for (let i = 0; i < bitmap.length && i < frame.width; i++) {
                     expectedArray[i] = bitmap[i];
                 }
                 expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""))
             });
             it('should display the end padding when scrolled past message', () => {
-               frame.scroll(-frameWidth-messageLength);
-               let result = getOffsetArray(frame);
+                frame.scroll(-frameWidth - messageLength);
+                let result = getOffsetArray(frame);
                 expect(result.hex).to.equal(expectedArray.map(numToPaddedHex).join(""));
             });
+        };
+
+        describe('when message is shorter than frame width', () => {
+
+            const messageLength = 1;
+            const frameWidth = 3;
+            runTests(messageLength, frameWidth);
         });
         describe('when message is longer than frame width', () => {
-            // TODO
+            const messageLength = 5;
+            const frameWidth = 3;
+            runTests(messageLength, frameWidth);
+
         });
 
     });
