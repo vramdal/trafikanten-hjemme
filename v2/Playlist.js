@@ -27,7 +27,7 @@ class Playlist {
             promise = promise.then(() => {
                     console.log("Playing message " + message.toString());
                     let preparedMessage = this.prepareMessage(message);
-                    return preparedMessage.play()
+                    return preparedMessage.play();
                 })
                 .catch((err) => {throw err})
                 .then(() => {
@@ -40,8 +40,10 @@ class Playlist {
 
     //noinspection JSMethodCanBeStatic
     prepareMessage(message : Message) : MessageDisplay {
-        let renderedMessage : RenderedMessage = rastrify(message.text);
-        let layout : Layout = [new Frame(0, 20)]; // TODO: Extract from message
+        let frameStart = 0; // TODO: Extract from message
+        let frameWidth = 20; // TODO: Extract from message
+        let renderedMessage : RenderedMessage = rastrify(message.text, frameWidth);
+        let layout : Layout = [new Frame(frameStart, frameWidth)];
         for (let i = 0; i < layout.length; i++) {
             layout[i].setBitmap(renderedMessage[i]);
         }

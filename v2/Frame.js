@@ -87,7 +87,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get scrollWidth() : number {
-        return this._width * 2 + this._source.length;
+        return this._width + this._source.length;
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -107,7 +107,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get remainingScrollWidth() : number { // TODO: Only supports scrolling left for now
-        return Math.max(this.scrollWidth - Math.abs(this._scrollOffset), 0);
+        return this.scrollWidth - Math.abs(this._scrollOffset);
     }
 
     get width(): number {

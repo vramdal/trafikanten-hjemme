@@ -30,7 +30,7 @@ function isControlSequenceStart(ch : Char) {
 }
 
 module.exports =  {
-    rastrify: function(text : string, frameWidth: number = 128) : Array<Bitmap> { // TODO: Don't assume 128
+    rastrify: function(text : string, frameWidth: number) : Array<Bitmap> {
         let bitmapWithControlCharacters = rastrifyText(text, frameWidth);
         return expandControlCharacters(bitmapWithControlCharacters);
     },
