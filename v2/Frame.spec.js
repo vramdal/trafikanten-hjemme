@@ -120,7 +120,7 @@ describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
         function getOffsetArray(frame) {
             let array = new Array(frame.width);
             for (let i = 0; i < array.length; i++) {
-                array[i] = frame._getAdjustedByScrollOffset(i);
+                array[i] = frame._getTranslated(i);
             }
             return {array, hex: array.map(byte => numToPaddedHex(byte)).join("")};
         }

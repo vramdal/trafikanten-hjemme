@@ -2,6 +2,8 @@
 //export type EventTypes = $Keys<typeof EventTypeNames>;
 
 export type Char = string;
+
+export type Byte = number;
 //noinspection JSUnusedGlobalSymbols
 const NEWLINE : Char = '\n';
 //noinspection JSUnusedGlobalSymbols

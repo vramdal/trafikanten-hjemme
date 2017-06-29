@@ -1,6 +1,8 @@
 // @flow
 
 import type {Bitmap} from "./BitmapWithControlCharacters";
+import type {Byte} from "./SimpleTypes";
+const BitmapProxy = require("./BitmapProxy.js");
 
 /**
  * When the returned number is 0, the scroll has completed a full cycle
@@ -12,7 +14,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     _width : number;
     _scrollOffset: number;
     _source: Bitmap;
-    _bitmap: Bitmap;
+    _bitmap: BitmapProxy;
     _x: number;
 
     constructor(x: number, width : number) {
@@ -23,45 +25,10 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     setBitmap(source: Bitmap) {
         this._source = source;
         this._scrollOffset = 0;
-        let _this = this;
-        this._bitmap = new Proxy(new Uint8Array(this._source.buffer, this._source.byteOffset, this._source.length), {
-            subarray: function(begin = 0, end = _this._width) {
-                let result = new Array(end - begin);
-                for (let i = begin; i < end; i++) {
-                    result[i] = _this._getAdjustedByScrollOffset(i);
-                }
-                return result;
-            },
-            get: function(target, propertyKey) {
-                let idx;
-                if (typeof propertyKey === "string" && !isNaN(parseInt(propertyKey))) {
-                    idx = parseInt(propertyKey, 10);
-                } else if (typeof propertyKey === "number") {
-                    idx = propertyKey;
-                }
-                if (idx !== undefined) {
-                    return this.getByIdx(idx);
-                } else if (propertyKey === "toString") {
-                    return () => {
-                        let leftPads = Math.min(_this._scrollOffset, 0);
-                        let rightPads = Math.max(_this._width, _this._width - _this._source.length);
-                        return new Array(leftPads).join(",") + target.join(", ") + new Array(rightPads).join(",");
-                    }
-                } else if (propertyKey === "length") {
-                    return _this.width;
-                } else if (this[propertyKey]) {
-                    return this[propertyKey];
-                } else {
-                    return Reflect.get(target, propertyKey, target);
-                }
-            },
-            getByIdx: function(idx) {
-                return _this._getAdjustedByScrollOffset(idx);
-            }
-        });
+        this._bitmap = new BitmapProxy(this._source, this._width, this._getTranslated.bind(this));
     }
 
-    _getAdjustedByScrollOffset(idx : number) {
+    _getTranslated(idx : number) : Byte {
         let contentStart = this._width;
         let contentEnd = contentStart + this._source.length;
         let end = contentEnd + this._width;
@@ -74,6 +41,8 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
             return this._source[offsetIdx - contentStart];
         } else if (offsetIdx < end) {
             return 0;
+        } else {
+            throw new Error("Out of range: " + idx);
         }
     }
 
@@ -123,7 +92,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get bitmap(): Bitmap {
-        return this._bitmap;
+        return (this._bitmap : any);
     }
 
 
