@@ -1,73 +1,33 @@
 // @flow
 
 import type {Bitmap} from "./BitmapWithControlCharacters";
-import type {Byte} from "./SimpleTypes";
-const BitmapProxy = require("./BitmapProxy.js");
+import type {Animation} from "./animations/Animation";
 
 /**
  * When the returned number is 0, the scroll has completed a full cycle
  */
-export type ScrollPromise = Promise<void>;
+export type AnimationTickPromise = Promise<void>;
 export type Layout = Array<Frame>;
 
 class Frame { // TODO: this should really be called ScrollFrame. Make abstract class.
     _width : number;
-    _scrollOffset: number;
-    _source: Bitmap;
-    _bitmap: BitmapProxy;
     _x: number;
+    _animation: Animation;
 
-    constructor(x: number, width : number) {
+    constructor(x: number, width : number, animation : Animation) {
         this._x = x;
         this._width = width;
+        this._animation = animation;
     }
 
     setBitmap(source: Bitmap) {
-        this._source = source;
-        this._scrollOffset = 0;
-        this._bitmap = new BitmapProxy(this._source, this._width, this._getTranslated.bind(this));
+        this._animation.setSource(source, this._width);
     }
 
-    _getTranslated(idx : number) : Byte {
-        let contentStart = this._width;
-        let contentEnd = contentStart + this._source.length;
-        let end = contentEnd + this._width;
-
-        let offsetIdx = idx + this._scrollOffset * -1;
-
-        if (offsetIdx < contentStart) {
-            return 0;
-        } else if (offsetIdx < contentEnd) {
-            return this._source[offsetIdx - contentStart];
-        } else if (offsetIdx < end) {
-            return 0;
-        } else {
-            throw new Error("Out of range: " + idx);
-        }
-    }
-
-    scroll(delta : number) {
-        if (!this._source) {
-            throw new Error("No source bitmap set for frame");
-        }
-        if (this.remainingScrollWidth > 0) {
-            this._scrollOffset += delta;
-        }
-    }
-
-    get scrollWidth() : number {
-        return this._width + this._source.length;
-    }
-
-    //noinspection JSUnusedGlobalSymbols
-    resetScroll() {
-        this._scrollOffset = 0;
-    }
-
-    tick() : ScrollPromise {
+    tick() : AnimationTickPromise {
         return new Promise((resolve, reject) => {
             try {
-                this.scroll(-1);
+                this._animation.tick();
                 return resolve();
             } catch (e) {
                 return reject(e);
@@ -75,16 +35,12 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
         });
     }
 
-    get remainingScrollWidth() : number { // TODO: Only supports scrolling left for now
-        return Math.max(this.scrollWidth - Math.abs(this._scrollOffset), 0);
-    }
-
     get animationComplete() : boolean {
-        return this.remainingScrollWidth === 0;
+        return this._animation.animationComplete;
     }
 
     get animationRemaining() : number {
-        return this.remainingScrollWidth / this.scrollWidth;
+        return this._animation.animationRemaining;
     }
 
     get width(): number {
@@ -92,9 +48,8 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get bitmap(): Bitmap {
-        return (this._bitmap : any);
+        return this._animation.bitmap;
     }
-
 
     get x(): number {
         return this._x;
