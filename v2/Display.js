@@ -32,7 +32,7 @@ class Display {
     onBitmapUpdated(layout : Layout) : void {
         let collage : Collage = new Collage(layout);
         collage.pasteTo(this._buffer);
-        BitmapUtil.bitmapTo8Lines(this._buffer);
+        //BitmapUtil.bitmapTo8Lines(this._buffer);
     }
 
 

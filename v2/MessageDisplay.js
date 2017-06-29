@@ -4,6 +4,7 @@ const Frame = require("./Frame.js");
 import type {CountdownPromise} from "./Ticker";
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+const ConsoleUtils = require("./ConsoleUtils.js");
 import type {Layout} from "./Frame.js";
 import type {RenderedMessage} from "./RenderedMessage.js";
 
@@ -24,7 +25,10 @@ class MessageDisplay {
     }
 
     play() : Promise<any> {
-        return this._ticker.countdown().then(() => Promise.resolve()).catch(err => Promise.reject(err));
+        return this._ticker.countdown().then(() => {
+            process.stdout.write("\n");
+            Promise.resolve();
+        }).catch(err => Promise.reject(err));
     }
 
     stop() {
@@ -35,8 +39,11 @@ class MessageDisplay {
         return new Promise((resolve, reject) => {
             let frames = this._framesThatArePlaying.slice();
             let promises = frames.map(frame => frame.tick());
+            let findMax = (acc, currentValue) => Math.max(acc, currentValue);
             Promise.all(promises).then(() => {
                 this._framesThatArePlaying = frames.filter(frame => !frame.animationComplete);
+                let animationRemaining = frames.map(frame => frame.animationRemaining).reduce(findMax);
+                ConsoleUtils.progressBar(1 - animationRemaining);
                 this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_UPDATED, frames);
                 resolve(this._framesThatArePlaying.length);
             }).catch((err) => {
