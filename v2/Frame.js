@@ -3,6 +3,7 @@
 import type {Bitmap} from "./BitmapWithControlCharacters";
 import type {Animation} from "./animations/Animation";
 
+const BitmapProxy = require("./BitmapProxy.js");
 /**
  * When the returned number is 0, the scroll has completed a full cycle
  */
@@ -13,6 +14,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     _width : number;
     _x: number;
     _animation: Animation;
+    _bitmap : Bitmap;
 
     constructor(x: number, width : number, animation : Animation) {
         this._x = x;
@@ -22,6 +24,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
 
     setBitmap(source: Bitmap) {
         this._animation.setSource(source, this._width);
+        this._bitmap = new BitmapProxy(source, this._width, this._animation.getTranslated.bind(this._animation));
     }
 
     tick() : AnimationTickPromise {
@@ -48,7 +51,7 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get bitmap(): Bitmap {
-        return this._animation.bitmap;
+        return this._bitmap;
     }
 
     get x(): number {

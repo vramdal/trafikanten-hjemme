@@ -35,7 +35,30 @@ function printRuler() {
     console.log(ruler);
 }
 
+function numToPaddedHex(num : number) : string {
+    "use strict";
+    let h = (num).toString(16);
+    return h.length % 2 ? '0' + h : h;
+}
+
+function getHexFingerprint(str : string) : string {
+    const lines = str.split("\n");
+    let width = lines[0].length;
+    let result = new Array(width).fill(0);
+    for (let x = 0; x < width; x++) {
+        let byte = 0;
+        let factor = 0x01;
+        for (let y = 0; y < 8; y++) {
+            let bit = lines[y][x] === "█" ? 1 : 0;
+            byte = byte | (bit * factor);
+            factor = factor * 2;
+        }
+        result[x] = byte;
+    }
+    return result.map(numToPaddedHex).join("");
+}
+
 
 module.exports = {
-    bitmapTo8Lines, printRuler
+    bitmapTo8Lines, printRuler, numToPaddedHex, getHexFingerprint
 };

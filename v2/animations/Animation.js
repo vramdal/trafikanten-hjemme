@@ -8,7 +8,7 @@ export interface Animation {
     tick() : void;
     reset() : void;
     getTranslated(idx : number) : Byte;
-    get bitmap() : Bitmap;
     get animationComplete() : boolean;
     get animationRemaining() : number;
+
 }
