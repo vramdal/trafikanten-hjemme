@@ -51,15 +51,8 @@ function rastrifyFrame(text : string, frameWidth : number) : Bitmap  {
 }
 
 module.exports =  {
-    rastrify: function(text : string, frameWidth: number = 128) : Array<Bitmap> {
-        let textParts = text.split(SimpleTypes.MESSAGE_PART_SEPARATOR);
-        // TODO: Parse Frame parameters
-        let bitmaps : Array<Bitmap> = [];
-        for (let textPart of textParts) {
-            let bitmap = rastrifyFrame(textPart, frameWidth);
-            bitmaps.push(bitmap);
-        }
-        return bitmaps;
+    rastrify: function(text : string, frameWidth: number = 128) : Bitmap {
+            return rastrifyFrame(text, frameWidth);
     },
     _testing: {
         rastrifyFrame, isControlSequenceStart : ControlCharacterProcessor._isControlSequenceStart

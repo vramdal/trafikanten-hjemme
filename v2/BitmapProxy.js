@@ -45,7 +45,6 @@ const classProxy = new Proxy(BitmapProxy, {
             let width : number = argumentsList[1];
             let getIdxTranslatedFunc : (idx : number) => Byte = argumentsList[2];
 */
-            console.log("This is the proxied constructor");
             return originalConstructor.apply(null, argumentsList);
 
             }

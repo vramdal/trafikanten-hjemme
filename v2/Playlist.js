@@ -2,12 +2,9 @@
 
 const MessageDisplay = require("./MessageDisplay");
 const Message = require("./Message.js");
-const rastrify = require("./Rastrifier.js").rastrify; // TODO: Inject rastrifier
 const Frame = require("./Frame.js");
 const Display = require("./Display.js");
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
-import type {Layout} from "./Frame.js";
-import type {RenderedMessage} from "./RenderedMessage";
 
 class Playlist {
 
@@ -41,16 +38,9 @@ class Playlist {
 
     //noinspection JSMethodCanBeStatic
     prepareMessage(message : Message) : MessageDisplay {
-        let frame = message.layout[0]; // TODO: Support multiple frames. Move logic to MessageDisplay
-        let frameStart = frame.x;
-        let frameWidth = frame.width;
-        let animation = frame._animation;
-        let renderedMessage : RenderedMessage = rastrify(message.text, frameWidth);
-        let layout : Layout = [new Frame(frameStart, frameWidth, animation)];
-        for (let i = 0; i < layout.length; i++) {
-            layout[i].setBitmap(renderedMessage[i]);
-        }
-        return new MessageDisplay(renderedMessage, layout, this._displayEventEmitter);
+        let messageDisplay = new MessageDisplay(message, this._displayEventEmitter);
+        messageDisplay.prepare();
+        return messageDisplay;
 
     }
 

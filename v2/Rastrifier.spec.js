@@ -22,7 +22,7 @@ describe('Rastrifier', () => {
 █···█··███··███·███··███·······█·█···███··█····███··███···█·····································································
 ································································································································`;
         let message = "Hello world!";
-        let result = Rastrifier.rastrify(message)[0];
+        let result = Rastrifier.rastrify(message);
         expect(result[0]).to.equal(0x7e);
         expect(bitmapTo8Lines(result)).to.equal(expectedResult);
     });
@@ -40,7 +40,7 @@ describe('Rastrifier', () => {
 ································································································································`;
             "use strict";
             let message = "Hello\x01world!";
-            let result = Rastrifier.rastrify(message, 128)[0];
+            let result = Rastrifier.rastrify(message, 128);
             let hex = Buffer.from(result).toString('hex');
             //console.log(hex);
             expect(bitmapTo8Lines(result)).to.equal(expectedResult);
@@ -60,7 +60,7 @@ describe('Rastrifier', () => {
 ·································█···█··███··███·███··███·······█·█···███··█····███··███···█····································
 ································································································································`;
             let message =  "\x02Hello world!";
-            let result = Rastrifier.rastrify(message, 128)[0];
+            let result = Rastrifier.rastrify(message, 128);
             expect(bitmapTo8Lines(result)).to.equal(expectedResult);
         });
     });
