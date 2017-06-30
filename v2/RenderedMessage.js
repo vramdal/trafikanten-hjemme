@@ -1,5 +1,5 @@
 // @flow
 
-import type {Bitmap} from "./BitmapWithControlCharacters";
+import type {Bitmap} from "./Bitmap";
 
 export type RenderedMessage = Array<Bitmap>;

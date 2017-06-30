@@ -1,6 +1,6 @@
 // @flow
 
-import type {Bitmap} from "./BitmapWithControlCharacters";
+import type {Bitmap} from "./Bitmap";
 import type {Byte} from "./SimpleTypes";
 
 function BitmapProxy(source: Bitmap, width: number, getIdxTranslatedFunc : (idx : number) => Byte) : Bitmap {

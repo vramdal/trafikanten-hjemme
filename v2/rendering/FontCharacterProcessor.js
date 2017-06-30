@@ -2,7 +2,7 @@
 
 import type {CharacterProcessor} from "./CharacterProcessor";
 import type {FontCharSpec, FontMap} from "../font";
-import type {Bitmap} from "../BitmapWithControlCharacters";
+import type {Bitmap} from "../Bitmap";
 
 type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 

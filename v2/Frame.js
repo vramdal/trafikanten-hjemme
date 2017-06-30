@@ -1,6 +1,6 @@
 // @flow
 
-import type {Bitmap} from "./BitmapWithControlCharacters";
+import type {Bitmap} from "./Bitmap";
 import type {Animation} from "./animations/Animation";
 
 const BitmapProxy = require("./BitmapProxy.js");
@@ -39,11 +39,11 @@ class Frame { // TODO: this should really be called ScrollFrame. Make abstract c
     }
 
     get animationComplete() : boolean {
-        return this._animation.animationComplete;
+        return this._animation.isAnimationComplete();
     }
 
     get animationRemaining() : number {
-        return this._animation.animationRemaining;
+        return this._animation.getAnimationRemaining();
     }
 
     get width(): number {

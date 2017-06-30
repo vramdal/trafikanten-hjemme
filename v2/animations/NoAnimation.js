@@ -1,7 +1,7 @@
 // @flow
 
 import type {Animation} from "./Animation";
-import type {Bitmap} from "../BitmapWithControlCharacters";
+import type {Bitmap} from "../Bitmap";
 
 class NoAnimation implements Animation {
     _source: Bitmap;
@@ -33,11 +33,11 @@ class NoAnimation implements Animation {
         return this._source[idx];
     };
     //noinspection JSUnusedGlobalSymbols
-    get animationComplete() : boolean {
+    isAnimationComplete() : boolean {
         return this._countdown <= 0;
     }
     //noinspection JSUnusedGlobalSymbols
-    get animationRemaining() : number {
+    getAnimationRemaining() : number {
         return this._countdown;
     }
 }

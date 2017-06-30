@@ -1,7 +1,7 @@
 // @flow
 
 import type {Animation} from "./Animation";
-import type {Bitmap} from "../BitmapWithControlCharacters";
+import type {Bitmap} from "../Bitmap";
 import type {Byte} from "../SimpleTypes";
 
 class Scrolling implements Animation {
@@ -60,12 +60,12 @@ class Scrolling implements Animation {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    get animationComplete() : boolean {
+    isAnimationComplete() : boolean {
         return this.remainingScrollWidth === 0;
     }
 
     //noinspection JSUnusedGlobalSymbols
-    get animationRemaining() : number {
+    getAnimationRemaining() : number {
         return this.remainingScrollWidth / this.scrollWidth;
     }
 

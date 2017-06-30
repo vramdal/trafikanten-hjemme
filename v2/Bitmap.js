@@ -2,32 +2,22 @@
 /**
  * An X by 8 pixel bitmap
  */
-//import type {RenderModifier} from './Rastrifier.js';
-import type {Char} from './SimpleTypes.js';
 export type Bitmap = Uint8Array;
-export type RenderControlAtPosition = {x: number, character: Char, parameters: string};
-
-export type RenderControlMap = Array<RenderControlAtPosition>;
 
 //noinspection JSUnusedLocalSymbols
-module.exports = class BitmapWithControlCharacters {
+module.exports = class BitmapClipped {
 
     _bitmap : Bitmap;
-    _renderControls : RenderControlMap;
     _clip : number;
 
     /**
      * @param bitmap An array of bytes, each byte corresponding to a column of the bitmap.
-     * @param renderControls An array where control characters are placed. The array's length should equal size of
-     * {@link bitmap}. If a control character should be placed in front of
-     * byte 6, the control character should be placed at <code>controlCharacters[6]</code>.
      * @param clip Optional. If set to a number, it specifies that anything to the right of <code>graphicLength</code> should
      * be considered not used (blank). If <code>false</code>, will use the width of {@link bitmap}.
      * If not set, the value will be calculated.
      */
-    constructor(bitmap: Bitmap, renderControls: RenderControlMap = [], clip : ?number | boolean) {
+    constructor(bitmap: Bitmap, clip : ?number | boolean) {
         this._bitmap = bitmap;
-        this._renderControls = renderControls;
         if (typeof clip === 'number') {
             this._clip = clip;
         } else if (clip === false) {
@@ -44,10 +34,6 @@ module.exports = class BitmapWithControlCharacters {
 
     get bitmap() : Bitmap {
         return this._bitmap;
-    }
-
-    get renderControls() : RenderControlMap {
-        return this._renderControls;
     }
 
     get clip(): number {

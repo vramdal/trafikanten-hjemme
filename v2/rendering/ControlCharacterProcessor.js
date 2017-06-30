@@ -1,6 +1,6 @@
 // @flow
 
-import type {Bitmap} from "../BitmapWithControlCharacters";
+import type {Bitmap} from "../Bitmap";
 import type {CharacterProcessor} from "./CharacterProcessor";
 
 const AlignRightRenderModifier = require("./AlignRightRenderModifier.js");

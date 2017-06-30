@@ -1,5 +1,5 @@
 // @flow
-import type {Bitmap} from "./BitmapWithControlCharacters";
+import type {Bitmap} from "./Bitmap";
 import type {Layout} from "./Frame";
 const Frame = require("./Frame.js");
 

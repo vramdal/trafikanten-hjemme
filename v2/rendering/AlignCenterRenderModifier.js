@@ -1,6 +1,6 @@
 // @flow
 
-import type {RenderControlAtPosition} from '../BitmapWithControlCharacters.js';
+import type {RenderControlAtPosition} from './RenderModfier';
 import type {RenderModifier} from "./RenderModfier";
 
 class AlignCenterRenderModifier implements RenderModifier {

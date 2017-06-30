@@ -1,5 +1,5 @@
 // @flow
-import type {Bitmap} from "./BitmapWithControlCharacters";
+import type {Bitmap} from "./Bitmap";
 
 function bitmapTo8Lines(bitmap : Bitmap) {
     let lines : Array<Array<string>> = [[], [], [], [], [], [], [], []];

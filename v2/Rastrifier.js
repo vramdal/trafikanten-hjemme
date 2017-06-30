@@ -1,13 +1,13 @@
 // @flow
 const font = require("./font");
-const BitmapWithControlCharacters = require("./BitmapWithControlCharacters");
 const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
 const ControlCharacterProcessor = require("./rendering/ControlCharacterProcessor.js");
-import type {Bitmap} from './BitmapWithControlCharacters';
+const SimpleTypes = require("./SimpleTypes.js");
+import type {Bitmap} from './Bitmap';
+import type {Layout} from "./Frame";
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";
 
 function parseString(text, characterProcessors) {
-    // TODO: Need to do this once per frame
     for (let chIdx = 0; chIdx < text.length;) {
         let position = chIdx;
         for (let cpIdx = 0; chIdx === position && cpIdx < characterProcessors.length; cpIdx++) {
@@ -31,7 +31,7 @@ function mapCharactersToPositions(glyphs, characterProcessors) : number {
     }, 0);
 }
 
-function rastrifyText(text : string, frameWidth : number) : Bitmap  {
+function rastrifyFrame(text : string, frameWidth : number) : Bitmap  {
     "use strict";
 
     let controlCharacterProcessor = new ControlCharacterProcessor();
@@ -53,11 +53,15 @@ function rastrifyText(text : string, frameWidth : number) : Bitmap  {
 
 module.exports =  {
     rastrify: function(text : string, frameWidth: number = 128) : Array<Bitmap> {
-        let bitmapWithControlCharacters = rastrifyText(text, frameWidth);
-        return [bitmapWithControlCharacters];
-        //return expandControlCharacters(bitmapWithControlCharacters);
+        let textParts = text.split(SimpleTypes.MESSAGE_PART_SEPARATOR);
+        let bitmaps : Array<Bitmap> = [];
+        for (let textPart of textParts) {
+            let bitmap = rastrifyFrame(textPart, frameWidth);
+            bitmaps.push(bitmap);
+        }
+        return bitmaps;
     },
     _testing: {
-        rastrifyText, isControlSequenceStart : ControlCharacterProcessor._isControlSequenceStart
+        rastrifyFrame, isControlSequenceStart : ControlCharacterProcessor._isControlSequenceStart
     }
 };
