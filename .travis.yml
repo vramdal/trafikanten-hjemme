@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- '0.11'
+- '6.11'
 before_deploy: "mkdir artifact; tar --exclude artifact --exclude \\.git -zcvf artifact/trafikanten-hjemme.tar.gz .; mv artifact/trafikanten-hjemme.tar.gz ."
 deploy:
   provider: releases
