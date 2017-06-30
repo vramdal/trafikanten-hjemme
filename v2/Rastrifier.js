@@ -49,28 +49,71 @@ function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlC
     return [bitmapWithControlCharacters.bitmap];
 }
 
-function rastrifyText(text : string, frameWidth : number) : BitmapWithControlCharacters  {
-    "use strict";
-    let glyphs : Array<FontCharSpec> = [];
-    let controlCharacterMap : ControlCharacterMap = [];
-    let plainText = "";
-    let chIdx = 0;
-    while (chIdx < text.length) {
-        let ch : Char = text[chIdx];
+class ControlCharacterProcessor implements CharacterProcessor {
+
+    controlCharacterMap : ControlCharacterMap;
+
+    constructor() {
+        this.controlCharacterMap = [];
+    }
+
+    processCharacter(text : string, chIdx : number) : number {
+        "use strict";
+        let ch: Char = text[chIdx];
         let controlSequenceLength = isControlSequenceStart(ch);
         if (controlSequenceLength) {
-            let controlCharacterAtPosition : ControlCharacterAtPosition =
+            let controlCharacterAtPosition: ControlCharacterAtPosition =
                 {position: chIdx, character: ch, parameters: text.substring(1, 1 + chIdx + controlSequenceLength)};
-            controlCharacterMap.push(controlCharacterAtPosition);
-            chIdx += controlSequenceLength;
-        } else if (font[ch]) {
-            glyphs.push(font[ch]);
-            plainText += ch;
-            chIdx++;
-        } else {
-            throw new Error(`Unsupported character at index ${chIdx}: ${ch}`);
+            this.controlCharacterMap.push(controlCharacterAtPosition);
+            return controlSequenceLength;
+        }
+        return 0;
+    }
+}
+
+class FontCharacterProcessor implements CharacterProcessor {
+    glyphs : Array<FontCharSpec>;
+
+    constructor() {
+        this.glyphs = [];
+    }
+
+    processCharacter(text : string, chIdx : number) : number {
+        let ch = text[chIdx];
+        if (font[ch]) {
+            this.glyphs.push(font[ch]);
+            return 1;
+        }
+        return 0;
+    }
+
+}
+
+function parseString(text, characterProcessors) {
+    for (let chIdx = 0; chIdx < text.length;) {
+        let position = chIdx;
+        for (let cpIdx = 0; chIdx === position && cpIdx < characterProcessors.length; cpIdx++) {
+            let characterProcessor = characterProcessors[cpIdx];
+            chIdx += characterProcessor.processCharacter(text, chIdx);
+        }
+        let notProcessed = position === chIdx;
+        if (notProcessed) {
+            throw new Error(`Unsupported character ${text[position]} at index ${position} in string "${text}"`);
         }
     }
+}
+
+function rastrifyText(text : string, frameWidth : number) : BitmapWithControlCharacters  {
+    "use strict";
+
+    let controlCharacterProcessor = new ControlCharacterProcessor();
+    let fontCharacterProcessor = new FontCharacterProcessor();
+    let characterProcessors : Array<CharacterProcessor> = [controlCharacterProcessor, fontCharacterProcessor];
+    parseString(text, characterProcessors);
+
+    let controlCharacterMap = controlCharacterProcessor.controlCharacterMap;
+    let glyphs = fontCharacterProcessor.glyphs;
+
     let renderControlsAtPositions : RenderControlMap = [];
     let glyphsAtPosition : Array<GlyphAtPosition> = [];
 
@@ -83,9 +126,9 @@ function rastrifyText(text : string, frameWidth : number) : BitmapWithControlCha
         let isLast = currentIndex >= array.length - 1;
         return accumulator + currentValue + (isLast ? 0 : 1);
     }, 0);
+
     let arrayBuffer = new ArrayBuffer(Math.max(glyphsCombinedWidth, frameWidth));
     let bitmap : Bitmap = new Uint8Array(arrayBuffer);
-
 
     glyphsAtPosition.forEach(glyphAtPosition => bitmap.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x));
 
@@ -96,3 +139,8 @@ type ControlCharacterAtPosition = {position: number, character: Char, parameters
 type ControlCharacterMap = Array<ControlCharacterAtPosition>;
 type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 
+interface CharacterProcessor {
+
+    processCharacter(fullString : string, chIdx : number) : number;
+
+}
