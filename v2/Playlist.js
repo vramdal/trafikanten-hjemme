@@ -6,10 +6,7 @@ const rastrify = require("./Rastrifier.js").rastrify; // TODO: Inject rastrifier
 const Frame = require("./Frame.js");
 const Display = require("./Display.js");
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
-const Scrolling = require("./animations/Scrolling.js");
-const NoAnimation = require("./animations/NoAnimation.js");
 import type {Layout} from "./Frame.js";
-import type {Animation} from "./animations/Animation";
 import type {RenderedMessage} from "./RenderedMessage";
 
 class Playlist {
@@ -19,14 +16,15 @@ class Playlist {
     _currentlyPlayingMessage : ?MessageDisplay;
     _displayEventEmitter: DisplayEventEmitter;
 
-    constructor(displayEventEmitter : DisplayEventEmitter) {
+    constructor(displayEventEmitter : DisplayEventEmitter, messages : Array<Message>) {
         this._displayEventEmitter = displayEventEmitter;
         this._playlistItemIdx = 0;
+        this._messages = messages.slice();
     }
 
-    play(messages: Array<Message>) : Promise<void> {
+    play() : Promise<void> {
         let promise : Promise<void> = Promise.resolve();
-        messages.forEach(message => {
+        this._messages.forEach(message => {
             promise = promise.then(() => {
                     console.log("Playing message " + message.toString());
                     let preparedMessage = this.prepareMessage(message);
@@ -43,10 +41,10 @@ class Playlist {
 
     //noinspection JSMethodCanBeStatic
     prepareMessage(message : Message) : MessageDisplay {
-        let frameStart = 0; // TODO: Extract from message
-        let frameWidth = 20; // TODO: Extract from message
-        let animation : Animation = new Scrolling(); // TODO: Extract from message
-        //let animation : Animation = new NoAnimation(10); // TODO: Extract from message
+        let frame = message.layout[0]; // TODO: Support multiple frames. Move logic to MessageDisplay
+        let frameStart = frame.x;
+        let frameWidth = frame.width;
+        let animation = frame._animation;
         let renderedMessage : RenderedMessage = rastrify(message.text, frameWidth);
         let layout : Layout = [new Frame(frameStart, frameWidth, animation)];
         for (let i = 0; i < layout.length; i++) {

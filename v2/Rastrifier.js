@@ -4,7 +4,6 @@ const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
 const ControlCharacterProcessor = require("./rendering/ControlCharacterProcessor.js");
 const SimpleTypes = require("./SimpleTypes.js");
 import type {Bitmap} from './Bitmap';
-import type {Layout} from "./Frame";
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";
 
 function parseString(text, characterProcessors) {
@@ -54,6 +53,7 @@ function rastrifyFrame(text : string, frameWidth : number) : Bitmap  {
 module.exports =  {
     rastrify: function(text : string, frameWidth: number = 128) : Array<Bitmap> {
         let textParts = text.split(SimpleTypes.MESSAGE_PART_SEPARATOR);
+        // TODO: Parse Frame parameters
         let bitmaps : Array<Bitmap> = [];
         for (let textPart of textParts) {
             let bitmap = rastrifyFrame(textPart, frameWidth);
