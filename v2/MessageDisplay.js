@@ -2,12 +2,12 @@
 const Ticker = require("./Ticker.js");
 const Frame = require("./Frame.js");
 import type {CountdownPromise} from "./Ticker";
+import type {TextInFrame} from "./Message";
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
 const ConsoleUtils = require("./ConsoleUtils.js");
 const Message = require("./Message.js");
 const Rastrifier = require("./Rastrifier.js");
-import type {Layout} from "./Frame.js";
 
 class MessageDisplay {
 
@@ -28,12 +28,13 @@ class MessageDisplay {
 
     prepare() {
         // TODO: Split into frames and parse frame parameters here
-        let layout : Layout = this._message.layout;
-        for (let frame of layout) {
+        let parts : Array<TextInFrame> = this._message.parts;
+        parts.forEach(part => {
+            let frame = part.frame;
             let frameWidth = frame.width;
-            let bitmap = Rastrifier.rastrify(this._message.text, frameWidth);
+            let bitmap = Rastrifier.rastrify(part.text, frameWidth);
             frame.setBitmap(bitmap);
-        }
+        });
         this._prepared = true;
     }
 

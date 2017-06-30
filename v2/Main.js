@@ -2,8 +2,15 @@
 const Display = require("./Display");
 const Message = require("./Message.js");
 const Playlist = require("./Playlist.js");
+const Framer = require("./Framer.js");
+const SimpleTypes = require("./SimpleTypes.js");
 
-const messages : Array<Message> = [new Message("Hei på deg!"), new Message("Hello, world!")];
+let framer = new Framer();
+
+const messages : Array<Message> = [
+    framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x78\x01\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!"),
+    framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x78\x01\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hello, world!"),
+];
 
 
 let display : Display = new Display();

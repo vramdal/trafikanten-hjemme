@@ -9,27 +9,33 @@ function defaultLayout() {
     return [new Frame(0, 128, new NoAnimation(10))];
 }
 
+export type TextInFrame = {
+    text : string,
+    frame : Frame
+}
 
 class Message {
 
-    _text : string;
-    _layout: Layout;
+    _parts: Array<TextInFrame>;
 
-    constructor(text: string, layout: ?Layout) {
-        this._text = text;
-        this._layout = layout || defaultLayout();
+    constructor(parts : Array<TextInFrame>) {
+        this._parts = parts;
     }
 
     get text(): string {
-        return this._text;
+        return this._parts.map(part => part.text).join("\n");
+    }
+
+    get parts() : Array<TextInFrame> {
+        return this._parts;
     }
 
     get layout(): Layout {
-        return this._layout;
+        return this._parts.map(part => part.frame);
     }
 
     toString() {
-        return this._text;
+        return this._parts.map(part => part.text).join(" | ");
     }
 }
 
