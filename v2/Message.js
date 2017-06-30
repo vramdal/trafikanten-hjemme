@@ -6,7 +6,7 @@ const NoAnimation = require("./animations/NoAnimation.js");
 //const Scrolling = require("./animations/Scrolling.js");
 
 function defaultLayout() {
-    return [new Frame(0, 128, new NoAnimation(100))];
+    return [new Frame(0, 128, new NoAnimation(10))];
 }
 
 
