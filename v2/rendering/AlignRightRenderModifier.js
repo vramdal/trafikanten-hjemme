@@ -1,9 +1,9 @@
 // @flow
 
 import type {RenderControlAtPosition} from '../BitmapWithControlCharacters.js';
-import type {RenderModifier} from '../Rastrifier.js';
+import type {RenderModifier} from "./RenderModfier";
 
-class TabRenderModifier implements RenderModifier {
+class AlignRightRenderModifier implements RenderModifier {
 
     //noinspection JSMethodCanBeStatic
     render(bufferView: Uint8Array, tabCtrl: RenderControlAtPosition, contentPixelLength: number) {
@@ -13,4 +13,4 @@ class TabRenderModifier implements RenderModifier {
     }
 }
 
-module.exports = TabRenderModifier;
+module.exports = AlignRightRenderModifier;

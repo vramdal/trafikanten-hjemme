@@ -22,7 +22,7 @@ describe('Rastrifier', () => {
 █···█··███··███·███··███·······█·█···███··█····███··███···█·····································································
 ································································································································`;
         let message = "Hello world!";
-        let result = Rastrifier.rastrify(message, 128)[0];
+        let result = Rastrifier.rastrify(message)[0];
         let base64 = Buffer.from(result).toString('base64');
         console.log("base64 = ", base64);
         expect(result[0]).to.equal(0x7e);
