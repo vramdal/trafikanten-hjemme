@@ -10,7 +10,7 @@ const BitmapProxy = require("./BitmapProxy.js");
 export type AnimationTickPromise = Promise<void>;
 export type Layout = Array<Frame>;
 
-class Frame { // TODO: this should really be called ScrollFrame. Make abstract class.
+class Frame {
     _width : number;
     _x: number;
     _animation: Animation;
