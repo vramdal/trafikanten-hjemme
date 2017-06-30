@@ -52,9 +52,11 @@ function expandControlCharacters(bitmapWithControlCharacters: BitmapWithControlC
 class ControlCharacterProcessor implements CharacterProcessor {
 
     controlCharacterMap : ControlCharacterMap;
+    renderControlsAtPositions: RenderControlMap;
 
     constructor() {
         this.controlCharacterMap = [];
+        this.renderControlsAtPositions = [];
     }
 
     processCharacter(text : string, chIdx : number) : number {
@@ -69,13 +71,27 @@ class ControlCharacterProcessor implements CharacterProcessor {
         }
         return 0;
     }
+
+    mapCharacterToPosition(chIdx, x) {
+        let controlCharacterAtPosition = this.controlCharacterMap.find(controlCharacterAtPosition => controlCharacterAtPosition.position === chIdx);
+        if (controlCharacterAtPosition) {
+            this.renderControlsAtPositions.push({
+                x: x,
+                character: controlCharacterAtPosition.character,
+                parameters: controlCharacterAtPosition.parameters
+            });
+        }
+    }
+
 }
 
 class FontCharacterProcessor implements CharacterProcessor {
     glyphs : Array<FontCharSpec>;
+    glyphsAtPosition : Array<GlyphAtPosition>;
 
     constructor() {
         this.glyphs = [];
+        this.glyphsAtPosition = [];
     }
 
     processCharacter(text : string, chIdx : number) : number {
@@ -85,6 +101,11 @@ class FontCharacterProcessor implements CharacterProcessor {
             return 1;
         }
         return 0;
+    }
+
+    mapCharacterToPosition(chIdx, x) {
+        this.glyphsAtPosition.push({x: x, glyph: this.glyphs[chIdx]});
+
     }
 
 }
@@ -111,21 +132,18 @@ function rastrifyText(text : string, frameWidth : number) : BitmapWithControlCha
     let characterProcessors : Array<CharacterProcessor> = [controlCharacterProcessor, fontCharacterProcessor];
     parseString(text, characterProcessors);
 
-    let controlCharacterMap = controlCharacterProcessor.controlCharacterMap;
     let glyphs = fontCharacterProcessor.glyphs;
 
-    let renderControlsAtPositions : RenderControlMap = [];
-    let glyphsAtPosition : Array<GlyphAtPosition> = [];
-
     let glyphsCombinedWidth = glyphs.map(glyph => glyph.width).reduce((accumulator, currentValue, currentIndex, array) => {
-        let controlCharacterAtPosition = controlCharacterMap.find(controlCharacterAtPosition => controlCharacterAtPosition.position === currentIndex);
-        if (controlCharacterAtPosition) {
-            renderControlsAtPositions.push({x: accumulator, character: controlCharacterAtPosition.character, parameters: controlCharacterAtPosition.parameters});
+        for (let characterProcessor of characterProcessors) {
+            characterProcessor.mapCharacterToPosition(currentIndex, accumulator);
         }
-        glyphsAtPosition.push({x: accumulator, glyph: glyphs[currentIndex]});
         let isLast = currentIndex >= array.length - 1;
         return accumulator + currentValue + (isLast ? 0 : 1);
     }, 0);
+
+    let glyphsAtPosition = fontCharacterProcessor.glyphsAtPosition;
+    let renderControlsAtPositions : RenderControlMap = controlCharacterProcessor.renderControlsAtPositions;
 
     let arrayBuffer = new ArrayBuffer(Math.max(glyphsCombinedWidth, frameWidth));
     let bitmap : Bitmap = new Uint8Array(arrayBuffer);
@@ -142,5 +160,6 @@ type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 interface CharacterProcessor {
 
     processCharacter(fullString : string, chIdx : number) : number;
+    mapCharacterToPosition(chIdx : number, x: number) : void;
 
 }
