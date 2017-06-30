@@ -18,6 +18,7 @@ class NoAnimation implements Animation {
     setSource(source : Bitmap, frameWidth: number) {
         this._source = source;
         this._frameWidth = frameWidth;
+        this.reset();
     }
 
     //noinspection JSUnusedGlobalSymbols
