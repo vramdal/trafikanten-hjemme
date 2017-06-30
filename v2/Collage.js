@@ -12,7 +12,13 @@ class Collage {
 
     pasteTo(target : Bitmap) {
         target.fill(0);
-        this._layout.forEach((frame : Frame) => target.set(frame.bitmap, frame.x));
+            this._layout.forEach((frame: Frame, idx : number) => {
+                try {
+                    return target.set(frame.bitmap, frame.x);
+                } catch (e) {
+                    throw new Error(`Attempting to paste a ${frame.width}-width bitmap on to a ${target.length}-width target in frame ${idx}\n${e.message}`);
+                }
+            });
     }
 }
 
