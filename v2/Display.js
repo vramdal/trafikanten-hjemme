@@ -41,7 +41,7 @@ class Display {
             this._playlist.play().then(() => {
                 this.play();
             }).catch(err => {
-                console.error("Feil: ", err)
+                console.error("Display error: ", err)
             });
         } else {
             setTimeout(this.play.bind(this), 1000);

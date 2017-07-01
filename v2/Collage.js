@@ -17,7 +17,7 @@ class Collage {
                     // TODO: Something bad happens when frame.x !== 0
                     return target.set(frame.bitmap, frame.x);
                 } catch (e) {
-                    throw new Error(`Attempting to paste a ${frame.width}-width bitmap on to a ${target.length}-width target in frame ${idx}\n${e.message}`);
+                    throw new Error(`Attempting to paste a ${frame.width}-width bitmap on position ${frame.x} on a ${target.length}-width target in frame ${idx}\n${e.message}`);
                 }
             });
     }

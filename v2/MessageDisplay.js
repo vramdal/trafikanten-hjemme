@@ -27,7 +27,6 @@ class MessageDisplay {
     }
 
     prepare() {
-        // TODO: Split into frames and parse frame parameters here
         let parts : Array<TextInFrame> = this._message.parts;
         parts.forEach(part => {
             let frame = part.frame;
