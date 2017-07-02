@@ -22,6 +22,8 @@ describe('Framer', () => {
             let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" + SimpleTypes.MESSAGE_PART_SEPARATOR + SimpleTypes.FORMAT_SPECIFIER_START + "\x10\x7F\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!";
             let message = framer.parse(text);
             expect(message.layout.length).to.equal(2);
+            expect(message.layout[0].x).to.equal(0);
+            expect(message.layout[1].x).to.equal(16);
         })
     });
 });

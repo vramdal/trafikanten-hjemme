@@ -32,7 +32,7 @@ class Framer {
         let split = str.split(SimpleTypes.MESSAGE_PART_SEPARATOR);
         let parts : Array<TextInFrame> = split.map(strPart => {
             if (strPart[0] === SimpleTypes.FORMAT_SPECIFIER_START) {
-                let {specLength, frameSpec} = this.parseFrameSpec(str);
+                let {specLength, frameSpec} = this.parseFrameSpec(strPart);
                 let frame = this.createFrame(frameSpec);
                 let text = strPart.substring(specLength);
                 return {frame, text};
