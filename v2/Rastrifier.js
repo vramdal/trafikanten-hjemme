@@ -15,7 +15,7 @@ function parseString(text, characterProcessors) {
         }
         let notProcessed = position === chIdx;
         if (notProcessed) {
-            throw new Error(`Unsupported character ${text[position]} at index ${position} in string "${text}"`);
+            throw new Error(`Unsupported character ${text[position]} (charcode ${text.charCodeAt(position)}) at index ${position} in string "${text}"`);
         }
     }
 }
