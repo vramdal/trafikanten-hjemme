@@ -18,7 +18,7 @@ const AnimationCharacterMap = {
 
 type FrameSpec = {
     x: number,
-    width: number,
+    end: number,
     animationClass : $Subtype<Animation>,
     animationParameters : Array<number>
 }
@@ -46,7 +46,7 @@ class Framer {
     parseFrameSpec(str : string) : {specLength : number, frameSpec : FrameSpec} {
         // [0] = FORMAT_SPECIFIER_START
         let x = str.charCodeAt(1);
-        let width = str.charCodeAt(2);
+        let end = str.charCodeAt(2);
         let animationId = str[3];
         let animationClass  : $Subtype<Animation> = AnimationCharacterMap[animationId];
         if (!animationClass) {
@@ -60,15 +60,15 @@ class Framer {
         // FORMAT_SPECIFIER_END
         return {
             specLength : 5 + numberOfAnimationParameters,
-            frameSpec: {x, width, animationClass, animationParameters}
+            frameSpec: {x, end, animationClass, animationParameters}
         };
     }
 
     //noinspection JSMethodCanBeStatic
     createFrame(frameSpec : FrameSpec) {
-        let {x , width , animationClass , animationParameters } = frameSpec;
+        let {x , end , animationClass , animationParameters } = frameSpec;
         let animation : Animation = new animationClass(animationParameters);
-        return new Frame(x, width, animation);
+        return new Frame(x, end - x, animation);
     }
 
 }
