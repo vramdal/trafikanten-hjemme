@@ -15,7 +15,7 @@ class Display {
     _buffer: Uint8Array;
 
     constructor() {
-        this._buffer = new Uint8Array(128);
+        this._buffer = new Uint8Array(256);
         this._eventEmitter = new DisplayEventEmitter();
         this._eventEmitter.on(EventTypeNames.EVENT_BITMAP_UPDATED, this.onBitmapUpdated.bind(this));
     }
@@ -31,7 +31,8 @@ class Display {
     onBitmapUpdated(layout : Layout) : void {
         let collage : Collage = new Collage(layout);
         collage.pasteTo(this._buffer);
-        BitmapUtil.bitmapTo8Lines(this._buffer);
+        BitmapUtil.bitmapTo8Lines(this._buffer.slice(0, 128));
+        BitmapUtil.bitmapTo8Lines(this._buffer.slice(128));
     }
 
 
