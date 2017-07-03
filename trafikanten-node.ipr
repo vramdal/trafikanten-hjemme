@@ -92,7 +92,7 @@
     <option yui="false" />
   </component>
   <component name="JavaScriptLibraryMappings">
-    <includedPredefinedLibrary name="Node.js Core" />
+    <file url="PROJECT" libraries="{babel, react, react-dom}" />
   </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="FLOW" />

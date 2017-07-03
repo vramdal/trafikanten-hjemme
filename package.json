@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "mocha test/*; node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node v2/*.spec.js",
-    "v2start": "node_modules/flow-remove-types/flow-node ./bin/www",
+    "v2start": "node_modules/flow-remove-types/flow-node ./v2/Main.js",
     "v2test": "node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node v2/*.spec.js"
   },
   "dependencies": {

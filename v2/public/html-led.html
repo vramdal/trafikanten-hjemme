@@ -74,17 +74,39 @@
             });
 
             function paint(bitmap) {
+                console.log("bitmap = ", bitmap);
+                let ctx = document.querySelector("canvas").getContext('2d');
                 for (let x = 0; x < bitmap.length; x++) {
                     const byte = bitmap[x];
                     let mask = 0x80;
                     let y = 0;
                     while (y < 8) {
                         let bit = byte & mask;
-                        rows[y][x].className = (bit ? "on" : "off");
+                        ctx.fillStyle = bit ? 'yellow' : "black";
+                        //console.log('Filling x, y, with ', x, y, ctx.fillStyle);
+                        let section = Math.floor(x / 128);
+                        ctx.fillRect(x % 128  * 10 , y * 10 + section * 8 * 10, 10, 10);
+
                         y = y + 1;
                         mask = mask / 2;
+
                     }
                 }
+
+
+                /*
+                 for (let x = 0; x < bitmap.length; x++) {
+                 const byte = bitmap[x];
+                 let mask = 0x80;
+                 let y = 0;
+                 while (y < 8) {
+                 let bit = byte & mask;
+                 rows[y][x].className = (bit ? "on" : "off");
+                 y = y + 1;
+                 mask = mask / 2;
+                 }
+                 }
+                 */
 
             }
         });
@@ -92,9 +114,8 @@
 </head>
 <body>
 
-    <button type="button" id="connectButton">Connect</button>
+<button type="button" id="connectButton">Connect</button>
 
-    <table id="row1"><tbody></tbody></table>
-    <table id="row2"><tbody></tbody></table>
+<canvas width="1270" height="320"></canvas>
 </body>
 </html>
