@@ -29,7 +29,7 @@ class Framer {
 
   parse(str : string) : Message { // TODO: Provide sensible default when spec characters are not present
       // TODO: Validate format
-        let split = str.split(SimpleTypes.MESSAGE_PART_SEPARATOR);
+        let split = str.split(SimpleTypes.MESSAGE_PART_SEPARATOR); // TODO: Get rid of MESSAGE_PART_SEPARATOR, should not be needed
         let parts : Array<TextInFrame> = split.map(strPart => {
             if (strPart[0] === SimpleTypes.FORMAT_SPECIFIER_START) {
                 let {specLength, frameSpec} = this.parseFrameSpec(strPart);
