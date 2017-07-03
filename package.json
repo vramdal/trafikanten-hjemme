@@ -10,17 +10,13 @@
   },
   "dependencies": {
     "async": "~0.9.0",
-    "debug": "~2.0.0",
-    "express": "4.9.x",
+    "express": "^4.15.3",
     "flow-bin": "^0.47.0",
     "flow-remove-types": "^1.2.1",
     "hyperquest": "~1.0.1",
-    "morgan": "1.3.0",
-    "node-red": "git://github.com/vramdal/node-red",
-    "request": "~2.46.0",
     "serve-favicon": "~2.1.3",
-    "through2": "~0.6.3",
     "wordwrap": "0.0.2",
+    "ws": "^3.0.0",
     "xml2js": "^0.4.4"
   },
   "devDependencies": {
@@ -39,13 +35,8 @@
   "bundledDependencies": [
     "async",
     "debug",
-    "hyperquest",
-    "node-red",
-    "request",
     "serve-favicon",
-    "through2",
-    "xml2js",
-    "express",
-    "morgan"
-  ]
+    "xml2js"
+  ],
+  "false": {}
 }

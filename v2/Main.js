@@ -1,8 +1,10 @@
 // @flow
-const Display = require("./Display");
+const Display = require("./display/Display");
 const Message = require("./Message.js");
 const Playlist = require("./Playlist.js");
 const Framer = require("./Framer.js");
+const ConsoleDisplay = require("./display/ConsoleDisplay.js");
+const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 //const SimpleTypes = require("./SimpleTypes.js");
 const Trafikanten = require("./Trafikanten.js");
 const testdata = require("./testdata/ensjø-departures.json");
@@ -18,7 +20,7 @@ const messages : Array<Message> = [
 
 
 
-let display : Display = new Display();
+let display : Display = new WebsocketDisplay();
 let playlist : Playlist = new Playlist(display.eventEmitter, messages);
 display.playlist = playlist;
 
