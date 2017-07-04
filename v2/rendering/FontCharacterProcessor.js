@@ -20,8 +20,9 @@ class FontCharacterProcessor implements CharacterProcessor {
 
     processCharacter(text : string, chIdx : number) : number {
         let ch = text[chIdx];
-        if (this._font[ch]) {
-            this.glyphs.push(this._font[ch]);
+        let glyph = this._font[ch] || this._font[ch.charCodeAt(0)];
+        if (glyph) {
+            this.glyphs.push(glyph);
             return 1;
         }
         return 0;
