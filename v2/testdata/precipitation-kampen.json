@@ -1,0 +1,122 @@
+{
+  "weatherdata": {
+    "credit": {
+      "link": {
+        "text": "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt",
+        "url": "http://www.yr.no/sted/Norge/Oslo/Oslo/Kampen/"
+      }
+    },
+    "meta": {
+      "lastupdate": "2017-07-04T13:15:16",
+      "nextupdate": "2017-07-04T13:22:46"
+    },
+    "forecast": {
+      "time": [
+        {
+          "from": "2017-07-04T13:15:00",
+          "to": "2017-07-04T13:15:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T13:22:30",
+          "to": "2017-07-04T13:22:30",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T13:30:00",
+          "to": "2017-07-04T13:30:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T13:37:30",
+          "to": "2017-07-04T13:37:30",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T13:45:00",
+          "to": "2017-07-04T13:45:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T13:52:30",
+          "to": "2017-07-04T13:52:30",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:00:00",
+          "to": "2017-07-04T14:00:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:07:30",
+          "to": "2017-07-04T14:07:30",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:15:00",
+          "to": "2017-07-04T14:15:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:22:30",
+          "to": "2017-07-04T14:22:30",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:30:00",
+          "to": "2017-07-04T14:30:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:37:30",
+          "to": "2017-07-04T14:37:30",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        },
+        {
+          "from": "2017-07-04T14:45:00",
+          "to": "2017-07-04T14:45:00",
+          "precipitation": {
+            "unit": "mm/h",
+            "value": "0"
+          }
+        }
+      ]
+    }
+  }
+}

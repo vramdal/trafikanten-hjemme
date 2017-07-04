@@ -22,7 +22,6 @@ type MonitoredStopVisit = {
 };
 type GetDeparturesResponse = Array<MonitoredStopVisit>;
 
-
 const createFormatSpecifier = (x : number, end : number, animationClass: Class<$Subtype<Animation>>, ...animationParameters: Array<number>) : string => {
     let animationId : string;
     switch (animationClass) {
@@ -38,17 +37,19 @@ const createFormatSpecifier = (x : number, end : number, animationClass: Class<$
 
 };
 
-
-
 class Trafikanten {
+
+    static createFormatSpecifier(x : number, end : number, animationClass: Class<$Subtype<Animation>>, ...animationParameters: Array<number>) {
+        return createFormatSpecifier.apply(this, arguments);
+    }
 
     formatMessage(getDeparturesResponse : GetDeparturesResponse) {
 
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
-        let firstLine = createFormatSpecifier(0, 20, NoAnimation) +
+        let firstLine = Trafikanten.createFormatSpecifier(0, 20, NoAnimation) +
             "\x02" + firstDeparture.LineRef +
             SimpleTypes.MESSAGE_PART_SEPARATOR +
-            createFormatSpecifier(22, 127, NoAnimation, 5) +
+            Trafikanten.createFormatSpecifier(22, 127, NoAnimation, 5) +
             firstDeparture.DestinationName +
             "\x01" +
             this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())
@@ -59,7 +60,7 @@ class Trafikanten {
             let journey = monitoredStopVisit.MonitoredVehicleJourney;
             return this.formatJourney(journey);
         });
-        let secondLine = createFormatSpecifier(128, 255, Scrolling) + formatted.join("  -  ");
+        let secondLine = Trafikanten.createFormatSpecifier(128, 255, Scrolling) + formatted.join("  -  ");
         return firstLine + secondLine;
     }
 
