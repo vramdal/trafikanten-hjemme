@@ -52,7 +52,7 @@ class Framer {
         if (!animationClass) {
             throw new Error(`Invalid animation code ${animationId.charCodeAt(0)}`);
         }
-        let numberOfAnimationParameters = animationClass.constructor.length;
+        let numberOfAnimationParameters = animationClass.length;
         let animationParameters : Array<number> = [];
         for (let i = 0; i < numberOfAnimationParameters; i++) {
             animationParameters[i] = str.charCodeAt(i + 4);
