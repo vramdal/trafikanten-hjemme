@@ -1,7 +1,11 @@
 // @flow
 
 export type FontCharSpec = {char: string | number, width : number, uint8Array: Uint8Array}
-export type FontMap = {[string | number] : FontCharSpec, byteArray: Uint8Array, bytes: {[string | number] : Uint8Array}}
+export type FontMap = {
+    byteArray: Uint8Array,
+    bytes: {[string | number] : Uint8Array},
+    kerning: (ch1 : string | number, ch2 : string | number) => number
+}
 
 module.exports = init();
 
@@ -9,6 +13,7 @@ module.exports = init();
 function init() {
 
     let characters : Array<FontCharSpec> = [];
+
 
     function registerCharacter(ch : string | number, width : number, ...lines) {
         const bytes = [];
@@ -969,6 +974,16 @@ function init() {
             " X  X  X ",
             "X  X  X  "
     );
+    registerCharacter(8202, 1,  // Hair space
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+            " "
+    );
     registerCharacter(9829, 7,
           " XX XX ",
           "XXXXXXX",
@@ -1038,6 +1053,86 @@ function init() {
             "XXXXXXXXX",
             "XX X X XX"
     );
+    registerCharacter(9601, 1, // ▁
+        " ",
+        " ",
+        " ",
+        " ",
+        " ",
+        " ",
+        " ",
+        "X"
+    );
+    registerCharacter(9602, 1, // ▂
+        " ",
+        " ",
+        " ",
+        " ",
+        " ",
+        " ",
+        "X",
+        "X"
+    );
+    registerCharacter(9603, 1, // ▃
+        " ",
+        " ",
+        " ",
+        " ",
+        " ",
+        "X",
+        "X",
+        "X"
+    );
+    registerCharacter(9604, 1, // ▄
+        " ",
+        " ",
+        " ",
+        " ",
+        "X",
+        "X",
+        "X",
+        "X"
+    );
+    registerCharacter(9605, 1, // ▅
+        " ",
+        " ",
+        " ",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X"
+    );
+    registerCharacter(9606, 1, // ▆
+        " ",
+        " ",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X"
+    );
+    registerCharacter(9607, 1, // ▇
+        " ",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X"
+    );
+    registerCharacter(9608, 1, // █
+        "X",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X",
+        "X"
+    );
 
     let requiredWidth = 0;
     let positions : {[string | number] : number} = {};
@@ -1046,8 +1141,18 @@ function init() {
         positions[fontCharSpec.char] = requiredWidth;
         requiredWidth += fontCharSpec.width;
     }
+    const noKerningSet = [8202, 9601, 9602, 9603, 9604, 9605, 9606, 9607, 9608];
     // Create a mother Uint8Array, that will hold all character sprites
-    let map : FontMap = {byteArray: new Uint8Array(requiredWidth), bytes: {}};
+    let map : FontMap = {
+        byteArray: new Uint8Array(requiredWidth),
+        bytes: {},
+        kerning: (ch1 : string | number, ch2 : string | number) => {
+            if (noKerningSet.includes(ch1) && noKerningSet.includes(ch2)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }};
     for (let i = 0; i < characters.length; i++) {
         let fontCharSpec = characters[i];
         let ch = fontCharSpec.char;

@@ -26,7 +26,7 @@ function mapCharactersToPositions(glyphs, characterProcessors) : number {
             characterProcessor.mapCharacterToPosition(currentIndex, accumulator);
         }
         let isLast = currentIndex >= array.length - 1;
-        return accumulator + currentValue + (isLast ? 0 : 1);
+        return accumulator + currentValue + (isLast ? 0 : font.kerning(glyphs[currentIndex].char, glyphs[currentIndex + 1].char));
     }, 0);
 }
 
