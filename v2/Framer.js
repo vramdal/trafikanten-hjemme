@@ -73,16 +73,16 @@ class Framer {
         let animationId = str[argumentIdx++];
         let animationClass  : $Subtype<Animation> = AnimationCharacterMap[animationId];
         if (!animationClass) {
-            throw new Error(`Invalid animation code ${animationId.charCodeAt(0)}`);
+            throw new Error(`Invalid animation code \\x${animationId.charCodeAt(0).toString(16)} in format specifier ${str.substring(0, 5).split("").map(ch => ch.charCodeAt(0).toString(16)).map(hex => "\\x" + hex).join(",")}`);
         }
         let numberOfAnimationParameters = animationClass.length;
         let animationParameters : Array<number> = [];
         for (let i = 0; i < numberOfAnimationParameters; i++) {
-            animationParameters[i] = str.charCodeAt(i + argumentIdx++);
+            animationParameters[i] = str.charCodeAt(i + argumentIdx);
         }
         // FORMAT_SPECIFIER_END
         return {
-            specLength : argumentIdx + numberOfAnimationParameters,
+            specLength : argumentIdx + numberOfAnimationParameters + 1,
             frameSpec: {x, end, animationClass, animationParameters, lines}
         };
     }

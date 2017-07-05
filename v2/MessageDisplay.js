@@ -22,7 +22,7 @@ class MessageDisplay {
     constructor(message : Message, display : DisplayEventEmitter) {
         this._message = message;
         this._displayEventEmitter = display;
-        this._ticker = new Ticker(50, this.scrollFrames.bind(this));
+        this._ticker = new Ticker(25, this.scrollFrames.bind(this));
         this._stop = false;
         this._prepared = false;
     }

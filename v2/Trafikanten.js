@@ -29,8 +29,10 @@ const createFormatSpecifier = (x : number, end : number, animationClass: Class<$
         case Scrolling : animationId = "\x02"; break;
         default : animationId = "\x01";
     }
-    return SimpleTypes.FORMAT_SPECIFIER_START + String.fromCharCode(x) +
+    return SimpleTypes.FORMAT_SPECIFIER_START +
+        String.fromCharCode(x) +
         String.fromCharCode(end) +
+        "\x01" +
         animationId +
         animationParameters.map((param : number) => String.fromCharCode(param)).join("")
         + SimpleTypes.FORMAT_SPECIFIER_END;
@@ -48,12 +50,10 @@ class Trafikanten {
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
         let firstLine = Trafikanten.createFormatSpecifier(0, 20, NoAnimation) +
             "\x02" + firstDeparture.LineRef +
-            SimpleTypes.MESSAGE_PART_SEPARATOR +
             Trafikanten.createFormatSpecifier(22, 127, NoAnimation, 5) +
             firstDeparture.DestinationName +
             "\x01" +
             this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())
-            + SimpleTypes.MESSAGE_PART_SEPARATOR
         ;
 
         let formatted = getDeparturesResponse.slice(1).map((monitoredStopVisit : MonitoredStopVisit) => {

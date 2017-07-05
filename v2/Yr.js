@@ -5,12 +5,12 @@ const xml2json = require("xml2json");
 const Trafikanten = require("./Trafikanten.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
-const SimpleTypes = require("./SimpleTypes.js");
 
 // const url = "http://www.yr.no/sted/Norge/Oslo/Oslo/Kampen/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Telemark/Bamble/Bamble/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Nordland/Bodø/Bodø/varsel_nu.xml";
-const url = "http://www.yr.no/sted/Norge/Sør-Trøndelag/Trondheim/Trondheim/varsel_nu.xml";
+// const url = "http://www.yr.no/sted/Norge/Sør-Trøndelag/Trondheim/Trondheim/varsel_nu.xml";
+const url = "http://www.yr.no/sted//Norge/Finnmark/Vadsø/Vadsø/varsel_nu.xml";
 
 type LinkType = {
     text: string,
@@ -79,11 +79,10 @@ class Yr {
             .map(charCode => new Array(barWidth).fill(String.fromCharCode(charCode)).join(String.fromCharCode(8202)))
             .join("");
 
-        return Trafikanten.createFormatSpecifier(0, 128, NoAnimation, 100)
-            + (noPrecipitation ? "" : "\x02Nedbør neste 90 min")
+        return Trafikanten.createFormatSpecifier(0, 128, NoAnimation, 200)
+            + ("\x02Nedbør neste 90 min")
             //+ yrPrecipitation.weatherdata.credit.link.text
-            + SimpleTypes.MESSAGE_PART_SEPARATOR
-            + Trafikanten.createFormatSpecifier(128, 255, NoAnimation, 100)
+            + Trafikanten.createFormatSpecifier(128, 255, NoAnimation, 200)
             + "\x02"
             + (noPrecipitation ? "Ingen" : graph)
     }

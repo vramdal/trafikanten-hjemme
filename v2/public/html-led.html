@@ -29,6 +29,12 @@
 
             let websocket;
 
+            window.setInterval(() => {
+                if (!websocket || websocket.readyState >= WebSocket.CLOSING) {
+                    openWebsocket()
+                }
+            }, 2000);
+
             document.querySelectorAll("table tbody").forEach(tbody => {
                 for (let r = 0; r < 8; r++) {
                     let row = document.createElement("tr");
@@ -55,6 +61,10 @@
             let paintLock;
 
             document.querySelector("#connectButton").addEventListener("click", () => {
+                openWebsocket();
+            });
+
+            let openWebsocket = () => {
                 websocket = new WebSocket("ws://localhost:6060", "bitmapUpdated");
                 websocket.binaryType = "arraybuffer";
                 websocket.onmessage = (event) => {
@@ -71,10 +81,24 @@
                         }
                     }
                 };
-            });
+
+                function handleWebsocketStatusChange(event) {
+                    let statusDomElement = document.querySelector("#websocket-status");
+                    let statusErrorElement = document.querySelector("#websocket-error");
+                    console.log("event = ", event);
+                    switch (event.type) {
+                        case "open" : statusErrorElement.innerText = ""; statusDomElement.innerText = "Open"; break;
+                        case "close" : statusDomElement.innerText = "Closed"; break;
+                        case "error" : statusErrorElement.innerText = "Error"; break;
+                        default : statusDomElement.innerText = "Unknown";
+                    }
+                }
+                websocket.onerror = handleWebsocketStatusChange;
+                websocket.onopen = handleWebsocketStatusChange;
+                websocket.onclose = handleWebsocketStatusChange;
+            };
 
             function paint(bitmap) {
-                console.log("bitmap = ", bitmap);
                 let ctx = document.querySelector("canvas").getContext('2d');
                 for (let x = 0; x < bitmap.length; x++) {
                     const byte = bitmap[x];
@@ -114,7 +138,7 @@
 </head>
 <body>
 
-<button type="button" id="connectButton">Connect</button>
+<button type="button" id="connectButton">Connect</button> - <span id="websocket-status">Not opened</span> <span id="websocket-error"></span>
 
 <canvas width="1270" height="320"></canvas>
 </body>
