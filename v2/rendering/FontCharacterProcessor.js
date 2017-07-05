@@ -33,7 +33,7 @@ class FontCharacterProcessor implements CharacterProcessor {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    place(bitmap : Bitmap) {
+    place(bitmap : Bitmap) : void {
         this.glyphsAtPosition.forEach(glyphAtPosition => bitmap.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x));
     }
 

@@ -67,7 +67,7 @@ class ControlCharacterProcessor implements CharacterProcessor {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    place(bitmap : Bitmap, contentLength : number) {
+    place(bitmap : Bitmap, contentLength : number) : void {
         for (let renderControlAtPosition of this.renderControlsAtPositions) {
             let renderModifierFactory : RenderModifierFactory = renderModifiers[renderControlAtPosition.character];
             let renderModifier : RenderModifier = renderModifierFactory(renderControlAtPosition.parameters);

@@ -2,6 +2,7 @@
 const Ticker = require("./Ticker.js");
 const Frame = require("./Frame.js");
 import type {CountdownPromise} from "./Ticker";
+import type {AnnotatedBitmap} from "./Bitmap";
 import type {TextInFrame} from "./Message";
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
@@ -31,7 +32,7 @@ class MessageDisplay {
         parts.forEach(part => {
             let frame = part.frame;
             let frameWidth = frame.width;
-            let bitmap = Rastrifier.rastrify(part.text, frameWidth);
+            let bitmap : AnnotatedBitmap = Rastrifier.rastrify(part.text, frameWidth);
             frame.setBitmap(bitmap);
         });
         this._prepared = true;

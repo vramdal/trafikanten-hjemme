@@ -1,6 +1,6 @@
 // @flow
 
-import type {Bitmap} from "./Bitmap";
+import type {AnnotatedBitmap, Bitmap} from "./Bitmap";
 import type {Animation} from "./animations/Animation";
 
 const BitmapProxy = require("./BitmapProxy.js");
@@ -22,7 +22,7 @@ class Frame {
         this._animation = animation;
     }
 
-    setBitmap(source: Bitmap) {
+    setBitmap(source: AnnotatedBitmap) {
         this._animation.setSource(source, this._width);
         this._bitmap = new BitmapProxy(source, this._width, this._animation.getTranslated.bind(this._animation));
     }

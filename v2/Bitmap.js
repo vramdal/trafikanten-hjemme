@@ -4,6 +4,17 @@
  */
 export type Bitmap = Uint8Array;
 
+export interface BitmapAnnotation {
+
+    start: number,
+    end: number
+
+}
+
+export type AnnotatedBitmap = Bitmap & {
+    annotations: Array<BitmapAnnotation>
+}
+
 //noinspection JSUnusedLocalSymbols
 module.exports = class BitmapClipped {
 

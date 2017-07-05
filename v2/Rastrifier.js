@@ -3,10 +3,10 @@ const font = require("./font");
 const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
 const ControlCharacterProcessor = require("./rendering/ControlCharacterProcessor.js");
 const SimpleTypes = require("./SimpleTypes.js");
-import type {Bitmap} from './Bitmap';
+import type {AnnotatedBitmap} from './Bitmap';
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";
 
-function parseString(text, characterProcessors) {
+function parseString(text : string, characterProcessors : Array<CharacterProcessor>) {
     for (let chIdx = 0; chIdx < text.length;) {
         let position = chIdx;
         for (let cpIdx = 0; chIdx === position && cpIdx < characterProcessors.length; cpIdx++) {
@@ -30,7 +30,7 @@ function mapCharactersToPositions(glyphs, characterProcessors) : number {
     }, 0);
 }
 
-function rastrifyFrame(text : string, frameWidth : number) : Bitmap  {
+function rastrifyFrame(text : string, frameWidth : number) : AnnotatedBitmap  {
     "use strict";
 
     let controlCharacterProcessor = new ControlCharacterProcessor();
@@ -42,19 +42,20 @@ function rastrifyFrame(text : string, frameWidth : number) : Bitmap  {
     let glyphsCombinedWidth = mapCharactersToPositions(glyphs, characterProcessors);
 
     let arrayBuffer = new ArrayBuffer(Math.max(glyphsCombinedWidth, frameWidth));
-    let bitmap : Bitmap = new Uint8Array(arrayBuffer);
-
+    let bitmap : any = new Uint8Array(arrayBuffer);
+    bitmap.annotations = [];
     for (let characterProcessor of characterProcessors) {
         characterProcessor.place(bitmap, glyphsCombinedWidth);
     }
+    bitmap.annotations.sort((ann1, ann2) => ann1.xStart - ann2.xStart);
     return bitmap;
 }
 
 module.exports =  {
-    rastrify: function(text : string, frameWidth: number = 128) : Bitmap {
+    rastrify: function(text : string, frameWidth: number = 128) : AnnotatedBitmap {
             return rastrifyFrame(text, frameWidth);
     },
     _testing: {
-        rastrifyFrame, isControlSequenceStart : ControlCharacterProcessor._isControlSequenceStart
+        rastrifyFrame, isControlSequenceStart : ControlCharacterProcessor._isControlSequenceStart, parseString
     }
 };
