@@ -3,10 +3,10 @@
 import type {AnnotatedBitmap, Bitmap, BitmapAnnotation} from "../Bitmap";
 import type {Byte, Char} from "../SimpleTypes";
 const FontCharacterAnnotation = require("../rendering/FontCharacterAnnotation.js");
-
+import type {Animation} from "./Animation";
 const LinebreakAnnotation = require("../rendering/LinebreakAnnotation.js");
 
-class PagingAnimation {
+class PagingAnimation implements Animation {
     _source: AnnotatedBitmap;
     _frameWidth: number;
     _ticksPerPage : number;
@@ -31,11 +31,12 @@ class PagingAnimation {
                 annotation instanceof LinebreakAnnotation
             ) : Array<any>) : Array<LinebreakAnnotation>);
         let annotationsReversed = linebreakAnnotations.reverse();
-        let rest = this._source.length;
         let cursor = 0;
         let previousPageStart = 0;
-        while (rest > 0) {
-            if (rest < frameWidth) {
+        while (cursor < this._source.length) {
+            let rest = this._source.length - cursor;
+            let canFitRestInOneFrame = rest < frameWidth;
+            if (canFitRestInOneFrame) {
                 this._pages.push(this._source.subarray(cursor));
                 cursor = this._source.length;
             } else {
@@ -55,8 +56,6 @@ class PagingAnimation {
                 .map(annotation => ((annotation : any) : FontCharacterAnnotation).char): Array<any>)
                 .join("");
             this._charPages.push(characters);
-            //console.log("characterAnnotation.char = ", characterAnnotation && characterAnnotation.char);
-            rest = this._source.length - cursor;
             previousPageStart = cursor;
         }
     }
@@ -86,13 +85,6 @@ class PagingAnimation {
             return 0;
         }
         let x = idx % this._frameWidth;
-/*
-        let characterAnnotation : FontCharacterAnnotation = (this._source.annotations
-            .filter(annotation => annotation instanceof FontCharacterAnnotation)
-            .find(annotation => annotation.start >= idx && idx < annotation.end ) : any);
-        //console.log("characterAnnotation.char = ", characterAnnotation && characterAnnotation.char);
-        let char = characterAnnotation && characterAnnotation.char;
-*/
         return this._pages[this.currentPageIdx + pageDelta] && this._pages[this.currentPageIdx + pageDelta][x] || 0;
     }
     isAnimationComplete() : boolean {
