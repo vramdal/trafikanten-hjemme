@@ -1,17 +1,9 @@
 const expect = require("chai").expect;
-const bitmapTo8Lines = require('../BitmapUtil').bitmapTo8Lines;
-const numToPaddedHex = require('../BitmapUtil').numToPaddedHex;
-const getHexFingerprint = require('../BitmapUtil').getHexFingerprint;
-const Frame = require("../Frame.js");
-const printRuler = require('../BitmapUtil').printRuler;
-const Scrolling = require("../animations/Scrolling.js");
-const BitmapProxy = require("../BitmapProxy.js");
 
 const PagingAnimation = require("./PagingAnimation.js");
 const LinebreakAnnotation = require("../rendering/LinebreakAnnotation.js");
 
 const FRAME_WIDTH = 16;
-
 
 describe('PagingAnimation', () => {
     it('should display a short message as a single page', () => {
@@ -38,5 +30,18 @@ describe('PagingAnimation', () => {
         let animation = new PagingAnimation(2);
         animation.setSource(source, FRAME_WIDTH);
         expect(animation._pages).to.have.lengthOf(2);
+    });
+    it('should cut off the end of a word that is longer than a frame', () => {
+        let source = new Uint8Array(FRAME_WIDTH + 2).fill(2);
+        source[0] = 1;
+        source[FRAME_WIDTH - 1] = 255;
+        source[source.length - 1] = 128;
+        source.annotations = [];
+        let animation = new PagingAnimation(2);
+        animation.setSource(source, FRAME_WIDTH);
+        expect(animation._pages).to.have.lengthOf(1);
+        expect(animation.getTranslated(0)).to.equal(source[0]);
+        expect(animation.getTranslated(FRAME_WIDTH - 1)).to.equal(source[FRAME_WIDTH - 1]);
+        expect(animation.getTranslated(FRAME_WIDTH)).to.equal(0);
     });
 });

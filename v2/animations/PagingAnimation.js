@@ -18,8 +18,6 @@ class PagingAnimation {
         this.reset();
     }
 
-// TODO: Should break a text into parts, and display each part in sequence within the same frame
-
     setSource(source : AnnotatedBitmap, frameWidth: number) : void {
         this._source = source;
         this._frameWidth = frameWidth;
@@ -33,16 +31,19 @@ class PagingAnimation {
         while (rest > 0) {
             if (rest < frameWidth) {
                 this._pages.push(this._source.subarray(cursor));
-                rest = 0;
+                cursor = this._source.length;
             } else {
                 let linebreakAnnotation = linebreakAnnotations.reverse().find(annotation => annotation.start < cursor + frameWidth);
                 if (linebreakAnnotation) {
-                    // TODO: What if no annotation found - i.e. content is too wide for frame
                     this._pages.push(this._source.subarray(cursor, linebreakAnnotation.start));
                     cursor = linebreakAnnotation.end;
-                    rest = this._source.length - cursor;
+                } else {
+                    this._pages.push(this._source.subarray(cursor, cursor + frameWidth));
+                    let nextBreak = linebreakAnnotations.find(annotation => annotation.start > cursor);
+                    cursor = nextBreak && nextBreak.end || this._source.length;
                 }
             }
+            rest = this._source.length - cursor;
         }
     }
     tick() : void {
