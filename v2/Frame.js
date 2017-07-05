@@ -11,6 +11,7 @@ export type AnimationTickPromise = Promise<void>;
 export type Layout = Array<Frame>;
 
 class Frame {
+    // TODO: Support multi-line
     _width : number;
     _x: number;
     _animation: Animation;
