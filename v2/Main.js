@@ -26,7 +26,7 @@ yr.fetch().then(json => {
         framer.parse(
             SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x02\x03\x1A" + SimpleTypes.FORMAT_SPECIFIER_END + "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt"
         ),
-        framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x01\xFF" + SimpleTypes.FORMAT_SPECIFIER_END + "\x02God natt!"
+        framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x01\xFF" + SimpleTypes.FORMAT_SPECIFIER_END + "\x02░░ God natt! ░░"
 
         )
 
