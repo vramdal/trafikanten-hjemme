@@ -22,7 +22,7 @@ let display : Display = new WebsocketDisplay();
         //framer.parse(new Trafikanten().formatMessage(testdata))
         //framer.parse(yr.format(json)),
         framer.parse(
-            SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x03\x10" + SimpleTypes.FORMAT_SPECIFIER_END + "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt"
+            SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x02\x03\x0A" + SimpleTypes.FORMAT_SPECIFIER_END + "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt"
         )
 
     ];

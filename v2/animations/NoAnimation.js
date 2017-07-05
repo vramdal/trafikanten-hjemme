@@ -15,7 +15,10 @@ class NoAnimation implements Animation {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    setSource(source : Bitmap, frameWidth: number) {
+    setSource(source : Bitmap, frameWidth: number, lines : number) {
+        if (lines > 1) {
+            throw new Error(`NoAnimation supports only 1 line, not ${lines}`);
+        }
         this._source = source;
         this._frameWidth = frameWidth;
         this.reset();

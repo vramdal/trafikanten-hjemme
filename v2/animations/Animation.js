@@ -5,7 +5,7 @@ import type {AnnotatedBitmap} from "../Bitmap.js";
 
 export interface Animation {
 
-    setSource(source : AnnotatedBitmap, frameWidth: number) : void;
+    setSource(source : AnnotatedBitmap, frameWidth : number, lines : number) : void;
     tick() : void;
     reset() : void;
     getTranslated(idx : number) : Byte;

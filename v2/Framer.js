@@ -22,7 +22,8 @@ type FrameSpec = {
     x: number,
     end: number,
     animationClass : $Subtype<Animation>,
-    animationParameters : Array<number>
+    animationParameters : Array<number>,
+    lines : number
 }
 
 class Framer {
@@ -64,10 +65,12 @@ class Framer {
     }
 
     parseFrameSpec(str : string) : {specLength : number, frameSpec : FrameSpec} {
+        let argumentIdx = 1;
         // [0] = FORMAT_SPECIFIER_START
-        let x = str.charCodeAt(1);
-        let end = str.charCodeAt(2);
-        let animationId = str[3];
+        let x = str.charCodeAt(argumentIdx++);
+        let end = str.charCodeAt(argumentIdx++);
+        let lines = str.charCodeAt(argumentIdx++);
+        let animationId = str[argumentIdx++];
         let animationClass  : $Subtype<Animation> = AnimationCharacterMap[animationId];
         if (!animationClass) {
             throw new Error(`Invalid animation code ${animationId.charCodeAt(0)}`);
@@ -75,20 +78,20 @@ class Framer {
         let numberOfAnimationParameters = animationClass.length;
         let animationParameters : Array<number> = [];
         for (let i = 0; i < numberOfAnimationParameters; i++) {
-            animationParameters[i] = str.charCodeAt(i + 4);
+            animationParameters[i] = str.charCodeAt(i + argumentIdx++);
         }
         // FORMAT_SPECIFIER_END
         return {
-            specLength : 5 + numberOfAnimationParameters,
-            frameSpec: {x, end, animationClass, animationParameters}
+            specLength : argumentIdx + numberOfAnimationParameters,
+            frameSpec: {x, end, animationClass, animationParameters, lines}
         };
     }
 
     //noinspection JSMethodCanBeStatic
     createFrame(frameSpec : FrameSpec) {
-        let {x , end , animationClass , animationParameters } = frameSpec;
+        let {x , end , animationClass , animationParameters, lines } = frameSpec;
         let animation : Animation = new animationClass(animationParameters);
-        return new Frame(x, end - x, animation);
+        return new Frame(x, end - x, animation, lines);
     }
 
 }

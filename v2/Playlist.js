@@ -22,6 +22,7 @@ class Playlist {
     play() : Promise<void> {
         let promise : Promise<void> = Promise.resolve();
         this._messages.forEach(message => {
+            let start = new Date();
             promise = promise.then(() => {
                     console.log("Playing message " + message.toString());
                     let preparedMessage = this.prepareMessage(message);
@@ -29,7 +30,9 @@ class Playlist {
                 })
                 .catch((err) => {throw err})
                 .then(() => {
-                    console.log("Done playing message");
+                    let end = new Date();
+                    let seconds = (end.getTime() - start.getTime()) / 1000;
+                    console.log("Done playing message", seconds, "seconds");
                 }
             );
         });

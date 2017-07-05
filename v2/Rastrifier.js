@@ -49,7 +49,7 @@ function rastrifyFrame(text : string, frameWidth : number) : AnnotatedBitmap  {
     for (let characterProcessor of characterProcessors) {
         characterProcessor.place(bitmap, glyphsCombinedWidth);
     }
-    bitmap.annotations.sort((ann1, ann2) => ann1.xStart - ann2.xStart);
+    bitmap.annotations.sort((ann1, ann2) => ann1.start - ann2.start);
     return bitmap;
 }
 

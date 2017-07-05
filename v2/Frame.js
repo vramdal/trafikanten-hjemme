@@ -15,18 +15,30 @@ class Frame {
     _width : number;
     _x: number;
     _animation: Animation;
-    _bitmap : Bitmap;
+    _bitmaps: Array<Bitmap>;
+    _lines: number;
 
-    constructor(x: number, width : number, animation : Animation) {
+    constructor(x: number, width : number, animation : Animation, lines : number = 1) {
         this._x = x;
         this._width = width;
         this._animation = animation;
+        this._lines = lines;
     }
 
     setBitmap(source: AnnotatedBitmap) {
-        this._animation.setSource(source, this._width);
-        this._bitmap = new BitmapProxy(source, this._width, this._animation.getTranslated.bind(this._animation));
+        this._animation.setSource(source, this._width, this._lines);
+        let bitmaps = [];
+        for (let bitmapIdx = 0; bitmapIdx < this._lines; bitmapIdx++) {
+            bitmaps.push(new BitmapProxy(source, this._width, this.translateCoordinates.bind(this, bitmapIdx)));
+        }
+        this._bitmaps = bitmaps;
     }
+
+    translateCoordinates(line : number, x : number) {
+        let idx = x + line * this._width;
+        return this._animation.getTranslated(idx);
+    }
+
 
     tick() : AnimationTickPromise {
         return new Promise((resolve, reject) => {
@@ -51,8 +63,16 @@ class Frame {
         return this._width;
     }
 
+    get lines(): number {
+        return this._lines;
+    }
+
     get bitmap(): Bitmap {
-        return this._bitmap;
+        return this._bitmaps[0];
+    }
+
+    getBitmap(lineIdx : number) : Bitmap {
+        return this._bitmaps[lineIdx];
     }
 
     get x(): number {

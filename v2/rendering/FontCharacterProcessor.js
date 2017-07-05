@@ -2,7 +2,10 @@
 
 import type {CharacterProcessor} from "./CharacterProcessor";
 import type {FontCharSpec, FontMap} from "../font";
-import type {Bitmap} from "../Bitmap";
+import type {AnnotatedBitmap} from "../Bitmap";
+
+const FontCharacterAnnotation = require("./FontCharacterAnnotation.js");
+
 
 type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 
@@ -33,8 +36,16 @@ class FontCharacterProcessor implements CharacterProcessor {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    place(bitmap : Bitmap) : void {
-        this.glyphsAtPosition.forEach(glyphAtPosition => bitmap.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x));
+    place(bitmap : AnnotatedBitmap) : void {
+        let annotations : Array<FontCharacterAnnotation> = [];
+        let str = "";
+        this.glyphsAtPosition.forEach((glyphAtPosition, idx) => {
+            let char = glyphAtPosition.glyph.char;
+            str += char;
+            annotations.push(new FontCharacterAnnotation(glyphAtPosition.x, glyphAtPosition.x + glyphAtPosition.glyph.width, char, idx));
+            bitmap.set(glyphAtPosition.glyph.uint8Array, glyphAtPosition.x);
+        });
+        bitmap.annotations = bitmap.annotations.concat(annotations);
     }
 
 }

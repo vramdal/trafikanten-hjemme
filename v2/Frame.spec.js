@@ -31,4 +31,21 @@ describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
         });
     });
 
+    describe('multi-line', () => {
+        it('should translate a linenumber and x-position to another x-position', () => {
+            let bitmap = [10, 20, 30, 40, 50, 60];
+            let frame = new Frame(0, 3, animation);
+            frame.setBitmap(bitmap);
+            expect(frame.translateCoordinates(0, 0)).to.equal(10);
+            expect(frame.translateCoordinates(0, 1)).to.equal(20);
+            expect(frame.translateCoordinates(0, 2)).to.equal(30);
+            expect(frame.translateCoordinates(1, 0)).to.equal(40);
+            expect(frame.translateCoordinates(1, 1)).to.equal(50);
+            expect(frame.translateCoordinates(1, 2)).to.equal(60);
+            expect(frame.translateCoordinates(2, 0)).to.equal(undefined);
+            expect(frame.translateCoordinates(2, 1)).to.equal(undefined);
+            expect(frame.translateCoordinates(2, 2)).to.equal(undefined);
+        });
+    });
+
 });
