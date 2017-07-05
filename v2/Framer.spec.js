@@ -19,7 +19,7 @@ describe('Framer', () => {
     
     describe('parse', () => {
         it('should create two frames for a message in two parts', () => {
-            let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" + SimpleTypes.MESSAGE_PART_SEPARATOR + SimpleTypes.FORMAT_SPECIFIER_START + "\x10\x7F\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!";
+            let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" + SimpleTypes.FORMAT_SPECIFIER_START + "\x10\x7F\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!";
             let message = framer.parse(text);
             expect(message.layout.length).to.equal(2);
             expect(message.layout[0].x).to.equal(0);

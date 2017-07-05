@@ -25,24 +25,42 @@ type FrameSpec = {
     animationParameters : Array<number>
 }
 
-// TODO: Write tests
-
 class Framer {
 
   parse(str : string) : Message { // TODO: Provide sensible default when spec characters are not present
       // TODO: Validate format
-        let split = str.split(SimpleTypes.MESSAGE_PART_SEPARATOR); // TODO: Get rid of MESSAGE_PART_SEPARATOR, should not be needed
-        let parts : Array<TextInFrame> = split.map(strPart => {
-            if (strPart[0] === SimpleTypes.FORMAT_SPECIFIER_START) {
-                let {specLength, frameSpec} = this.parseFrameSpec(strPart);
-                let frame = this.createFrame(frameSpec);
-                let text = strPart.substring(specLength);
-                return {frame, text};
-            } else {
-                throw new Error("No format specifier");
+      if (str[0] !== SimpleTypes.FORMAT_SPECIFIER_START) {
+          throw new Error(`String must start with FORMAT_SPECIFIER_START (charcode ${SimpleTypes.FORMAT_SPECIFIER_START})`);
+      }
+      let parts = this.splitMessageIntoParts(str);
+
+      let messageParts : Array<TextInFrame> = parts.map(strPart => {
+          if (strPart[0] === SimpleTypes.FORMAT_SPECIFIER_START) {
+              let {specLength, frameSpec} = this.parseFrameSpec(strPart);
+              let frame = this.createFrame(frameSpec);
+              let text = strPart.substring(specLength);
+              return {frame, text};
+          } else {
+              throw new Error("No format specifier");
+          }
+      });
+      return new Message(messageParts);
+    }
+
+    //noinspection JSMethodCanBeStatic
+    splitMessageIntoParts(str : string) {
+        let split = [];
+        let previousMatch = undefined;
+        for (let i = str.length - 1; i >= 0; i--) {
+            let ch = str[i];
+            if (ch === SimpleTypes.FORMAT_SPECIFIER_START) {
+                split.push(str.substring(i, previousMatch));
+                previousMatch = i;
             }
-        });
-        return new Message(parts);
+        }
+
+        split.reverse();
+        return split;
     }
 
     parseFrameSpec(str : string) : {specLength : number, frameSpec : FrameSpec} {
