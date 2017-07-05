@@ -2,6 +2,7 @@
 const font = require("./font");
 const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
 const ControlCharacterProcessor = require("./rendering/ControlCharacterProcessor.js");
+const LinebreakingCharacterProcessor = require("./rendering/LinebreakingCharacterProcessor.js");
 const SimpleTypes = require("./SimpleTypes.js");
 import type {AnnotatedBitmap} from './Bitmap';
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";
@@ -35,7 +36,8 @@ function rastrifyFrame(text : string, frameWidth : number) : AnnotatedBitmap  {
 
     let controlCharacterProcessor = new ControlCharacterProcessor();
     let fontCharacterProcessor = new FontCharacterProcessor(font);
-    let characterProcessors : Array<CharacterProcessor> = [fontCharacterProcessor, controlCharacterProcessor];
+    let linebreakingCharacterProcessor = new LinebreakingCharacterProcessor();
+    let characterProcessors : Array<CharacterProcessor> = [linebreakingCharacterProcessor, fontCharacterProcessor, controlCharacterProcessor];
     parseString(text, characterProcessors);
 
     let glyphs = fontCharacterProcessor.glyphs;

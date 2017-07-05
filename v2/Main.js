@@ -14,17 +14,15 @@ let framer = new Framer();
 
 let display : Display = new WebsocketDisplay();
 
-let yr = new Yr();
+//let yr = new Yr();
 
-yr.fetch().then(json => {
+//yr.fetch().then(json => {
     const messages : Array<Message> = [
         // framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" + SimpleTypes.MESSAGE_PART_SEPARATOR + SimpleTypes.FORMAT_SPECIFIER_START + "\x10\x7F\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!"),
         //framer.parse(new Trafikanten().formatMessage(testdata))
-        framer.parse(yr.format(json)),
+        //framer.parse(yr.format(json)),
         framer.parse(
-            SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x50" + SimpleTypes.FORMAT_SPECIFIER_END + "Værvarsel fra Yr, levert av" +
-            SimpleTypes.MESSAGE_PART_SEPARATOR +
-            SimpleTypes.FORMAT_SPECIFIER_START + "\x80\xFF\x01\x50" + SimpleTypes.FORMAT_SPECIFIER_END +"NRK og Meteorologisk institutt"
+            SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x03\x10" + SimpleTypes.FORMAT_SPECIFIER_END + "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt"
         )
 
     ];
@@ -36,7 +34,7 @@ yr.fetch().then(json => {
 
     display.play();
 
-});
+//});
 
 
 setTimeout(() => {

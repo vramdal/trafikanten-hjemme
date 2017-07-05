@@ -8,10 +8,12 @@ const NoAnimation = require("./animations/NoAnimation.js");
 const Message = require("./Message.js");
 const Scrolling = require("./animations/Scrolling.js");
 const Frame = require("./Frame.js");
+const Paging = require("./animations/Paging.js");
 
 const AnimationCharacterMap = {
     '\x01' : NoAnimation,
-    '\x02' : Scrolling
+    '\x02' : Scrolling,
+    '\x03' : Paging
 };
 
 // const FRAME_SPEC_FORMAT = [x, width, animation, ...animation parameters]

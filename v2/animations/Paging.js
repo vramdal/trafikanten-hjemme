@@ -26,6 +26,7 @@ class PagingAnimation {
             source.annotations.filter((annotation : BitmapAnnotation) =>
                 annotation instanceof LinebreakAnnotation
             ) : Array<any>) : Array<LinebreakAnnotation>);
+        let annotationsReversed = linebreakAnnotations.reverse();
         let rest = this._source.length;
         let cursor = 0;
         while (rest > 0) {
@@ -33,7 +34,7 @@ class PagingAnimation {
                 this._pages.push(this._source.subarray(cursor));
                 cursor = this._source.length;
             } else {
-                let linebreakAnnotation = linebreakAnnotations.reverse().find(annotation => annotation.start < cursor + frameWidth);
+                let linebreakAnnotation = annotationsReversed.find(annotation => annotation.start > cursor && annotation.start < cursor + frameWidth);
                 if (linebreakAnnotation) {
                     this._pages.push(this._source.subarray(cursor, linebreakAnnotation.start));
                     cursor = linebreakAnnotation.end;
