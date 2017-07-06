@@ -48,11 +48,11 @@ class Trafikanten {
     formatMessage(getDeparturesResponse : GetDeparturesResponse) {
 
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
-        let firstLine = Trafikanten.createFormatSpecifier(0, 20, NoAnimation) +
-            "\x02" + firstDeparture.LineRef +
-            Trafikanten.createFormatSpecifier(22, 127, NoAnimation, 5) +
+        let firstLine = Trafikanten.createFormatSpecifier(0, 12, NoAnimation, 5, 2) +
+            firstDeparture.LineRef +
+            Trafikanten.createFormatSpecifier(17, 100, NoAnimation, 5, 0) +
             firstDeparture.DestinationName +
-            "\x01" +
+            Trafikanten.createFormatSpecifier(100, 127, NoAnimation, 5, 2) +
             this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())
         ;
 

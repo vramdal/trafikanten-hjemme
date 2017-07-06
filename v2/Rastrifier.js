@@ -1,7 +1,6 @@
 // @flow
 const font = require("./font");
 const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
-const ControlCharacterProcessor = require("./rendering/ControlCharacterProcessor.js");
 const LinebreakingCharacterProcessor = require("./rendering/LinebreakingCharacterProcessor.js");
 const SimpleTypes = require("./SimpleTypes.js");
 import type {AnnotatedBitmap} from './Bitmap';
@@ -34,16 +33,15 @@ function mapCharactersToPositions(glyphs, characterProcessors) : number {
 function rastrifyFrame(text : string, frameWidth : number) : AnnotatedBitmap  {
     "use strict";
 
-    let controlCharacterProcessor = new ControlCharacterProcessor();
     let fontCharacterProcessor = new FontCharacterProcessor(font);
     let linebreakingCharacterProcessor = new LinebreakingCharacterProcessor();
-    let characterProcessors : Array<CharacterProcessor> = [linebreakingCharacterProcessor, fontCharacterProcessor, controlCharacterProcessor];
+    let characterProcessors : Array<CharacterProcessor> = [linebreakingCharacterProcessor, fontCharacterProcessor];
     parseString(text, characterProcessors);
 
     let glyphs = fontCharacterProcessor.glyphs;
     let glyphsCombinedWidth = mapCharactersToPositions(glyphs, characterProcessors);
 
-    let arrayBuffer = new ArrayBuffer(Math.max(glyphsCombinedWidth, frameWidth));
+    let arrayBuffer = new ArrayBuffer(glyphsCombinedWidth);
     let bitmap : any = new Uint8Array(arrayBuffer);
     bitmap.annotations = [];
     for (let characterProcessor of characterProcessors) {
@@ -58,6 +56,6 @@ module.exports =  {
             return rastrifyFrame(text, frameWidth);
     },
     _testing: {
-        rastrifyFrame, isControlSequenceStart : ControlCharacterProcessor._isControlSequenceStart, parseString
+        rastrifyFrame, isControlSequenceStart : parseString
     }
 };
