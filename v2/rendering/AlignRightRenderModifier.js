@@ -1,7 +1,7 @@
 // @flow
 
-import type {RenderControlAtPosition} from './RenderModfier';
-import type {RenderModifier} from "./RenderModfier";
+import type {RenderControlAtPosition} from './RenderModifier';
+import type {RenderModifier} from "./RenderModifier";
 
 class AlignRightRenderModifier implements RenderModifier {
 

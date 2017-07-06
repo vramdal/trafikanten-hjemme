@@ -6,7 +6,7 @@ import type {CharacterProcessor} from "./CharacterProcessor";
 const AlignRightRenderModifier = require("./AlignRightRenderModifier.js");
 const AlignCenterRenderModifier = require("./AlignCenterRenderModifier.js");
 import type {Char} from "../SimpleTypes";
-import type {RenderControlMap, RenderModifier} from "./RenderModfier";
+import type {RenderControlMap, RenderModifier} from "./RenderModifier";
 
 type RenderModifierFactory = (parameters : ?string) => RenderModifier;
 
