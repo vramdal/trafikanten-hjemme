@@ -48,6 +48,7 @@ class Framer {
       return new Message(messageParts);
     }
 
+    // TODO: Trouble if charcode 15 (SimpleTypes.FORMAT_SPECIFIER_START) is used as a value - issue#7
     //noinspection JSMethodCanBeStatic
     splitMessageIntoParts(str : string) {
         let split = [];
@@ -65,32 +66,37 @@ class Framer {
     }
 
     parseFrameSpec(str : string) : {specLength : number, frameSpec : FrameSpec} {
-        let argumentIdx = 1;
-        // [0] = FORMAT_SPECIFIER_START
-        let x = str.charCodeAt(argumentIdx++);
-        let end = str.charCodeAt(argumentIdx++);
-        let lines = str.charCodeAt(argumentIdx++);
-        let animationId = str[argumentIdx++];
-        let animationClass  : $Subtype<Animation> = AnimationCharacterMap[animationId];
-        if (!animationClass) {
-            throw new Error(`Invalid animation code \\x${animationId.charCodeAt(0).toString(16)} in format specifier ${str.substring(0, 5).split("").map(ch => ch.charCodeAt(0).toString(16)).map(hex => "\\x" + hex).join(",")}`);
+        try {
+            let argumentIdx = 1;
+            // [0] = FORMAT_SPECIFIER_START
+            let x = str.charCodeAt(argumentIdx++);
+            let end = str.charCodeAt(argumentIdx++);
+            let lines = str.charCodeAt(argumentIdx++);
+            let animationId = str[argumentIdx++];
+            let animationClass: $Subtype<Animation> = AnimationCharacterMap[animationId];
+            if (!animationClass) {
+                //noinspection ExceptionCaughtLocallyJS
+                throw new Error(`Invalid animation code \\x${animationId.charCodeAt(0).toString(16)} in format specifier ${str.substring(0, 5).split("").map(ch => ch.charCodeAt(0).toString(16)).map(hex => "\\x" + hex).join(",")}`);
+            }
+            let numberOfAnimationParameters = animationClass.length;
+            let animationParameters: Array<number> = [];
+            for (let i = 0; i < numberOfAnimationParameters; i++) {
+                animationParameters[i] = str.charCodeAt(i + argumentIdx);
+            }
+            return {
+                specLength : argumentIdx + numberOfAnimationParameters + 1,
+                frameSpec: {x, end, animationClass, animationParameters, lines}
+            };
+            // FORMAT_SPECIFIER_END
+        } catch (e) {
+            throw new Error(`Error parsing format specifier. Received values: x = ${str.charCodeAt(1)}, end = ${str.charCodeAt(2)}, lines = ${str.charCodeAt(3)}, animationId = ${str[4]}, animationParameters:= ${str.substring(5).split("").map((ch, idx) => str.charCodeAt(idx)).join(",")}`)
         }
-        let numberOfAnimationParameters = animationClass.length;
-        let animationParameters : Array<number> = [];
-        for (let i = 0; i < numberOfAnimationParameters; i++) {
-            animationParameters[i] = str.charCodeAt(i + argumentIdx);
-        }
-        // FORMAT_SPECIFIER_END
-        return {
-            specLength : argumentIdx + numberOfAnimationParameters + 1,
-            frameSpec: {x, end, animationClass, animationParameters, lines}
-        };
     }
 
     //noinspection JSMethodCanBeStatic
     createFrame(frameSpec : FrameSpec) {
         let {x , end , animationClass , animationParameters, lines } = frameSpec;
-        let animation : Animation = new animationClass(animationParameters);
+        let animation : Animation = new animationClass(animationParameters[0], animationParameters[1], animationParameters[2]);
         return new Frame(x, end - x, animation, lines);
     }
 

@@ -3,15 +3,30 @@
 import type {Animation} from "./Animation";
 import type {Bitmap} from "../Bitmap";
 
+const alignments : Array<(frameWidth : number, contentPixelLength : number) => number> = [
+    function alignLeft() {
+        return 0;
+    },
+    function alignCenter(frameWidth : number, contentPixelLength: number) {
+        return Math.floor((contentPixelLength - frameWidth) / 2);
+    },
+    function alignRight(frameWidth : number, contentPixelLength: number) {
+        return contentPixelLength - frameWidth;
+    }
+];
+
 class NoAnimation implements Animation {
     _source: Bitmap;
     _frameWidth: number;
     _timeoutTicks : number;
     _countdown : number;
+    _alignmentOffset: number;
+    _alignmentId: number;
 
-    constructor(timeoutTicks : number) {
+    constructor(timeoutTicks : number, alignmentId : number) {
         this._timeoutTicks = timeoutTicks;
         this._countdown = timeoutTicks;
+        this._alignmentId = alignmentId;
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -21,6 +36,7 @@ class NoAnimation implements Animation {
         }
         this._source = source;
         this._frameWidth = frameWidth;
+        this._alignmentOffset = alignments[this._alignmentId](this._frameWidth, this._source.length);
         this.reset();
     }
 
@@ -34,7 +50,14 @@ class NoAnimation implements Animation {
     }
     //noinspection JSUnusedGlobalSymbols
     getTranslated(idx : number) {
-        return this._source[idx];
+        let offsetTranslated = idx + this._alignmentOffset;
+        if (offsetTranslated < 0) {
+            return 0;
+        } else if (offsetTranslated >= this._source.length) {
+            return 0;
+        } else {
+            return this._source[offsetTranslated];
+        }
     };
     //noinspection JSUnusedGlobalSymbols
     isAnimationComplete() : boolean {
@@ -45,5 +68,4 @@ class NoAnimation implements Animation {
         return this._countdown;
     }
 }
-
 module.exports = NoAnimation;
