@@ -3,6 +3,7 @@
 import type {Animation} from "./Animation";
 import type {Bitmap} from "../Bitmap";
 
+//noinspection JSUnusedGlobalSymbols
 const alignments : Array<(frameWidth : number, contentPixelLength : number) => number> = [
     function alignLeft() {
         return 0;
@@ -26,7 +27,7 @@ class NoAnimation implements Animation {
     constructor(timeoutTicks : number, alignmentId : number) {
         this._timeoutTicks = timeoutTicks;
         this._countdown = timeoutTicks;
-        this._alignmentId = alignmentId;
+        this._alignmentId = (alignmentId !== undefined ? alignmentId : 0);
     }
 
     //noinspection JSUnusedGlobalSymbols

@@ -10,10 +10,10 @@ describe('Framer', () => {
 
     describe('parseFrameSpec', () => {
         it('should set correct start, end and animation', () => {
-            let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x01\x0A\x01\x01\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!";
+            let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x01\x0A\x01\x01\x05\x00" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!";
             let parsed = framer.parseFrameSpec(text);
-            expect(parsed.specLength).to.equal(7);
-            expect(JSON.stringify(parsed.frameSpec)).to.equal(JSON.stringify({x: 1, end: 10, animationClass: NoAnimation, animationParameters: [5], lines: 1}));
+            expect(parsed.specLength).to.equal(8);
+            expect(JSON.stringify(parsed.frameSpec)).to.equal(JSON.stringify({x: 1, end: 10, animationClass: NoAnimation, animationParameters: [5, 0], lines: 1}));
         });
     });
     

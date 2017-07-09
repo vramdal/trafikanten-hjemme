@@ -42,9 +42,9 @@ describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
             expect(frame.translateCoordinates(1, 0)).to.equal(40);
             expect(frame.translateCoordinates(1, 1)).to.equal(50);
             expect(frame.translateCoordinates(1, 2)).to.equal(60);
-            expect(frame.translateCoordinates(2, 0)).to.equal(undefined);
-            expect(frame.translateCoordinates(2, 1)).to.equal(undefined);
-            expect(frame.translateCoordinates(2, 2)).to.equal(undefined);
+            expect(frame.translateCoordinates(2, 0)).to.equal(0);
+            expect(frame.translateCoordinates(2, 1)).to.equal(0);
+            expect(frame.translateCoordinates(2, 2)).to.equal(0);
         });
     });
 

@@ -30,7 +30,7 @@ function mapCharactersToPositions(glyphs, characterProcessors) : number {
     }, 0);
 }
 
-function rastrifyFrame(text : string, frameWidth : number) : AnnotatedBitmap  {
+function rastrifyFrame(text: string): AnnotatedBitmap {
     "use strict";
 
     let fontCharacterProcessor = new FontCharacterProcessor(font);
@@ -52,10 +52,10 @@ function rastrifyFrame(text : string, frameWidth : number) : AnnotatedBitmap  {
 }
 
 module.exports =  {
-    rastrify: function(text : string, frameWidth: number = 128) : AnnotatedBitmap {
-            return rastrifyFrame(text, frameWidth);
+    rastrify: function (text: string): AnnotatedBitmap {
+        return rastrifyFrame(text);
     },
     _testing: {
-        rastrifyFrame, isControlSequenceStart : parseString
+        rastrifyFrame, parseString
     }
 };
