@@ -5,6 +5,7 @@ const xml2json = require("xml2json");
 const Trafikanten = require("./Trafikanten.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
+import type {MessageType} from "./message/MessageType";
 
 // const url = "http://www.yr.no/sted/Norge/Oslo/Oslo/Kampen/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Telemark/Bamble/Bamble/varsel_nu.xml";
@@ -57,12 +58,12 @@ class Yr {
             .then(json => JSON.parse(json))
     }
 
-    format(yrPrecipitation : YrPrecipitationType) : string {
+    format(yrPrecipitation : YrPrecipitationType) : MessageType {
 
         const barWidth = 6; //Math.floor(128 / yrPrecipitation.weatherdata.forecast.time.length / 2);
         let noPrecipitation = true;
 
-        const graph = yrPrecipitation.weatherdata.forecast.time
+        const graph = yrPrecipitation.weatherdata.forecast.time && yrPrecipitation.weatherdata.forecast.time
             .map(precipitationTime => parseFloat(precipitationTime.precipitation.value))
             .map(value => {
                 if (value > 0) {
@@ -77,14 +78,20 @@ class Yr {
             })
             .map(eights => eights === 0 ? 8202 : 9600 + eights)
             .map(charCode => new Array(barWidth).fill(String.fromCharCode(charCode)).join(String.fromCharCode(8202)))
-            .join("");
+            .join("")
+        || "Nå-varsel utilgjengelig";
 
-        return Trafikanten.createFormatSpecifier(0, 128, NoAnimation, 200)
-            + ("\x02Nedbør neste 90 min")
-            //+ yrPrecipitation.weatherdata.credit.link.text
-            + Trafikanten.createFormatSpecifier(128, 255, NoAnimation, 200)
-            + "\x02"
-            + (noPrecipitation ? "Ingen" : graph)
+        let part1 = {
+            text: "Nedbør neste 90 min",
+            ...Trafikanten.createFormatSpecifier(0, 128), animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "left"}
+        };
+
+        let part2 = {
+            text: (noPrecipitation ? "Ingen" : graph),
+            ...Trafikanten.createFormatSpecifier(128, 255), animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "left"}
+        };
+        
+        return [part1, part2];
     }
 
 }

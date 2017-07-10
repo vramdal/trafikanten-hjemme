@@ -35,7 +35,7 @@ describe('NoAnimation', () => {
         describe('leftAlign', () => {
 
             beforeEach(() => {
-                animation = new NoAnimation(TIMEOUT_TICKS, 0);
+                animation = new NoAnimation(TIMEOUT_TICKS, "left");
             });
 
             it('should align a short message to the left of the frame', () => {
@@ -53,7 +53,7 @@ describe('NoAnimation', () => {
         describe('centerAlign', () => {
 
             beforeEach(() => {
-                animation = new NoAnimation(TIMEOUT_TICKS, 1);
+                animation = new NoAnimation(TIMEOUT_TICKS, "center");
             });
 
             it('should center a short message', () => {
@@ -73,7 +73,7 @@ describe('NoAnimation', () => {
         describe('rightAlign', () => {
 
             beforeEach(() => {
-                animation = new NoAnimation(TIMEOUT_TICKS, 2);
+                animation = new NoAnimation(TIMEOUT_TICKS, "right");
             });
 
             it('should align a short message to the right of the frame', () => {

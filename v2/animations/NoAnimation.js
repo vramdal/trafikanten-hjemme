@@ -2,19 +2,16 @@
 
 import type {Animation} from "./Animation";
 import type {Bitmap} from "../Bitmap";
+import type {Alignments} from "./Types";
+
+// type AlignmentFunc = (frameWidth : number, contentPixelLength : number) => number;
 
 //noinspection JSUnusedGlobalSymbols
-const alignments : Array<(frameWidth : number, contentPixelLength : number) => number> = [
-    function alignLeft() {
-        return 0;
-    },
-    function alignCenter(frameWidth : number, contentPixelLength: number) {
-        return Math.floor((contentPixelLength - frameWidth) / 2);
-    },
-    function alignRight(frameWidth : number, contentPixelLength: number) {
-        return contentPixelLength - frameWidth;
-    }
-];
+const alignments = {
+    "left": (frameWidth : number, contentPixelLength: number) => 0,
+    "center": (frameWidth : number, contentPixelLength: number) => Math.floor((contentPixelLength - frameWidth) / 2),
+    "right": (frameWidth : number, contentPixelLength: number) => contentPixelLength - frameWidth
+};
 
 class NoAnimation implements Animation {
     _source: Bitmap;
@@ -22,12 +19,12 @@ class NoAnimation implements Animation {
     _timeoutTicks : number;
     _countdown : number;
     _alignmentOffset: number;
-    _alignmentId: number;
+    _alignment: Alignments;
 
-    constructor(timeoutTicks : number, alignmentId : number) {
+    constructor(timeoutTicks : number, alignment : Alignments) {
         this._timeoutTicks = timeoutTicks;
         this._countdown = timeoutTicks;
-        this._alignmentId = (alignmentId !== undefined ? alignmentId : 0);
+        this._alignment = alignment;
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -37,7 +34,7 @@ class NoAnimation implements Animation {
         }
         this._source = source;
         this._frameWidth = frameWidth;
-        this._alignmentOffset = alignments[this._alignmentId](this._frameWidth, this._source.length);
+        this._alignmentOffset = alignments[this._alignment](this._frameWidth, this._source.length);
         this.reset();
     }
 

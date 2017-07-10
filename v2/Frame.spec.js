@@ -14,7 +14,7 @@ describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
 
     let imageHex = "7e1010107e001c2a2a2a1800427e0200427e02001c2222221c00000000003c020c023c001c2222221c003e10202000427e02000c12127e0000007a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     let bitmap = Buffer.from(imageHex, "hex");
-    const animation = new NoAnimation();
+    const animation = new NoAnimation(10, "left");
 
     it('should display a bitmap when there is enough space', () => {
         let frame = new Frame(0, 128, animation);

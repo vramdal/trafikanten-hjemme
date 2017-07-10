@@ -3,11 +3,12 @@
 const SimpleTypes = require("./SimpleTypes.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
-import type {Animation} from "./animations/Animation";
+//import type {Animation} from "./animations/Animation";
 type MonitoredCall = {
     ExpectedDepartureTime : string
 }
 
+import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
 
 
 type MonitoredVehicleJourney = {
@@ -22,46 +23,44 @@ type MonitoredStopVisit = {
 };
 type GetDeparturesResponse = Array<MonitoredStopVisit>;
 
-const createFormatSpecifier = (x : number, end : number, animationClass: Class<$Subtype<Animation>>, ...animationParameters: Array<number>) : string => {
-    let animationId : string;
-    switch (animationClass) {
-        case NoAnimation : animationId = "\x01"; break;
-        case Scrolling : animationId = "\x02"; break;
-        default : animationId = "\x01";
+const createFormatSpecifier = (x : number, end : number) : {start : number, end : number, lines : number}  => {
+    return {
+        start: x,
+        end: end,
+        lines: 1
     }
-    return SimpleTypes.FORMAT_SPECIFIER_START +
-        String.fromCharCode(x) +
-        String.fromCharCode(end) +
-        "\x01" +
-        animationId +
-        animationParameters.map((param : number) => String.fromCharCode(param)).join("")
-        + SimpleTypes.FORMAT_SPECIFIER_END;
 
 };
 
 class Trafikanten {
 
-    static createFormatSpecifier(x : number, end : number, animationClass: Class<$Subtype<Animation>>, ...animationParameters: Array<number>) {
+    static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
     }
 
-    formatMessage(getDeparturesResponse : GetDeparturesResponse) {
-
+    formatMessage(getDeparturesResponse : GetDeparturesResponse) : MessageType {
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
-        let firstLine = Trafikanten.createFormatSpecifier(0, 12, NoAnimation, 5, 2) +
-            firstDeparture.LineRef +
-            Trafikanten.createFormatSpecifier(17, 100, NoAnimation, 5, 0) +
-            firstDeparture.DestinationName +
-            Trafikanten.createFormatSpecifier(100, 127, NoAnimation, 5, 2) +
-            this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())
-        ;
-
+        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"};
+        let part1 : MessagePartType = {
+            text: firstDeparture.LineRef,
+            ...Trafikanten.createFormatSpecifier(0, 12), animation: noAnimation
+        };
+        let part2 : MessagePartType = {
+            text: firstDeparture.DestinationName,
+            ...Trafikanten.createFormatSpecifier(17, 100), animation: noAnimation
+        };
+        let part3 : MessagePartType= {
+            text: this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime()),
+            ...Trafikanten.createFormatSpecifier(100, 127), animation: noAnimation
+        };
         let formatted = getDeparturesResponse.slice(1).map((monitoredStopVisit : MonitoredStopVisit) => {
             let journey = monitoredStopVisit.MonitoredVehicleJourney;
             return this.formatJourney(journey);
         });
-        let secondLine = Trafikanten.createFormatSpecifier(128, 255, Scrolling) + formatted.join("  -  ");
-        return firstLine + secondLine;
+        let secondLine : MessagePartType = {
+            text: formatted.join("  -  "), ...Trafikanten.createFormatSpecifier(128, 255), animation: {animationName: "ScrollingAnimation"}
+        };
+        return [part1, part2, part3, secondLine];
     }
 
     formatJourney(journey : MonitoredVehicleJourney) {
