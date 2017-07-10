@@ -19,6 +19,7 @@ class Display implements DisplayInterface {
         this._buffer = new Uint8Array(256);
         this._eventEmitter = new DisplayEventEmitter();
         this._eventEmitter.on(EventTypeNames.EVENT_BITMAP_UPDATED, this.onBitmapUpdated.bind(this));
+        this._eventEmitter.on(EventTypeNames.EVENT_BITMAP_CLEAR, this.clear.bind(this));
     }
 
     get eventEmitter() : DisplayEventEmitter {
@@ -32,6 +33,11 @@ class Display implements DisplayInterface {
     onBitmapUpdated(layout : Layout) : void {
         let collage : Collage = new Collage(layout);
         collage.pasteTo(this._buffer);
+        this.output();
+    }
+
+    clear() : void {
+        this._buffer.fill(0);
         this.output();
     }
 

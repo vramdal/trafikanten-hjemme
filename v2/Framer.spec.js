@@ -1,30 +1,52 @@
 const expect = require("chai").expect;
 
-const SimpleTypes = require("./SimpleTypes.js");
 const Framer = require("./Framer.js");
 const NoAnimation = require("./animations/NoAnimation.js");
+
 
 describe('Framer', () => {
 
     const framer = new Framer();
+    const TEXT_1 = "Hello, world!";
+    const TEXT_2 = "Hello, world, again!";
+
+    const MESSAGE_SPEC = [{
+        text: TEXT_1,
+        start: 0, end: 127, lines: 1,
+        animationName: "NoAnimation",
+        timeoutTicks: 10,
+        alignment: "left"
+    }];
+
 
     describe('parseFrameSpec', () => {
         it('should set correct start, end and animation', () => {
-            let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x01\x0A\x01\x01\x05\x00" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!";
-            let parsed = framer.parseFrameSpec(text);
-            expect(parsed.specLength).to.equal(8);
-            expect(JSON.stringify(parsed.frameSpec)).to.equal(JSON.stringify({x: 1, end: 10, animationClass: NoAnimation, animationParameters: [5, 0], lines: 1}));
+            "use strict";
+            let result = framer.parse(MESSAGE_SPEC);
+            expect(result.parts).to.have.lengthOf(1);
+            let part = result.parts[0];
+            expect(part.text).to.equal(TEXT_1);
+            expect(part.frame.x).to.equal(0);
+            expect(part.frame.width).to.equal(127);
+            expect(part.frame.lines).to.equal(1);
+            expect(part.frame._animation).to.eql(new NoAnimation(10, "left"));
+
+
         });
     });
     
     describe('parse', () => {
         it('should create two frames for a message in two parts', () => {
-            let text = SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x01\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!"
-                + SimpleTypes.FORMAT_SPECIFIER_START + "\x10\x7F\x01\x02\x05" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!";
-            let message = framer.parse(text);
-            expect(message.layout.length).to.equal(2);
-            expect(message.layout[0].x).to.equal(0);
-            expect(message.layout[1].x).to.equal(16);
+            "use strict";
+            let messageSpec = [...MESSAGE_SPEC, {
+                text : TEXT_2,
+                start: 128, end: 255, lines: 1,
+                animationName: "NoAnimation",
+                timeoutTicks: 10,
+                alignment: "left"
+            }];
+            let result = framer.parse(messageSpec);
+            expect(result.parts).to.have.lengthOf(2);
         })
     });
 });

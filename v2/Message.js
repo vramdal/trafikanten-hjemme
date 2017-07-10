@@ -5,8 +5,9 @@ const Frame = require("./Frame.js");
 const NoAnimation = require("./animations/NoAnimation.js");
 //const Scrolling = require("./animations/Scrolling.js");
 
+//noinspection JSUnusedLocalSymbols
 function defaultLayout() {
-    return [new Frame(0, 128, new NoAnimation(10))];
+    return [new Frame(0, 128, new NoAnimation(10, "left"))];
 }
 
 export type TextInFrame = {

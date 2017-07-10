@@ -31,8 +31,7 @@ class MessageDisplay {
         let parts : Array<TextInFrame> = this._message.parts;
         parts.forEach(part => {
             let frame = part.frame;
-            let frameWidth = frame.width;
-            let bitmap : AnnotatedBitmap = Rastrifier.rastrify(part.text, frameWidth);
+            let bitmap : AnnotatedBitmap = Rastrifier.rastrify(part.text);
             frame.setBitmap(bitmap);
         });
         this._prepared = true;
@@ -40,7 +39,7 @@ class MessageDisplay {
 
     play() : Promise<any> {
         this._framesThatArePlaying = this._message.layout.map(frame => frame);
-
+        this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_CLEAR);
         return this._ticker.countdown().then(() => {
             process.stdout.write("\n");
             Promise.resolve();
