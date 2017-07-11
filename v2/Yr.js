@@ -81,15 +81,19 @@ class Yr {
             .join("")
         || "Nå-varsel utilgjengelig";
 
-        let part1 = {
-            text: "Nedbør neste 90 min",
-            ...Trafikanten.createFormatSpecifier(0, 128), animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "left"}
-        };
+        let part1 = Object.assign(
+            {},
+            {text: "Nedbør neste 90 min"},
+            Trafikanten.createFormatSpecifier(0, 128),
+            {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "left"}}
+        );
 
-        let part2 = {
-            text: (noPrecipitation ? "Ingen" : graph),
-            ...Trafikanten.createFormatSpecifier(128, 255), animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "left"}
-        };
+        let part2 = Object.assign(
+            {},
+            {text: (noPrecipitation ? "Ingen" : graph)},
+            Trafikanten.createFormatSpecifier(128, 255),
+            {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "left"}}
+        );
         
         return [part1, part2];
     }

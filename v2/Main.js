@@ -22,11 +22,11 @@ yr.fetch().then(json => {
         // framer.parse(
         //     SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x01\x02" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" +
         //     SimpleTypes.FORMAT_SPECIFIER_START + "\x0A\x7F\x01\x02" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!"),
-        framer.parse(yr.format(json)),
-        framer.parse([{text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt", start: 0, end: 128, lines: 2, animation: {animationName: "PagingAnimation", ticksPerPage: 100}}]
+        // framer.parse(yr.format(json)),
+        framer.parse([{text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt", start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", ticksPerPage: 100}}]
         ),
         //framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x01\xFF\x01" + SimpleTypes.FORMAT_SPECIFIER_END + "░░ God natt! ░░"
-        framer.parse(new Trafikanten().formatMessage(testdata))
+        //framer.parse(new Trafikanten().formatMessage(testdata))
 
 
 

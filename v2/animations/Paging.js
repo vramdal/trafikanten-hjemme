@@ -87,6 +87,12 @@ class PagingAnimation implements Animation {
         let x = idx % this._frameWidth;
         return this._pages[this.currentPageIdx + pageDelta] && this._pages[this.currentPageIdx + pageDelta][x] || 0;
     }
+
+    getTranslatedOnLine(x : number, lineDelta : number) : Byte {
+        return this._pages[this.currentPageIdx + lineDelta] && this._pages[this.currentPageIdx + lineDelta][x] || 0;
+    }
+
+
     isAnimationComplete() : boolean {
         return this._currentTick >= this.ticksPerMessage;
     }
