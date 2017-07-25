@@ -3,12 +3,16 @@
 const LinebreakAnnotation = require("../rendering/LinebreakAnnotation.js");
 const FontCharacterAnnotation = require("../rendering/FontCharacterAnnotation.js");
 
-import type {AnnotatedBitmap, Bitmap, BitmapAnnotation} from "../Bitmap";
+const MultilineBitmap = require("../Bitmap.js").MultilineBitmap;
+
+import type {AnnotatedBitmap, BitmapAnnotation} from "../Bitmap";
+
 import type {Char} from "../SimpleTypes";
 
+// TODO: Tests: move from VerticalScrolling.spec and Paging.spec
 class TextLayout {
 
-    _pages: Array<Bitmap>;
+    _pages: MultilineBitmap;
     _charPages : Array<Char>;
 
     constructor(source : AnnotatedBitmap, frameWidth: number) {
@@ -48,11 +52,11 @@ class TextLayout {
     }
 
     reset() : void {
-        this._pages = [];
+        this._pages = new MultilineBitmap();
         this._charPages = [];
     };
 
-    get pages(): Array<Bitmap> {
+    get pages(): MultilineBitmap {
         return this._pages;
     }
 
