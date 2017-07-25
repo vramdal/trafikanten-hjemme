@@ -17,8 +17,8 @@ class VerticalScrollingAnimation implements Animation {
     _currentTick : number;
 
 
-    constructor() {
-        this._waitTicksOnLine = WAIT_TICKS_ON_LINE;
+    constructor(holdOnLine : number) {
+        this._waitTicksOnLine = holdOnLine || WAIT_TICKS_ON_LINE;
     }
 
     setSource(source : AnnotatedBitmap, frameWidth: number, lines : number = 1) : void {
@@ -37,19 +37,25 @@ class VerticalScrollingAnimation implements Animation {
     }
 
     getAnimationRemaining(): number {
-        return this.numLines * this.ticksPerLine - this._currentTick;
+        return this.numLines * this.ticksPerLine + this.height - this._currentTick;
     }
 
+    //noinspection JSUnusedGlobalSymbols
     isAnimationComplete() : boolean {
         return this.getAnimationRemaining() <= 0;
     }
 
     get height() : number {
-        return this.numLines * 10 - PADDING_BETWEEN_LINES;
+        return this.numLines * this.lineHeight - PADDING_BETWEEN_LINES;
     }
 
     //noinspection JSMethodCanBeStatic
     get ticksPerLine() : number {
+        return 8 + PADDING_BETWEEN_LINES + this._waitTicksOnLine;
+    }
+
+    //noinspection JSMethodCanBeStatic
+    get lineHeight() : number {
         return 8 + PADDING_BETWEEN_LINES;
     }
 
@@ -57,19 +63,33 @@ class VerticalScrollingAnimation implements Animation {
         return this._textLayout.pages.length;
     }
 
+    //noinspection JSMethodCanBeStatic
+    padByteStr(byte : Byte | string) : string {
+        let str = byte + "";
+        while (str.length < 8) {
+            str = "0" + str;
+        }
+        return str;
+    }
+
     getTranslatedOnLine(x : number, line : number = 0) : Byte {
-        let byteStack = this._textLayout.pages.getByteStack(x, PADDING_BETWEEN_LINES);
-        let str : string = byteStack.toString(2);
+        let str = this._textLayout.pages
+            .map(page => page[x])
+            .map(byte => byte || 0)
+            .map(byte => byte.toString(2))
+            .map(str => this.padByteStr(str))
+            .join("00");
         for (let i = 0; i < this.height; i++) {
             str = "0" + str;
         }
         for (let i = 0; i < this.height; i++) {
             str = str + "0";
         }
-        str = str.slice(this._currentTick, this._currentTick + this.height);
+        let windowStartY = this._currentTick;
+
+        str = str.slice(windowStartY, windowStartY + this.height);
         //noinspection UnnecessaryLocalVariableJS
-        //let lineAdjusted = byteStack >> this.numLines * this.ticksPerLine;
-        let start = line * this.ticksPerLine;
+        let start = line * this.lineHeight;
         let lineAdjustedStr = str.substring(start, start + 8);
         return parseInt(lineAdjustedStr, 2);
     }

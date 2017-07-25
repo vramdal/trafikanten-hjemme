@@ -30,7 +30,7 @@ yr.fetch().then(json => {
                 "Til mat og klæde "+
             "den mann hev trong "+
             "som hev i fjell fari. ",
-start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", ticksPerPage: 100}}]
+start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 1}}]
         ),
         //framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x01\xFF\x01" + SimpleTypes.FORMAT_SPECIFIER_END + "░░ God natt! ░░"
         //framer.parse(new Trafikanten().formatMessage(testdata))

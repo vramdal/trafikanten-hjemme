@@ -109,7 +109,7 @@
                         ctx.fillStyle = bit ? 'yellow' : "black";
                         //console.log('Filling x, y, with ', x, y, ctx.fillStyle);
                         let section = Math.floor(x / 128);
-                        ctx.fillRect(x % 128  * 10 , y * 10 + section * 8 * 10, 10, 10);
+                        ctx.fillRect(x % 128  * 10 , y * 10 + section * 8 * 10 + Math.min(1, section) * 10, 10, 10);
 
                         y = y + 1;
                         mask = mask / 2;
@@ -140,6 +140,6 @@
 
 <button type="button" id="connectButton">Connect</button> - <span id="websocket-status">Not opened</span> <span id="websocket-error"></span>
 
-<canvas width="1270" height="320"></canvas>
+<canvas width="1270" height="330"></canvas>
 </body>
 </html>

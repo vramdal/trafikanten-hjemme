@@ -8,5 +8,5 @@ export type PagingAnimationType = {animationName : 'PagingAnimation', ticksPerPa
 
 export type ScrollingType = {animationName : 'ScrollingAnimation' }
 
-export type VerticalScrollingType = {animationName : "VerticalScrollingAnimation"}
+export type VerticalScrollingType = {animationName : "VerticalScrollingAnimation", holdOnLine : number}
 
