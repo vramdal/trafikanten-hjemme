@@ -15,6 +15,7 @@ class VerticalScrollingAnimation implements Animation {
     _textLayout : TextLayout;
     _lines : number;
     _currentTick : number;
+    _holdOnLine : number;
 
 
     constructor(holdOnLine : number) {
@@ -30,14 +31,26 @@ class VerticalScrollingAnimation implements Animation {
 
     reset() : void {
         this._currentTick = 0;
+        this._holdOnLine = this._waitTicksOnLine;
     }
 
     tick() : void {
-        this._currentTick++;
+        let alignedAtLine = (this._currentTick - this.viewportHeight) >= 0
+            && (this._currentTick - this.viewportHeight) % this.lineHeight === 0
+            && (this._currentTick < this.numLines * this.ticksPerLine);
+
+        if (alignedAtLine && this._holdOnLine === 0) {
+            this._currentTick++;
+            this._holdOnLine = this._waitTicksOnLine;
+        } else if (alignedAtLine) {
+            this._holdOnLine--;
+        } else {
+            this._currentTick++;
+        }
     }
 
     getAnimationRemaining(): number {
-        return this.numLines * this.ticksPerLine + this.height - this._currentTick;
+        return this.numLines * this.lineHeight + this.scrollHeight - this._currentTick;
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -45,7 +58,7 @@ class VerticalScrollingAnimation implements Animation {
         return this.getAnimationRemaining() <= 0;
     }
 
-    get height() : number {
+    get scrollHeight() : number {
         return this.numLines * this.lineHeight - PADDING_BETWEEN_LINES;
     }
 
@@ -72,6 +85,11 @@ class VerticalScrollingAnimation implements Animation {
         return str;
     }
 
+    get viewportHeight() : number {
+        return this._lines * this.lineHeight - PADDING_BETWEEN_LINES;
+    }
+
+
     getTranslatedOnLine(x : number, line : number = 0) : Byte {
         let str = this._textLayout.pages
             .map(page => page[x])
@@ -79,15 +97,15 @@ class VerticalScrollingAnimation implements Animation {
             .map(byte => byte.toString(2))
             .map(str => this.padByteStr(str))
             .join("00");
-        for (let i = 0; i < this.height; i++) {
+        for (let i = 0; i < this.scrollHeight; i++) {
             str = "0" + str;
         }
-        for (let i = 0; i < this.height; i++) {
+        for (let i = 0; i < this.scrollHeight; i++) {
             str = str + "0";
         }
         let windowStartY = this._currentTick;
 
-        str = str.slice(windowStartY, windowStartY + this.height);
+        str = str.slice(windowStartY, windowStartY + this.scrollHeight);
         //noinspection UnnecessaryLocalVariableJS
         let start = line * this.lineHeight;
         let lineAdjustedStr = str.substring(start, start + 8);

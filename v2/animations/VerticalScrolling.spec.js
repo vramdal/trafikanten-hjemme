@@ -54,8 +54,8 @@ describe('VerticalScrollingAnimation', () => {
             .fill(parseInt("11111111", 2), 0, FRAME_WIDTH)
             .fill(parseInt("11111111", 2), FRAME_WIDTH);
         source.annotations = [new LinebreakAnnotation(FRAME_WIDTH + 1, FRAME_WIDTH + 1)];
-        let animation = new VerticalScrolling();
-        animation.setSource(source, FRAME_WIDTH);
+        let animation = new VerticalScrolling(2);
+        animation.setSource(source, FRAME_WIDTH, 2);
         expect(animation._textLayout.pages).to.have.lengthOf(2);
         expect(animation.getTranslatedOnLine(0, 0)).to.equal(0);
         expect(animation.getTranslatedOnLine(0, 1)).to.equal(0);
@@ -106,6 +106,12 @@ describe('VerticalScrollingAnimation', () => {
         expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
         expect(animation.getTranslatedOnLine(0, 1)).to.equal(0b11111111);
         animation.tick();
+        expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
+        expect(animation.getTranslatedOnLine(0, 1)).to.equal(0b11111111);
+        animation.tick();
+        expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
+        expect(animation.getTranslatedOnLine(0, 1)).to.equal(0b11111111);
+        animation.tick();
         expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111110);
         expect(animation.getTranslatedOnLine(0, 1)).to.equal(0b11111110);
         animation.tick();
@@ -135,6 +141,8 @@ describe('VerticalScrollingAnimation', () => {
         animation.tick();
         expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
         expect(animation.getTranslatedOnLine(0, 1)).to.equal(0b00000000);
+        animation.tick();
+        animation.tick();
         animation.tick();
         animation.tick();
         animation.tick();
