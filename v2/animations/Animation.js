@@ -11,5 +11,6 @@ export interface Animation {
     getTranslated(idx : number) : Byte;
     isAnimationComplete() : boolean;
     getAnimationRemaining() : number;
+    getTranslatedOnLine(x : number, line : number) : Byte;
 
 }

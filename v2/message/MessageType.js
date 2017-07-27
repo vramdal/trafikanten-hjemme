@@ -1,7 +1,7 @@
 // @flow
 
-import type {NoAnimationType, PagingAnimationType, ScrollingType} from "../animations/Types";
-export type AnimationType = NoAnimationType | PagingAnimationType | ScrollingType
+import type {NoAnimationType, PagingAnimationType, ScrollingType, VerticalScrollingType} from "../animations/Types";
+export type AnimationType = NoAnimationType | PagingAnimationType | ScrollingType | VerticalScrollingType
 
 type FrameSpecType = {
     text: string,

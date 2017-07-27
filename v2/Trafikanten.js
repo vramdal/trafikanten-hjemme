@@ -41,25 +41,33 @@ class Trafikanten {
     formatMessage(getDeparturesResponse : GetDeparturesResponse) : MessageType {
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
         let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"};
-        let part1 : MessagePartType = {
-            text: firstDeparture.LineRef,
-            ...Trafikanten.createFormatSpecifier(0, 12), animation: noAnimation
-        };
-        let part2 : MessagePartType = {
-            text: firstDeparture.DestinationName,
-            ...Trafikanten.createFormatSpecifier(17, 100), animation: noAnimation
-        };
-        let part3 : MessagePartType= {
-            text: this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime()),
-            ...Trafikanten.createFormatSpecifier(100, 127), animation: noAnimation
-        };
+        let part1 : MessagePartType = Object.assign(
+            {},
+            {text: firstDeparture.LineRef},
+            Trafikanten.createFormatSpecifier(0, 12),
+            {animation: noAnimation}
+        );
+        let part2 : MessagePartType = Object.assign(
+            {},
+            {text: firstDeparture.DestinationName},
+            Trafikanten.createFormatSpecifier(17, 100),
+            {animation: noAnimation}
+        );
+        let part3 : MessagePartType= Object.assign(
+            {},
+            { text: this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())},
+            Trafikanten.createFormatSpecifier(100, 127),
+            {animation: noAnimation}
+        );
         let formatted = getDeparturesResponse.slice(1).map((monitoredStopVisit : MonitoredStopVisit) => {
             let journey = monitoredStopVisit.MonitoredVehicleJourney;
             return this.formatJourney(journey);
         });
-        let secondLine : MessagePartType = {
-            text: formatted.join("  -  "), ...Trafikanten.createFormatSpecifier(128, 255), animation: {animationName: "ScrollingAnimation"}
-        };
+        let secondLine : MessagePartType = Object.assign(
+            {},
+            {text: formatted.join("  -  ")},
+            Trafikanten.createFormatSpecifier(128, 255), {animation: {animationName: "ScrollingAnimation"}}
+        );
         return [part1, part2, part3, secondLine];
     }
 
