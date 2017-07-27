@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "mocha test/*; node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node v2/*.spec.js",
-    "v2start": "node_modules/flow-remove-types/flow-node ./v2/Main.js",
-    "v2test": "node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node v2/*.spec.js"
+    "test": "node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node v2/*.spec.js",
+    "v2start": "node_modules/flow-remove-types/flow-node ./v2/Main.js"
   },
   "dependencies": {
     "async": "~0.9.0",
@@ -23,8 +22,10 @@
   },
   "devDependencies": {
     "chai": "~1.10.0",
+    "coveralls": "^2.13.1",
     "jasmine-node": "*",
     "mocha": "^3.4.2",
+    "mocha-lcov-reporter": "^1.3.0",
     "mockery": "~1.4.0",
     "sinon": "1.12.2",
     "tape": "*",
