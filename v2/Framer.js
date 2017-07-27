@@ -10,6 +10,7 @@ const Message = require("./Message.js");
 const Scrolling = require("./animations/Scrolling.js");
 const Frame = require("./Frame.js");
 const PagingAnimation = require("./animations/Paging.js");
+const VerticalScrollingAnimation = require("./animations/VerticalScrolling.js");
 
 let animationFactory = (animationSpec : AnimationType) : Animation => {
     "use strict";
@@ -17,7 +18,8 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
         case "NoAnimation" : return new NoAnimation(animationSpec.timeoutTicks, animationSpec.alignment);
         case "PagingAnimation" : return new PagingAnimation(animationSpec.ticksPerPage);
         case "ScrollingAnimation": return new Scrolling();
-        default: throw new Error("Unknown animation type: " + animationSpec.name);
+        case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine);
+        default: throw new Error("Unknown animation type: " + animationSpec.animationName);
     }
 };
 
@@ -25,7 +27,7 @@ class Framer {
 
   parse(messageType : MessageType) : Message { // TODO: Provide sensible default when spec characters are not present
       return new Message(messageType.map(part => ({
-          frame : new Frame(part.start, part.end - part.start, animationFactory(((part : any) : AnimationType)), part.lines),
+          frame : new Frame(part.start, part.end - part.start, animationFactory((part.animation : AnimationType)), part.lines),
           text: part.text,
 
       })));

@@ -36,7 +36,11 @@ class Frame {
 
     translateCoordinates(line : number, x : number) {
         let idx = x + line * this._width;
-        return this._animation.getTranslated(idx);
+        if (this._animation.getTranslatedOnLine) {
+            return this._animation.getTranslatedOnLine(x, line);
+        } else {
+            return this._animation.getTranslated(idx);
+        }
     }
 
 

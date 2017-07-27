@@ -13,9 +13,12 @@ describe('Framer', () => {
     const MESSAGE_SPEC = [{
         text: TEXT_1,
         start: 0, end: 127, lines: 1,
-        animationName: "NoAnimation",
-        timeoutTicks: 10,
-        alignment: "left"
+        animation: {
+            animationName: "NoAnimation",
+            timeoutTicks: 10,
+            alignment: "left"
+
+        }
     }];
 
 
@@ -41,9 +44,11 @@ describe('Framer', () => {
             let messageSpec = [...MESSAGE_SPEC, {
                 text : TEXT_2,
                 start: 128, end: 255, lines: 1,
-                animationName: "NoAnimation",
-                timeoutTicks: 10,
-                alignment: "left"
+                animation: {
+                    animationName: "NoAnimation",
+                    timeoutTicks: 10,
+                    alignment: "left"
+                }
             }];
             let result = framer.parse(messageSpec);
             expect(result.parts).to.have.lengthOf(2);

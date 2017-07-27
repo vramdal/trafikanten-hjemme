@@ -16,7 +16,7 @@ export type AnnotatedBitmap = Bitmap & {
 }
 
 //noinspection JSUnusedLocalSymbols
-module.exports = class BitmapClipped {
+class BitmapClipped {
 
     _bitmap : Bitmap;
     _clip : number;
@@ -50,4 +50,14 @@ module.exports = class BitmapClipped {
     get clip(): number {
         return this._clip;
     }
-};
+}
+
+class MultilineBitmap extends Array<Bitmap> {
+
+    getByteStack(x : number, paddingBits : number = 0) : number {
+        return super.reduce((byteStack, bitmap) => byteStack << 8 + paddingBits | bitmap[x], 0);
+    }
+
+}
+
+module.exports = {BitmapClipped, MultilineBitmap};
