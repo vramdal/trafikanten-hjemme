@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - '6.11'
 env:
-  - CXX="g++-4.8"
+  - CXX="g++-4.8" # From https://github.com/buglabs/node-xml2json/blob/master/.travis.yml
 before_deploy: "mkdir artifact; tar --exclude artifact --exclude \\.git -zcvf artifact/trafikanten-hjemme.tar.gz .; mv artifact/trafikanten-hjemme.tar.gz ."
 deploy:
   provider: releases
