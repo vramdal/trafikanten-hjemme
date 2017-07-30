@@ -38,8 +38,9 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
 
     start() {
         this.stop();
-        this._runFetchers();
+        const promise = this._runFetchers();
         this._timer = setInterval(this._runFetchers.bind(this), this._tickFrequence);
+        return promise;
     }
 
     stop() {
@@ -104,15 +105,18 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
     _runFetchers() {
         this._tick++;
         let isNotAlreadyFetchingFilter = fetcherSpec => !fetcherSpec.isFetching;
-        this._fetchers
+        let promises = this._fetchers
             .filter(this._staleFetcherFilter.bind(this))
             .filter(isNotAlreadyFetchingFilter)
-            .forEach(fetcherSpec => {
-                this._runFetcher(fetcherSpec)
-                    .catch(() => {
-                        console.error(`Error running scheduled fetch of ${fetcherSpec.fetcher.id}`);
-                    })
-            });
+            .map(fetcherSpec => this._runFetcher(fetcherSpec))
+            .map(PreemptiveCache.reflect);
+        return Promise.all(promises);
+    }
+
+    static reflect(promise : Promise<any>) { // https://stackoverflow.com/questions/31424561/wait-until-all-es6-promises-complete-even-rejected-promises
+        return promise
+            .then(value => Promise.resolve(value))
+            .catch(err => Promise.resolve(err));
     }
 
     _runFetcher<V>(fetcherSpec : FetcherSpec<V>) : Promise<V> {

@@ -50,29 +50,37 @@ describe('PreemptiveCache', () => {
 
         });
 
-        it('should run registered fetchers that are stale and not already running', () => {
-            preemptiveCache._runFetchers();
-            expect(fetcher1.fetched).to.have.lengthOf(1);
-            expect(fetcher2.fetched).to.have.lengthOf(1);
+        it('should run registered fetchers that are stale and not already running', (done) => {
+            preemptiveCache._runFetchers().then(() => {
+                expect(fetcher1.fetched).to.have.lengthOf(1);
+                expect(fetcher2.fetched).to.have.lengthOf(1);
+                done();
+            });
         });
-        it('should run only fetchers that are not already running', () => {
-            fetcher1.fetch = () => new Promise(() => {});
-            preemptiveCache._runFetchers();
-            setTimeout(() => {
-                preemptiveCache._runFetchers();
-                expect(fetcher1.fetched).to.have.lengthOf(0);
-                expect(fetcher2.fetched).to.have.lengthOf(2);
-            }, 100);
+        it('should run only fetchers that are not already running', (done) => {
+            fetcher1.fetch = () => new Promise((resolve) => {
+                setTimeout(() => resolve(), 1);
+
+            });
+            preemptiveCache._runFetchers().then(() => {
+                preemptiveCache._runFetchers().then(() => {
+                    expect(fetcher1.fetched).to.have.lengthOf(0);
+                    expect(fetcher2.fetched).to.have.lengthOf(2);
+                    done();
+
+                });
+            });
         });
-        it('should run only fetchers that have passed their time for update', () => {
+
+        it('should run only fetchers that have passed their time for update', (done) => {
+            preemptiveCache._runFetchers();
             fetcher1.fetchIntervalSeconds = 100;
-            preemptiveCache._runFetchers();
-            preemptiveCache._runFetchers();
-            setTimeout(() => {
+            preemptiveCache._runFetchers().then(() => {
                 preemptiveCache._runFetchers();
                 expect(fetcher1.fetched).to.have.lengthOf(1);
                 expect(fetcher2.fetched).to.have.lengthOf(2);
-            }, 100);
+                done();
+            });
 
         });
     });
@@ -178,53 +186,49 @@ describe('PreemptiveCache', () => {
         beforeEach(() => {
             fetcher1 = new contentFetcherConstructor("content-fetcher-1");
             preemptiveCache.registerFetcher(fetcher1);
-            preemptiveCache.start();
         });
 
         it('should return last value if error', (done) => {
-            setTimeout(() => {
+            preemptiveCache.start().then(() => {
                 fetcher1.fetch = function () {
                     throw new Error("Some fetcher error");
                 };
                 fetcher1.fetchIntervalSeconds = 0;
-                preemptiveCache._runFetcher(preemptiveCache._fetchers[0]);
-                setTimeout(() => {
+                preemptiveCache._runFetcher(preemptiveCache._fetchers[0]).then(() => {
                     preemptiveCache.getValue(fetcher1).then(value => {
                         "use strict";
                         expect(preemptiveCache._fetchers[0].errorCount).to.equal(1);
                         expect(value).to.equal(fetcher1.fetched[0]);
                         done();
                     });
-                }, 500);
-            }, 500);
+                });
+            });
         });
         
         it('should return last value on reject', (done) => {
-            setTimeout(() => {
+            preemptiveCache.start().then(() => {
                 fetcher1.fetch = function () {
                     return Promise.reject("Rejection");
                 };
                 fetcher1.fetchIntervalSeconds = 0;
-                preemptiveCache._runFetcher(preemptiveCache._fetchers[0]);
-                setTimeout(() => {
-                    "use strict";
+                preemptiveCache._runFetcher(preemptiveCache._fetchers[0]).then(() => {
                     preemptiveCache.getValue(fetcher1).then(value => {
                         "use strict";
                         expect(value).to.equal(fetcher1.fetched[0]);
                         done();
                     });
-                }, 500);
-            }, 500);
+                });
+            });
         });
         
         it('should reject when no more retries', (done) => {
-            setTimeout(() => {
+            preemptiveCache.start().then(() => {
                 fetcher1.fetch = function () {
                     throw new Error("Some error");
                 };
                 fetcher1.maxErrorCount = 1;
-                preemptiveCache._runFetchers();
-                setTimeout(() => {
+                fetcher1.fetchIntervalSeconds = 0;
+                preemptiveCache._runFetchers().then(() => {
                     preemptiveCache.getValue(fetcher1)
                         .then(() => {
                             throw new Error("Should have been rejected");
@@ -234,8 +238,10 @@ describe('PreemptiveCache', () => {
                             expect(errObj.error).to.equal("Error fetching content");
                             done();
                         });
-                }, 500);
-            }, 500);
+                }).catch(err => {
+                    console.error("err")
+                });
+            });
         });
         
         it('should should give no lastGoodContent if nothing but failures', (done) => {
@@ -245,9 +251,9 @@ describe('PreemptiveCache', () => {
             };
             fetcher2.maxErrorCount = 1;
             preemptiveCache.registerFetcher(fetcher2);
-            setTimeout(() => {
-                preemptiveCache._runFetchers();
-                setTimeout(() => {
+            preemptiveCache.start().then(() => {
+                preemptiveCache._runFetchers().then(() => {
+                    "use strict";
                     preemptiveCache.getValue(fetcher2)
                         .then(() => {
                             throw new Error("Should have been rejected");
@@ -257,9 +263,8 @@ describe('PreemptiveCache', () => {
                             expect(errObj.error).to.equal("Error fetching content");
                             done();
                         });
-                }, 500);
-
-            }, 500);
+                });
+            });
         });
     });
 
