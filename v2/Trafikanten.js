@@ -3,12 +3,18 @@
 const SimpleTypes = require("./SimpleTypes.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
-//import type {Animation} from "./animations/Animation";
+const testdata1 = require("./testdata/ensjø-departures-1.json");
+const testdata2 = require("./testdata/ensjø-departures-2.json");
+const PreemptiveCache = require("./fetch/PreemptiveCache.js");
+
 type MonitoredCall = {
     ExpectedDepartureTime : string
 }
 
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
+import type {CachedValueProvider} from "./fetch/Cache";
+import type {ContentFetcher} from "./fetch/ContentFetcher";
+import type {ContentProvider} from "./provider/ContentProvider";
 
 
 type MonitoredVehicleJourney = {
@@ -32,13 +38,42 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
-class Trafikanten {
+class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesResponse> {
+
+    _content : MessageType;
+    fetchIntervalSeconds : number;
+    id : string;
+    _cachedValueProvider : CachedValueProvider<GetDeparturesResponse>;
 
     static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
     }
 
-    formatMessage(getDeparturesResponse : GetDeparturesResponse) : MessageType {
+    constructor(id : string, fetcher : PreemptiveCache) {
+        this._content = [];
+        this.id = id;
+        this.fetchIntervalSeconds = 10;
+        this._cachedValueProvider = fetcher.registerFetcher(this);
+    }
+
+    //noinspection JSUnusedGlobalSymbols
+    fetch() : Promise<GetDeparturesResponse> {
+        let shouldError = Math.random() > 0.9;
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (shouldError) {
+                    return reject(new Error("Trafikanten fetching error"));
+                }
+                resolve(this.id === "1" ? testdata1 : testdata2);
+            }, Math.random() * (2000 - 1000) + 1000);
+        });
+    }
+
+    getContent() : Promise<MessageType> {
+        return this._cachedValueProvider().then(response => this.format(response));
+    }
+
+    format(getDeparturesResponse : GetDeparturesResponse) : MessageType {
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
         let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"};
         let part1 : MessagePartType = Object.assign(
@@ -68,7 +103,9 @@ class Trafikanten {
             {text: formatted.join("  -  ")},
             Trafikanten.createFormatSpecifier(128, 255), {animation: {animationName: "ScrollingAnimation"}}
         );
-        return [part1, part2, part3, secondLine];
+        let message : MessageType = [part1, part2, part3, secondLine];
+        message.id = "trafikanten-1";
+        return message;
     }
 
     formatJourney(journey : MonitoredVehicleJourney) {

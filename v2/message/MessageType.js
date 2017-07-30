@@ -7,9 +7,13 @@ type FrameSpecType = {
     text: string,
     start : number,
     end : number,
-    lines : number,
+    lines : number
 }
 
 export type MessagePartType = FrameSpecType & {animation: AnimationType}
 
-export type MessageType = Array<MessagePartType>;
+// https://github.com/facebook/flow/issues/631
+
+class _MessageSpec extends Array<MessagePartType> { id: string }
+
+export type MessageType = $Supertype<_MessageSpec>;

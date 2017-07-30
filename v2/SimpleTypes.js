@@ -22,4 +22,6 @@ const EventTypeNames = {
 
 module.exports = {NEWLINE, TAB, /*MESSAGE_PART_SEPARATOR, */EventTypeNames, FORMAT_SPECIFIER_START, FORMAT_SPECIFIER_END};
 
+export type OptionalArrayOrSingleElement<V> = ?(V | Array<V>);
+
 
