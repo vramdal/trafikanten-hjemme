@@ -22,7 +22,6 @@ export type FetchError = {
     lastGoodContent? : any
 }
 
-// TODO: Test
 class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
 
     _timer : number;

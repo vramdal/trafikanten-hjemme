@@ -34,6 +34,48 @@ describe('PreemptiveCache', () => {
     beforeEach(() => {
         preemptiveCache = new PreemptiveCache();
     });
+    
+    describe('_runFetchers', () => {
+
+        let fetcher1;
+        let fetcher2;
+
+        beforeEach(() => {
+            fetcher1 = new contentFetcherConstructor("fetcher-1");
+            fetcher2 = new contentFetcherConstructor("fetcher-2");
+            fetcher1.fetchIntervalSeconds = 0;
+            fetcher2.fetchIntervalSeconds = 0;
+            preemptiveCache.registerFetcher(fetcher1);
+            preemptiveCache.registerFetcher(fetcher2);
+
+        });
+
+        it('should run registered fetchers that are stale and not already running', () => {
+            preemptiveCache._runFetchers();
+            expect(fetcher1.fetched).to.have.lengthOf(1);
+            expect(fetcher2.fetched).to.have.lengthOf(1);
+        });
+        it('should run only fetchers that are not already running', () => {
+            fetcher1.fetch = () => new Promise(() => {});
+            preemptiveCache._runFetchers();
+            setTimeout(() => {
+                preemptiveCache._runFetchers();
+                expect(fetcher1.fetched).to.have.lengthOf(0);
+                expect(fetcher2.fetched).to.have.lengthOf(2);
+            }, 100);
+        });
+        it('should run only fetchers that have passed their time for update', () => {
+            fetcher1.fetchIntervalSeconds = 100;
+            preemptiveCache._runFetchers();
+            preemptiveCache._runFetchers();
+            setTimeout(() => {
+                preemptiveCache._runFetchers();
+                expect(fetcher1.fetched).to.have.lengthOf(1);
+                expect(fetcher2.fetched).to.have.lengthOf(2);
+            }, 100);
+
+        });
+    });
 
 
     describe('registration', () => {
