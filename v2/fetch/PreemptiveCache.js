@@ -1,39 +1,52 @@
 // @flow
 
 import type {ContentFetcher} from "./ContentFetcher";
-import type {OptionalArrayOrSingleElement} from "../SimpleTypes";
 import type {Cache, CachedValueProvider} from "./Cache";
 
 type FetcherSpec<V> = {
     fetcher : ContentFetcher<V>,
     lastFetchedSecond : number,
     content : ?V,
-    lastError? : any,
+    lastError? : FetchError,
     isFetching? : Promise<V>,
-    isError? : boolean
+    errorCount : number,
+    maxErrorCount : number
 }
 
+//const ERROR_FETCHER_HAS_NOT_BEEN_RUN_YET : string = "Fetcher has not been run yet";
+const ERROR_NO_CONTENT : string  = "No content";
+const ERROR_FETCHER : string = "Error fetching content";
 
+export type FetchError = {
+    error: string,
+    lastGoodContent? : any
+}
+
+// TODO: Test
 class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
 
     _timer : number;
     _fetchers : Array<FetcherSpec<*>>;
     _tick : number;
+    _tickFrequence : number;
 
     constructor() {
         this._fetchers = [];
         this._tick = 0;
+        this._timer = 0;
+        this._tickFrequence = 1000;
     }
 
     start() {
         this.stop();
         this._runFetchers();
-        this._timer = setInterval(this._runFetchers.bind(this), 1000);
+        this._timer = setInterval(this._runFetchers.bind(this), this._tickFrequence);
     }
 
     stop() {
         this._tick = 0;
         clearInterval(this._timer);
+        this._timer = 0;
     }
 
     getValue<V>(fetcher : ContentFetcher<V>) : Promise<V> {
@@ -44,28 +57,36 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
         const existing  = ((this._fetchers.find(existing => existing.fetcher.id === fetcher.id): any) : FetcherSpec<V> );
         if (existing && existing.isFetching) {
             return existing.isFetching;
-        } else if (existing && existing.content && !existing.isError) {
+        } else if (existing && existing.errorCount > existing.fetcher.maxErrorCount) {
+            return Promise.reject(existing.lastError);
+        } else if (existing && existing.content) {
             return Promise.resolve(existing.content);
-        } else if (existing) {
-            return this._runFetcher(existing);
+        } else if (existing && (existing.content === null || existing.content === undefined)) {
+            return Promise.reject(({error : ERROR_NO_CONTENT} ));
         } else {
-            this.registerFetcher(fetcher);
-            let registered = ((this._fetchers.find(existing => existing.fetcher.id === fetcher.id): any) : FetcherSpec<V>);
-            if (registered === undefined || registered === null) {
-                throw new Error(`Could not register fetcher ${fetcher.id}`)
-            }
-            return ((registered.isFetching: any) : Promise<V>);
+            throw new Error(`Fetcher ${fetcher.id} not registered`);
         }
+    }
+
+    get isStarted() : boolean {
+        return this._timer !== 0;
     }
 
     registerFetcher<V>(fetcher : ContentFetcher<V>) : CachedValueProvider<V> {
         let existingIndex = this._fetchers.findIndex(existing => existing.fetcher.id === fetcher.id);
-        const fetcherSpec = (({fetcher: fetcher, lastFetchedSecond: -1, content: null}: any) : FetcherSpec<*>);
+        const fetcherSpec = (({
+            fetcher: fetcher,
+            lastFetchedSecond: -1,
+            content: null,
+            errorCount: 0
+        }: any) : FetcherSpec<*>);
         if (existingIndex !== -1) {
             this._fetchers[existingIndex] = fetcherSpec;
         } else {
             this._fetchers.push(fetcherSpec);
-            this._runFetcher(fetcherSpec);
+            if (this.isStarted) {
+                this._runFetcher(fetcherSpec);
+            }
         }
         return () => this.getValue(fetcher);
     }
@@ -98,20 +119,36 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
     _runFetcher<V>(fetcherSpec : FetcherSpec<V>) : Promise<V> {
         console.log(`Fetching ${fetcherSpec.fetcher.id}`);
         fetcherSpec.isFetching = new Promise((resolve, reject) => {
-            fetcherSpec.fetcher.fetch().then(data => {
-                console.log(`Fetched ${fetcherSpec.fetcher.id}`);
-                fetcherSpec.content = data;
-                fetcherSpec.lastFetchedSecond = this._tick;
-                resolve(fetcherSpec.content);
+            const errorhandler = (error : Error) => {
+                console.error(`Error fetching ${fetcherSpec.fetcher.id}. Retryihg ${fetcherSpec.fetcher.maxErrorCount - fetcherSpec.errorCount} more times.`, error);
+                const errorObj : FetchError = {error: ERROR_FETCHER};
+                //noinspection EqualityComparisonWithCoercionJS
+                if (fetcherSpec.content != null) {
+                    errorObj.lastGoodContent = fetcherSpec.content;
+                }
+                fetcherSpec.lastError = errorObj;
+                fetcherSpec.errorCount++;
                 delete fetcherSpec.isFetching;
-                delete fetcherSpec.isError;
-            }).catch((error : Error) => {
-                console.error(`Error fetching ${fetcherSpec.fetcher.id}`, error);
-                fetcherSpec.lastError = error;
-                fetcherSpec.isError = true;
-                reject({lastGoodContent: fetcherSpec.content, error: error});
-                delete fetcherSpec.isFetching;
-            });
+                if (fetcherSpec.errorCount >= fetcherSpec.fetcher.maxErrorCount) {
+                    // TODO: Suspend? Blacklist?
+                    fetcherSpec.errorCount = 0;
+                    reject(errorObj)
+                } else if (fetcherSpec.content) {
+                    resolve(fetcherSpec.content);
+                }
+            };
+            try {
+                fetcherSpec.fetcher.fetch().then(data => {
+                    console.log(`Fetched ${fetcherSpec.fetcher.id}`);
+                    fetcherSpec.content = data;
+                    fetcherSpec.lastFetchedSecond = this._tick;
+                    fetcherSpec.errorCount = 0;
+                    delete fetcherSpec.isFetching;
+                    resolve(fetcherSpec.content);
+                }).catch(errorhandler);
+            } catch (e) {
+                errorhandler(e);
+            }
         });
         return fetcherSpec.isFetching;
     }

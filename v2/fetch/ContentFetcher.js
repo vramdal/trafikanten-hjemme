@@ -10,6 +10,8 @@ export interface ContentFetcher<DataType> {
 
     fetchIntervalSeconds : number;
 
-    id : string
+    id : string,
+
+    maxErrorCount : number
 
 }
