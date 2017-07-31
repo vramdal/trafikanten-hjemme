@@ -14,12 +14,14 @@ class Display implements DisplayInterface {
     _playlist: ?Playlist;
     _eventEmitter: DisplayEventEmitter;
     _buffer: Uint8Array;
+    _isPlaying : boolean;
 
     constructor() {
         this._buffer = new Uint8Array(256);
         this._eventEmitter = new DisplayEventEmitter();
         this._eventEmitter.on(EventTypeNames.EVENT_BITMAP_UPDATED, this.onBitmapUpdated.bind(this));
         this._eventEmitter.on(EventTypeNames.EVENT_BITMAP_CLEAR, this.clear.bind(this));
+        this._isPlaying = false;
     }
 
     get eventEmitter() : DisplayEventEmitter {
@@ -52,6 +54,9 @@ class Display implements DisplayInterface {
     play() {
         if (this._playlist) {
             this._playlist.play().then(() => {
+                this._isPlaying = true;
+                console.log("Playlist exhausted");
+                this._eventEmitter.emit(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED);
                 this.play();
             }).catch(err => {
                 console.error("Display error: ", err)
@@ -62,6 +67,7 @@ class Display implements DisplayInterface {
     }
 
     stop() {
+        this._isPlaying = false;
         if (this._playlist) {
             this._playlist.stop();
         }

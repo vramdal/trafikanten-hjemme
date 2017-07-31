@@ -6,8 +6,11 @@ const ConsoleDisplay = require("./display/ConsoleDisplay.js");
 const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 //const SimpleTypes = require("./SimpleTypes.js");
 const Trafikanten = require("./Trafikanten.js");
-const testdata = require("./testdata/ensjø-departures-1.json");
+//const testdata = require("./testdata/ensjø-departures-1.json");
 const Yr = require("./Yr.js");
+//const displayEventEmitter = require("./DisplayEventEmitter.js");
+const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+
 
 const FetchService = require("./fetch/PreemptiveCache.js");
 
@@ -15,22 +18,30 @@ let framer = new Framer();
 
 let display : Display = new WebsocketDisplay();
 
-let yr = new Yr();
 
 let fetchService = new FetchService();
 
-let trafikanten1 = new Trafikanten("1", fetchService);
-let trafikanten2 = new Trafikanten("2", fetchService);
+let yr = new Yr("yr-1", fetchService);
 
-fetchService.start();
+let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
+let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
 
-Promise.all([trafikanten1.getContent(), trafikanten2.getContent()])
-    .then(messageSpecs => {
-        const messages = messageSpecs.map(framer.parse);
-        display.playlist = new Playlist(display.eventEmitter, messages);
-        display.play();
-    })
-    .catch(err => console.error(err));
+fetchService.start().then(() => {
+    "use strict";
+    let loop = function () {
+        return Promise.all([trafikanten1.getContent(), trafikanten2.getContent(), yr.getContent()])
+            .then(messageSpecs => {
+                const messages = messageSpecs.map(framer.parse);
+                display.playlist = new Playlist(display.eventEmitter, messages);
+            })
+            .catch(err => console.error(err));
+    };
+
+    display.eventEmitter.on(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED, loop);
+    loop().then(() => display.play());
+
+});
+
 
 //noinspection JSUnusedLocalSymbols
 /*yr.fetch().then(json => {

@@ -13,7 +13,6 @@ type MonitoredCall = {
 
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
 import type {CachedValueProvider} from "./fetch/Cache";
-import type {ContentFetcher} from "./fetch/ContentFetcher";
 import type {ContentProvider} from "./provider/ContentProvider";
 
 
@@ -38,22 +37,32 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
-class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesResponse> {
+class Trafikanten implements ContentProvider {
 
     _content : MessageType;
-    fetchIntervalSeconds : number;
     id : string;
-    _cachedValueProvider : CachedValueProvider<GetDeparturesResponse>;
+    _rawValueProvider : CachedValueProvider<GetDeparturesResponse>;
+    _formattedValueProvider : CachedValueProvider<MessageType>;
+    maxErrorCount : number;
+    currentContent : string;
+    currentMessage : MessageType;
+    loadingMessage : MessageType;
 
     static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
     }
 
-    constructor(id : string, fetcher : PreemptiveCache) {
+    constructor(id : string, dataStore : PreemptiveCache) {
         this._content = [];
         this.id = id;
-        this.fetchIntervalSeconds = 10;
-        this._cachedValueProvider = fetcher.registerFetcher(this);
+        this._rawValueProvider = dataStore.registerFetcher(this.fetch.bind(this), id, 30, 3);
+        this._formattedValueProvider = dataStore.registerFetcher(this.formatContent.bind(this), id + "-formatter", 10, 3);
+        this.currentContent = "";
+        this.loadingMessage = [Object.assign({},
+            {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
+            {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})];
+        this.currentMessage = this.loadingMessage;
+
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -69,8 +78,23 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
         });
     }
 
-    getContent() : Promise<MessageType> {
-        return this._cachedValueProvider().then(response => this.format(response));
+    getContent() : MessageType {
+        return this.currentMessage;
+    }
+
+    formatContent() : Promise<MessageType> {
+        return this._rawValueProvider()
+            .then(response => this.format(response))
+            .catch(err => this.loadingMessage)
+            .then(currentMessage => {
+                const str = JSON.stringify(currentMessage);
+                if (this.currentContent !== str) {
+                    console.info("Oppdatert innhold");
+                    this.currentContent = str;
+                }
+                this.currentMessage = currentMessage;
+                return currentMessage
+            })
     }
 
     format(getDeparturesResponse : GetDeparturesResponse) : MessageType {
@@ -86,7 +110,7 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
             {},
             {text: firstDeparture.DestinationName},
             Trafikanten.createFormatSpecifier(17, 100),
-            {animation: noAnimation}
+            {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"}}
         );
         let part3 : MessagePartType= Object.assign(
             {},
