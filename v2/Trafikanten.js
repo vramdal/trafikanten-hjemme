@@ -44,6 +44,8 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
     fetchIntervalSeconds : number;
     id : string;
     _cachedValueProvider : CachedValueProvider<GetDeparturesResponse>;
+    maxErrorCount : number;
+    currentContent : string;
 
     static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
@@ -54,6 +56,8 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
         this.id = id;
         this.fetchIntervalSeconds = 10;
         this._cachedValueProvider = fetcher.registerFetcher(this);
+        this.maxErrorCount = 3;
+        this.currentContent = "";
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -70,7 +74,18 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
     }
 
     getContent() : Promise<MessageType> {
-        return this._cachedValueProvider().then(response => this.format(response));
+        return this._cachedValueProvider()
+            .then(response => this.format(response))
+            .catch(err => [Object.assign({},
+                { start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
+                { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})])
+            .then(currentMessage => {
+                const str = JSON.stringify(currentMessage);
+                if (this.currentContent !== str) {
+                    console.info("Oppdatert innhold");
+                }
+                return currentMessage
+            })
     }
 
     format(getDeparturesResponse : GetDeparturesResponse) : MessageType {
@@ -86,7 +101,7 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
             {},
             {text: firstDeparture.DestinationName},
             Trafikanten.createFormatSpecifier(17, 100),
-            {animation: noAnimation}
+            {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"}}
         );
         let part3 : MessagePartType= Object.assign(
             {},
