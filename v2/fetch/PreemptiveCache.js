@@ -99,7 +99,7 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
     }
 
     _staleFetcherFilter(fetcherSpec : FetcherSpec<any>) {
-        return fetcherSpec.lastFetchedSecond + fetcherSpec.fetcher.fetchIntervalSeconds < this._tick;
+        return fetcherSpec.lastFetchedSecond === -1 || fetcherSpec.lastFetchedSecond + fetcherSpec.fetcher.fetchIntervalSeconds < this._tick;
     }
 
     _runFetchers() {
@@ -123,7 +123,7 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
         console.log(`Fetching ${fetcherSpec.fetcher.id}`);
         fetcherSpec.isFetching = new Promise((resolve, reject) => {
             const errorhandler = (error : Error) => {
-                console.error(`Error fetching ${fetcherSpec.fetcher.id}. Retryihg ${fetcherSpec.fetcher.maxErrorCount - fetcherSpec.errorCount} more times.`, error);
+                console.error(`Error fetching ${fetcherSpec.fetcher.id}. Retrying ${fetcherSpec.fetcher.maxErrorCount - fetcherSpec.errorCount} more times.`, error);
                 const errorObj : FetchError = {error: ERROR_FETCHER};
                 //noinspection EqualityComparisonWithCoercionJS
                 if (fetcherSpec.content != null) {
