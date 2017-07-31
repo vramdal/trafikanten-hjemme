@@ -10,7 +10,9 @@ type FetcherSpec<V> = {
     lastError? : FetchError,
     isFetching? : Promise<V>,
     errorCount : number,
-    maxErrorCount : number
+    maxErrorCount : number,
+    id : string,
+    fetchIntervalSeconds : number
 }
 
 //const ERROR_FETCHER_HAS_NOT_BEEN_RUN_YET : string = "Fetcher has not been run yet";
@@ -22,7 +24,7 @@ export type FetchError = {
     lastGoodContent? : any
 }
 
-class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
+class PreemptiveCache implements Cache<string, *> {
 
     _timer : number;
     _fetchers : Array<FetcherSpec<*>>;
@@ -49,22 +51,22 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
         this._timer = 0;
     }
 
-    getValue<V>(fetcher : ContentFetcher<V>) : Promise<V> {
-        return this.getContent(fetcher);
+    getValue<V>(fetcherId : string) : Promise<V> {
+        return this.getContent(fetcherId);
     }
 
-    getContent<V>(fetcher : ContentFetcher<V>) : Promise<V> {
-        const existing  = ((this._fetchers.find(existing => existing.fetcher.id === fetcher.id): any) : FetcherSpec<V> );
+    getContent<V>(fetcherId : string) : Promise<V> {
+        const existing  = ((this._fetchers.find(existing => existing.id === fetcherId): any) : FetcherSpec<V> );
         if (existing && existing.isFetching) {
             return existing.isFetching;
-        } else if (existing && existing.errorCount > existing.fetcher.maxErrorCount) {
+        } else if (existing && existing.errorCount > existing.maxErrorCount) {
             return Promise.reject(existing.lastError);
         } else if (existing && existing.content) {
             return Promise.resolve(existing.content);
         } else if (existing && (existing.content === null || existing.content === undefined)) {
             return Promise.reject(({error : ERROR_NO_CONTENT} ));
         } else {
-            throw new Error(`Fetcher ${fetcher.id} not registered`);
+            throw new Error(`Fetcher ${fetcherId} not registered`);
         }
     }
 
@@ -72,13 +74,16 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
         return this._timer !== 0;
     }
 
-    registerFetcher<V>(fetcher : ContentFetcher<V>) : CachedValueProvider<V> {
-        let existingIndex = this._fetchers.findIndex(existing => existing.fetcher.id === fetcher.id);
+    registerFetcher<V>(fetcher : ContentFetcher<V>, id : string, fetchIntervalSeconds : number, maxErrorCount : number = 3) : CachedValueProvider<V> {
+        let existingIndex = this._fetchers.findIndex(existing => existing.id === id);
         const fetcherSpec = (({
             fetcher: fetcher,
             lastFetchedSecond: -1,
             content: null,
-            errorCount: 0
+            errorCount: 0,
+            fetchIntervalSeconds,
+            maxErrorCount,
+            id
         }: any) : FetcherSpec<*>);
         if (existingIndex !== -1) {
             this._fetchers[existingIndex] = fetcherSpec;
@@ -88,18 +93,18 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
                 this._runFetcher(fetcherSpec);
             }
         }
-        return () => this.getValue(fetcher);
+        return () => this.getValue(id);
     }
 
-    unregisterFetcher(fetcher : ContentFetcher<any>) {
-        let existingIndex = this._fetchers.findIndex(existing => existing.fetcher.id === fetcher.id);
+    unregisterFetcher(id : string) {
+        let existingIndex = this._fetchers.findIndex(existing => existing.id === id);
         if (existingIndex !== -1) {
             this._fetchers.splice(existingIndex, 1);
         }
     }
 
     _staleFetcherFilter(fetcherSpec : FetcherSpec<any>) {
-        return fetcherSpec.lastFetchedSecond === -1 || fetcherSpec.lastFetchedSecond + fetcherSpec.fetcher.fetchIntervalSeconds < this._tick;
+        return fetcherSpec.lastFetchedSecond === -1 || fetcherSpec.lastFetchedSecond + fetcherSpec.fetchIntervalSeconds < this._tick;
     }
 
     _runFetchers() {
@@ -120,10 +125,10 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
     }
 
     _runFetcher<V>(fetcherSpec : FetcherSpec<V>) : Promise<V> {
-        console.log(`Fetching ${fetcherSpec.fetcher.id}`);
+        console.log(`Fetching ${fetcherSpec.id}`);
         fetcherSpec.isFetching = new Promise((resolve, reject) => {
             const errorhandler = (error : Error) => {
-                console.error(`Error fetching ${fetcherSpec.fetcher.id}. Retrying ${fetcherSpec.fetcher.maxErrorCount - fetcherSpec.errorCount} more times.`, error);
+                console.error(`Error fetching ${fetcherSpec.id}. Retrying ${fetcherSpec.maxErrorCount - fetcherSpec.errorCount} more times.`, error);
                 const errorObj : FetchError = {error: ERROR_FETCHER};
                 //noinspection EqualityComparisonWithCoercionJS
                 if (fetcherSpec.content != null) {
@@ -132,7 +137,7 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
                 fetcherSpec.lastError = errorObj;
                 fetcherSpec.errorCount++;
                 delete fetcherSpec.isFetching;
-                if (fetcherSpec.errorCount >= fetcherSpec.fetcher.maxErrorCount) {
+                if (fetcherSpec.errorCount >= fetcherSpec.maxErrorCount) {
                     // TODO: Suspend? Blacklist?
                     fetcherSpec.errorCount = 0;
                     reject(errorObj)
@@ -141,8 +146,8 @@ class PreemptiveCache implements Cache<ContentFetcher<*>, *> {
                 }
             };
             try {
-                fetcherSpec.fetcher.fetch().then(data => {
-                    console.log(`Fetched ${fetcherSpec.fetcher.id}`);
+                fetcherSpec.fetcher().then(data => {
+                    console.log(`Fetched ${fetcherSpec.id}`);
                     fetcherSpec.content = data;
                     fetcherSpec.lastFetchedSecond = this._tick;
                     fetcherSpec.errorCount = 0;

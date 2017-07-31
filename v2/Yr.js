@@ -56,13 +56,7 @@ class Yr implements ContentProvider {
 
     constructor(id : string, dataStore : PreemptiveCache) {
         this._id = id;
-        this._cachedValueProvider = dataStore.registerFetcher({
-            id : url,
-            fetchIntervalSeconds : 30,
-            format : this.format.bind(this),
-            maxErrorCount : 3,
-            fetch: this.fetch.bind(this)
-        });
+        this._cachedValueProvider = dataStore.registerFetcher(this.fetch.bind(this), url, 30, 3);
     }
 
     fetch() {

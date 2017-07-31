@@ -13,7 +13,6 @@ type MonitoredCall = {
 
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
 import type {CachedValueProvider} from "./fetch/Cache";
-import type {ContentFetcher} from "./fetch/ContentFetcher";
 import type {ContentProvider} from "./provider/ContentProvider";
 
 
@@ -38,10 +37,9 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
-class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesResponse> {
+class Trafikanten implements ContentProvider {
 
     _content : MessageType;
-    fetchIntervalSeconds : number;
     id : string;
     _cachedValueProvider : CachedValueProvider<GetDeparturesResponse>;
     maxErrorCount : number;
@@ -54,9 +52,7 @@ class Trafikanten implements ContentProvider, ContentFetcher<GetDeparturesRespon
     constructor(id : string, fetcher : PreemptiveCache) {
         this._content = [];
         this.id = id;
-        this.fetchIntervalSeconds = 10;
-        this._cachedValueProvider = fetcher.registerFetcher(this);
-        this.maxErrorCount = 3;
+        this._cachedValueProvider = fetcher.registerFetcher(this.fetch.bind(this), id, 10, 3);
         this.currentContent = "";
     }
 
