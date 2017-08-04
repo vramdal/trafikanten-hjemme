@@ -1,7 +1,7 @@
 // @flow
 const font = require("./font");
 const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
-const LinebreakingCharacterProcessor = require("./rendering/LinebreakingCharacterProcessor.js");
+const LinebreakingCharacterProcessor = require("./rendering/SoftLinebreakingCharacterProcessor.js");
 const SimpleTypes = require("./SimpleTypes.js");
 import type {AnnotatedBitmap} from './Bitmap';
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";

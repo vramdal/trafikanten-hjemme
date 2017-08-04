@@ -15,11 +15,14 @@ class VerticalScrollingAnimation implements Animation {
     _textLayout : TextLayout;
     _lines : number;
     _currentTick : number;
+    _totalTicked : number;
     _holdOnLine : number;
+    _waitTicksOnLastLine: number;
 
 
-    constructor(holdOnLine : number) {
-        this._waitTicksOnLine = holdOnLine || WAIT_TICKS_ON_LINE;
+    constructor(waitTicksOnLine : number, waitTicksOnLastLine? : number) {
+        this._waitTicksOnLine = waitTicksOnLine || WAIT_TICKS_ON_LINE;
+        this._waitTicksOnLastLine = waitTicksOnLastLine || 0;
     }
 
     setSource(source : AnnotatedBitmap, frameWidth: number, lines : number = 1) : void {
@@ -32,16 +35,22 @@ class VerticalScrollingAnimation implements Animation {
     reset() : void {
         this._currentTick = 0;
         this._holdOnLine = this._waitTicksOnLine;
+        this._totalTicked = 0;
     }
 
     tick() : void {
+        this._totalTicked++;
         let alignedAtLine = (this._currentTick - this.viewportHeight) >= 0
             && (this._currentTick - this.viewportHeight) % this.lineHeight === 0
-            && (this._currentTick < this.numLines * this.ticksPerLine);
+            && (this._currentTick < (this.numLines + 1) * this.ticksPerLine);
 
         if (alignedAtLine && this._holdOnLine === 0) {
             this._currentTick++;
-            this._holdOnLine = this._waitTicksOnLine;
+            let startingOnLastLine = this._currentTick >  (this.numLines - 1) * this.ticksPerLine;
+            if (startingOnLastLine) {
+                console.log("startingOnLastLine = ", startingOnLastLine);
+            }
+            this._holdOnLine = startingOnLastLine && this._waitTicksOnLastLine || this._waitTicksOnLine;
         } else if (alignedAtLine) {
             this._holdOnLine--;
         } else {
@@ -50,7 +59,10 @@ class VerticalScrollingAnimation implements Animation {
     }
 
     getAnimationRemaining(): number {
-        return this.numLines * this.lineHeight + this.scrollHeight - this._currentTick;
+        return (this._waitTicksOnLastLine ? this._waitTicksOnLastLine : this._waitTicksOnLine + this.viewportHeight)
+            + (this.numLines - 1) * this.ticksPerLine
+            + this.viewportHeight
+        - this._totalTicked;
     }
 
     //noinspection JSUnusedGlobalSymbols

@@ -8,7 +8,7 @@ import type {CharacterProcessor} from "./CharacterProcessor";
 
 type SoftLinebreakAtPosition = {chStart : number, chEnd: number, xStart : number, xEnd: number};
 
-class LinebreakingCharacterProcessor implements CharacterProcessor {
+class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
 
     characterMap : Array<{chIdx: number, str: string}>;
     softLinebreaksAtPositions: Array<SoftLinebreakAtPosition>;
@@ -63,10 +63,10 @@ class LinebreakingCharacterProcessor implements CharacterProcessor {
     //noinspection JSUnusedGlobalSymbols
     place(bitmap: AnnotatedBitmap): void {
         for (let softLinebreakAtPosition of this.softLinebreaksAtPositions) {
-            bitmap.annotations.push(new LinebreakAnnotation(softLinebreakAtPosition.xStart, softLinebreakAtPosition.xEnd));
+            bitmap.annotations.push(new LinebreakAnnotation(softLinebreakAtPosition.xStart, softLinebreakAtPosition.xEnd, 'Soft'));
         }
     }
 
 }
 
-module.exports = LinebreakingCharacterProcessor;
+module.exports = SoftLinebreakingCharacterProcessor;

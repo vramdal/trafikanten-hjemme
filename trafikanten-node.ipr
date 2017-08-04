@@ -91,9 +91,6 @@
     <option wsh="false" />
     <option yui="false" />
   </component>
-  <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{babel, react, react-dom}" />
-  </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="FLOW" />
   </component>
@@ -217,6 +214,13 @@
         <default-constraints vsize-policy="6" hsize-policy="0" anchor="0" fill="2" />
       </item>
     </group>
+  </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="vramdal">
+      <words>
+        <w>linebreaker</w>
+      </words>
+    </dictionary>
   </component>
   <component name="ProjectKey">
     <option name="state" value="https://github.com/vramdal/trafikanten-hjemme" />
