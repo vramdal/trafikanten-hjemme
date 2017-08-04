@@ -6,6 +6,8 @@ const NoAnimation = require("./animations/NoAnimation.js");
 const testdata1 = require("./testdata/ensjø-departures-1.json");
 const testdata2 = require("./testdata/ensjø-departures-2.json");
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
+const fetch = require("node-fetch");
+
 
 type MonitoredCall = {
     ExpectedDepartureTime : string
@@ -65,26 +67,38 @@ class Trafikanten implements ContentProvider {
 
     }
 
-    //noinspection JSUnusedGlobalSymbols
+    //noinspection JSUnusedGlobalSymbols,JSMethodCanBeStatic
     fetch() : Promise<GetDeparturesResponse> {
-        let shouldError = Math.random() > 0.9;
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (shouldError) {
-                    return reject(new Error("Trafikanten fetching error"));
-                }
-                resolve(this.id === "1" ? testdata1 : testdata2);
-            }, Math.random() * (2000 - 1000) + 1000);
-        });
+        return fetch("http://reisapi.ruter.no/StopVisit/GetDepartures/3011430")
+            .then(res => res.json())
+
+
+        /*
+                let shouldError = Math.random() > 0.9;
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (shouldError) {
+                            return reject(new Error("Trafikanten fetching error"));
+                        }
+                        resolve(this.id === "1" ? testdata1 : testdata2);
+                    }, Math.random() * (2000 - 1000) + 1000);
+                });
+        */
     }
 
+    //noinspection JSUnusedGlobalSymbols
     getContent() : MessageType {
         return this.currentMessage;
     }
 
     formatContent() : Promise<MessageType> {
+        let now = new Date().getTime();
         return this._rawValueProvider()
-            .then(response => this.format(response))
+            .then((departures : GetDeparturesResponse) =>
+                departures.filter(departure =>
+                    new Date(departure.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime).getTime() > now + 5 * 60 * 1000
+            ))
+            .then(departures => this.format(departures))
             .catch(err => this.loadingMessage)
             .then(currentMessage => {
                 const str = JSON.stringify(currentMessage);
@@ -99,26 +113,20 @@ class Trafikanten implements ContentProvider {
 
     format(getDeparturesResponse : GetDeparturesResponse) : MessageType {
         let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
-        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"};
+        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"};
         let part1 : MessagePartType = Object.assign(
             {},
-            {text: firstDeparture.LineRef},
-            Trafikanten.createFormatSpecifier(0, 12),
+            {text: firstDeparture.LineRef + " " + firstDeparture.DestinationName},
+            Trafikanten.createFormatSpecifier(0, 100),
             {animation: noAnimation}
         );
-        let part2 : MessagePartType = Object.assign(
-            {},
-            {text: firstDeparture.DestinationName},
-            Trafikanten.createFormatSpecifier(17, 100),
-            {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"}}
-        );
-        let part3 : MessagePartType= Object.assign(
+        let part2 : MessagePartType= Object.assign(
             {},
             { text: this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())},
             Trafikanten.createFormatSpecifier(100, 127),
-            {animation: noAnimation}
+            {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"}}
         );
-        let formatted = getDeparturesResponse.slice(1).map((monitoredStopVisit : MonitoredStopVisit) => {
+        let formatted = getDeparturesResponse.slice(1).slice(0, 5).map((monitoredStopVisit : MonitoredStopVisit) => {
             let journey = monitoredStopVisit.MonitoredVehicleJourney;
             return this.formatJourney(journey);
         });
@@ -127,7 +135,7 @@ class Trafikanten implements ContentProvider {
             {text: formatted.join("  -  ")},
             Trafikanten.createFormatSpecifier(128, 255), {animation: {animationName: "ScrollingAnimation"}}
         );
-        let message : MessageType = [part1, part2, part3, secondLine];
+        let message : MessageType = [part1, part2, secondLine];
         message.id = "trafikanten-1";
         return message;
     }

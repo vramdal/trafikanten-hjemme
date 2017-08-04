@@ -25,7 +25,7 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
 
 class Framer {
 
-  parse(messageType : MessageType) : Message { // TODO: Provide sensible default when spec characters are not present
+  parse(messageType : MessageType) : Message {
       return new Message(messageType.map(part => ({
           frame : new Frame(part.start, part.end - part.start, animationFactory((part.animation : AnimationType)), part.lines),
           text: part.text,

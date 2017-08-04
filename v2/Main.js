@@ -29,7 +29,7 @@ let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
 fetchService.start().then(() => {
     "use strict";
     let loop = function () {
-        return Promise.all([trafikanten1.getContent(), trafikanten2.getContent(), yr.getContent()])
+        return Promise.all([trafikanten1.getContent(), yr.getContent()])
             .then(messageSpecs => {
                 const messages = messageSpecs.map(framer.parse);
                 display.playlist = new Playlist(display.eventEmitter, messages);
@@ -79,8 +79,10 @@ start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnima
 });*/
 
 
+/*
 setTimeout(() => {
     "use strict";
     fetchService.stop();
     display.stop();
 }, 300000);
+*/

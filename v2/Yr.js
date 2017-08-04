@@ -67,6 +67,13 @@ class Yr implements ContentProvider {
     }
 
     getContent() {
+/*        return [{
+            text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt",
+            start: 0, end: 128, lines: 2,
+            animation: {
+                animationName: "VerticalScrollingAnimation",
+                holdOnLine: 5
+            }}].concat(*/
         return this._cachedValueProvider()
             .then(response => this.format(response))
             .catch(err => [Object.assign({},
