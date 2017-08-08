@@ -10,11 +10,13 @@ import type {MessageType} from "./message/MessageType";
 import type {CachedValueProvider} from "./fetch/Cache";
 import type {ContentProvider} from "./provider/ContentProvider";
 
-const url = "http://www.yr.no/sted/Norge/Oslo/Oslo/Kampen/varsel_nu.xml";
+const nowPrecipitationUrl = "http://www.yr.no/sted/Norge/Oslo/Oslo/Kampen/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Telemark/Bamble/Bamble/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Nordland/Bodø/Bodø/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Sør-Trøndelag/Trondheim/Trondheim/varsel_nu.xml";
 // const url = "http://www.yr.no/sted//Norge/Finnmark/Vadsø/Vadsø/varsel_nu.xml";
+
+const place = "Norge/Oslo/Oslo/Kampen";
 
 type LinkType = {
     text: string,
@@ -34,7 +36,14 @@ type PrecipitationTimeType = {
 
 type dateStringType = string;
 
-export type YrPrecipitationType = {
+type YrPrecipitationForecastType = {
+    time: Array<PrecipitationTimeType>
+}
+
+export type YrPrecipitationResponse = YrResponseType<YrPrecipitationForecastType>;
+
+
+type YrResponseType<T> = {
     weatherdata: {
         credit: {
             link: LinkType
@@ -43,24 +52,84 @@ export type YrPrecipitationType = {
             lastupdate: string,
             nextupdate: string
         },
-        forecast: {
-            time: Array<PrecipitationTimeType>
-        }
+        forecast: T ;
     }
 }
 
+type TabTime = {
+    from : string,
+    to: string,
+    period : number,
+    symbol : {
+        number: number,
+        numberEx : number,
+        name : string,
+        'var' : string
+    },
+    precipitation : {
+        value : number
+    },
+    windDirection: {
+        deg: number,
+        code : string,
+        name : string
+    },
+    windSpeed : {
+        mps : number,
+        name : string
+    },
+    temperature : {
+        unit : string,
+        value : number
+    },
+    pressure : {
+        unit : string,
+        value : number
+    }
+}
+
+type ForecastType = {
+    location : {
+        name : string,
+        time: {
+            from: string,
+            to: string,
+            title: string,
+            body: string
+        }
+    },
+    tabular : {
+        time : Array<TabTime>
+    }
+}
+
+export type YrForecastResponse = YrResponseType<ForecastType>;
+
 class Yr implements ContentProvider {
 
-    _cachedValueProvider : CachedValueProvider<YrPrecipitationType>;
+    _nowPrecipitationValueProvider : CachedValueProvider<YrPrecipitationResponse>;
     _id : string;
+    _nowPrecipitationUrl : string;
+    _forecastUrl : string;
+    _forecastValueProvider : CachedValueProvider<YrForecastResponse>;
 
     constructor(id : string, dataStore : PreemptiveCache) {
         this._id = id;
-        this._cachedValueProvider = dataStore.registerFetcher(this.fetch.bind(this), url, 30, 3);
+        this._nowPrecipitationUrl = "http://www.yr.no/sted/" + place + "/varsel_nu.xml";
+        this._forecastUrl = "http://www.yr.no/sted/" + place + "/varsel.xml";
+        this._nowPrecipitationValueProvider = dataStore.registerFetcher(this.fetchNowPrecipitation.bind(this), this._nowPrecipitationUrl, 120, 3);
+        this._forecastValueProvider = dataStore.registerFetcher(this.fetchForecast.bind(this), this._forecastUrl, 60*10, 3);
     }
 
-    fetch() {
-        return fetch(url)
+    fetchNowPrecipitation() {
+        return fetch(this._nowPrecipitationUrl)
+            .then(res => res.text())
+            .then(body => Promise.resolve(xml2json.toJson(body)))
+            .then(json => JSON.parse(json))
+    }
+
+    fetchForecast() {
+        return fetch(this._forecastUrl)
             .then(res => res.text())
             .then(body => Promise.resolve(xml2json.toJson(body)))
             .then(json => JSON.parse(json))
@@ -74,14 +143,48 @@ class Yr implements ContentProvider {
                 animationName: "VerticalScrollingAnimation",
                 holdOnLine: 5
             }}].concat(*/
-        return this._cachedValueProvider()
-            .then(response => this.format(response))
+/*
+        return this._nowPrecipitationValueProvider()
+            .then(response => this.formatPrecipitation(response))
             .catch(err => [Object.assign({},
                 { start: 0, end: 127, text: "Loading data for " + this._id, lines: 2},
                 { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})])
+*/
+        return this._forecastValueProvider()
+            .then(response => this.formatForecast(response))
+            .catch(err => [Object.assign({},
+                { start: 0, end: 127, text: "Loading data for " + this._id, lines: 2},
+                { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})]
+            )
     }
 
-    format(yrPrecipitation : YrPrecipitationType) : MessageType {
+    formatForecast(yrForecast : YrForecastResponse) : MessageType {
+        const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
+        let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
+        let periodText = (period : number) => {
+            switch (parseInt(period)) {
+                case 0 : return "natt";
+                case 1 : return "morgen";
+                case 2 : return "dag";
+                case 3 : return "kveld";
+            }
+        };
+        //let row1 = times.map(time => `${timestampRegex.exec(time.from)[4]}-${timestampRegex.exec(time.to)[4]}`).join(" ");
+        let row1 = times.map(time => time.period).map(periodText).map((periodText, idx) => (
+            {text : periodText, start : idx * 31, end : idx * 31 + 31, animation: {animationName: "NoAnimation",  timeoutTicks : 100, alignment : 'left'}}
+        ));
+        let row2 = times.map((time, idx) => ( {
+                text : `${time.temperature.value}°  ${time.symbol.numberEx}`,
+                start : 127 + idx * 31,
+                end : 127 + idx * 31 + 31,
+                animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 50}
+        } ));
+
+        //let row2 = times.map(time => time.temperature.value + "grd-" + time.symbol.name).join(" ");
+        return row1.concat(row2);
+    }
+
+    formatPrecipitation(yrPrecipitation : YrPrecipitationResponse) : MessageType {
 
         const barWidth = 6; //Math.floor(128 / yrPrecipitation.weatherdata.forecast.time.length / 2);
         let noPrecipitation = true;

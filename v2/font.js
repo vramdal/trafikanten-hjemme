@@ -1133,6 +1133,16 @@ function init() {
         "X",
         "X"
     );
+    registerCharacter(176, 4, // °, degree sign)
+        " XX ",
+        "X  X",
+        " XX ",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+    );
 
     let requiredWidth = 0;
     let positions : {[string | number] : number} = {};
