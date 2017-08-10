@@ -9,11 +9,11 @@ import type {AnnotatedBitmap, BitmapAnnotation} from "../Bitmap";
 
 import type {Char} from "../SimpleTypes";
 
-// TODO: Tests: move from VerticalScrolling.spec and Paging.spec
 class TextLayout {
 
     _pages: MultilineBitmap;
     _charPages : Array<Char>;
+    _overflows: MultilineBitmap;
 
     constructor(source : AnnotatedBitmap, frameWidth: number) {
         this.reset();
@@ -21,7 +21,7 @@ class TextLayout {
             source.annotations.filter((annotation : BitmapAnnotation) =>
                 annotation instanceof LinebreakAnnotation
             ) : Array<any>) : Array<LinebreakAnnotation>);
-        let annotationsReversed = linebreakAnnotations.reverse();
+        let annotationsReversed = linebreakAnnotations.slice().reverse();
         let cursor = 0;
         let previousPageStart = 0;
         while (cursor < source.length) {
@@ -38,7 +38,9 @@ class TextLayout {
                 } else {
                     this._pages.push(source.subarray(cursor, cursor + frameWidth));
                     let nextBreak = linebreakAnnotations.find(annotation => annotation.start > cursor);
-                    cursor = nextBreak && nextBreak.end || source.length;
+                    cursor = nextBreak && nextBreak.end
+                        //|| annotationsReversed.filter(annotation => annotation.start > cursor).map(annotation => annotation.start)[0]
+                        || source.length;
                 }
             }
             let characters : string = (source.annotations
@@ -53,6 +55,7 @@ class TextLayout {
 
     reset() : void {
         this._pages = new MultilineBitmap();
+        this._overflows = new MultilineBitmap();
         this._charPages = [];
     };
 
