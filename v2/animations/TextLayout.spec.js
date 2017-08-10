@@ -27,7 +27,7 @@ describe('TextLayout', () => {
         expect(textlayout.pages[1]).to.eql({'0': 2, '1': 3});
 
         expect(textlayout._overflows[0]).to.be.undefined();
-        //expect(textlayout._overflows[1]).to.eql({'0': 4});
+        expect(textlayout._overflows[1]).to.eql({'0': 4});
     });
 
     it('should break into multiple lines AND overflow when necessary', () => {
@@ -40,12 +40,10 @@ describe('TextLayout', () => {
         expect(textlayout.pages[2]).to.eql({'0': 7, '1': 8});
         expect(textlayout.pages[3]).to.eql({'0': 14 });
 
-/*
-        expect(textlayout._overflows[0]).to.be.undefined();
-        expect(textlayout._overflows[1]).to.be.undefined();
-        expect(textlayout._overflows[2]).to.eql({'0': 10, '1': 11, '2': 12, '3': 13});
+        expect(textlayout._overflows[0]).to.eql({'0': 3});
+        expect(textlayout._overflows[1]).to.eql({'0': 6});
+        expect(textlayout._overflows[2]).to.eql({'0': 9, '1': 10, '2': 11, '3': 12, '4': 13});
         expect(textlayout._overflows[3]).to.be.undefined();
-*/
     });
 
 });

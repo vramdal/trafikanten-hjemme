@@ -39,8 +39,8 @@ class TextLayout {
                     this._pages.push(source.subarray(cursor, cursor + frameWidth));
                     let nextBreak = linebreakAnnotations.find(annotation => annotation.start > cursor);
                     cursor = nextBreak && nextBreak.end
-                        //|| annotationsReversed.filter(annotation => annotation.start > cursor).map(annotation => annotation.start)[0]
                         || source.length;
+                    this._overflows[this._pages.length - 1] = source.slice(previousPageStart + frameWidth, cursor);
                 }
             }
             let characters : string = (source.annotations
