@@ -1,4 +1,10 @@
 // @flow
+const memwatch = require('memwatch-next');
+
+memwatch.on('leak', (info) => {
+    console.error('Memory leak detected:\n', info);
+});
+
 const Display = require("./display/Display");
 const Playlist = require("./Playlist.js");
 const Framer = require("./Framer.js");
@@ -10,6 +16,7 @@ const Trafikanten = require("./Trafikanten.js");
 const Yr = require("./Yr.js");
 //const displayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+
 
 
 const FetchService = require("./fetch/PreemptiveCache.js");

@@ -14,6 +14,6 @@ export type MessagePartType = FrameSpecType & {animation: AnimationType}
 
 // https://github.com/facebook/flow/issues/631
 
-class _MessageSpec extends Array<MessagePartType> { id: string }
+class _MessageSpec extends Array<MessagePartType> { messageId: string }
 
 export type MessageType = $Supertype<_MessageSpec>;
