@@ -15,7 +15,7 @@ describe('HardLinebreakingCharacterProcessor', () => {
             const text = "Hello,\nworld!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(1);
+                expect(charactersConsumed).to.equal(i === 6 ? 1 : 0);
             }
             expect(processor.characterMap).to.have.lengthOf(1);
             const characterAtPosition = processor.characterMap[0];
@@ -25,7 +25,7 @@ describe('HardLinebreakingCharacterProcessor', () => {
             const text = "Hello,\nworld,\nand you!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(1);
+                expect(charactersConsumed).to.equal(i === 6 || i === 13 ? 1 : 0);
             }
             expect(processor.characterMap).to.have.lengthOf(2);
             expect(processor.characterMap[0]).to.eql({chIdx:  6, str: '\n'});

@@ -24,8 +24,9 @@ class HardLinebreakingCharacterProcessor implements CharacterProcessor {
         let match = restStr.match(/^(\n+).+/);
         if (match) {
             this.characterMap.push({chIdx, str: match[1]});
+            return 1;
         }
-        return 1;
+        return 0;
     }
 
     mapCharacterToPosition(chIdx : number, x : number) {
