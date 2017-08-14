@@ -1143,6 +1143,46 @@ function init() {
         "    ",
         "    "
     );
+    registerCharacter(30829, 8, // Day)
+        "XX XX XX",
+        " XX  XX ",
+        "  XXXX  ",
+        "XXXXXXXX",
+        "XXXXXXXX",
+        "  XXXX  ",
+        " XX  XX ",
+        "XX XX XX"
+    );
+    registerCharacter(12192, 8, // Morning)
+        "XX X    ",
+        " XX     ",
+        "  XX    ",
+        "XXXX    ",
+        "XXXX    ",
+        "  XX    ",
+        " XX     ",
+        "XX X    "
+    );
+    registerCharacter(12067, 8, // Evening)
+        "    X XX",
+        "     XX ",
+        "    XX  ",
+        "    XXXX",
+        "    XXXX",
+        "    XX  ",
+        "     XX ",
+        "    X XX"
+    );
+    registerCharacter(22812, 8, // Night)
+        "        ",
+        "  XXXX  ",
+        " X    X ",
+        "X      X",
+        "X      X",
+        " X    X ",
+        "  XXXX  ",
+        "        "
+    );
 
     let requiredWidth = 0;
     let positions : {[string | number] : number} = {};

@@ -162,22 +162,21 @@ class Yr implements ContentProvider {
     formatForecast(yrForecast : YrForecastResponse) : MessageType {
         const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
         let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
-        let periodText = (period : number) : [string, number, Alignments] => {
+        let periodText = (period : number) : [string, number, Alignments, number] => {
             switch (parseInt(period)) {
-                case 0 : return ["natt", 25, "left"];
-                case 1 : return ["morgen", 32, "left"];
-                case 2 : return ["dag", 15, "left"];
-                case 3 : return ["kveld", 28, "left"];
+                case 0 : return ["natt", 25, "center", 22812];
+                case 1 : return ["morgen", 25, "center", 12192];
+                case 2 : return ["dag", 25, "center", 30829];
+                case 3 : return ["kveld", 25, "center", 12067];
                 default : throw new Error("Unknown period: " + period);
             }
         };
-        //let row1 = times.map(time => `${timestampRegex.exec(time.from)[4]}-${timestampRegex.exec(time.to)[4]}`).join(" ");
         let lastStop = 0;
         let elements = [];
-        times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments], idx : number, array : Array<[string, number, Alignments]>) =>
+        times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) =>
             {
                 const width = Math.round(periodTextAndPctWidth[1] * 128 / 100);
-                let el = [periodTextAndPctWidth[0], lastStop, lastStop + width, periodTextAndPctWidth[2]];
+                let el = [String.fromCharCode(periodTextAndPctWidth[3]), lastStop, lastStop + width, periodTextAndPctWidth[2]];
                 lastStop = lastStop + width;
                 elements.push(el);
             }
@@ -199,7 +198,6 @@ class Yr implements ContentProvider {
                 animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 50}
         } ));
 
-        //let row2 = times.map(time => time.temperature.value + "grd-" + time.symbol.name).join(" ");
         return row1.concat(row2);
     }
 
