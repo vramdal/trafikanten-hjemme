@@ -7,6 +7,7 @@ const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
 import type {MessageType} from "./message/MessageType";
+import type {Alignments} from "./animations/Types";
 import type {CachedValueProvider} from "./fetch/Cache";
 import type {ContentProvider} from "./provider/ContentProvider";
 
@@ -161,22 +162,40 @@ class Yr implements ContentProvider {
     formatForecast(yrForecast : YrForecastResponse) : MessageType {
         const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
         let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
-        let periodText = (period : number) => {
+        let periodText = (period : number) : [string, number, Alignments] => {
             switch (parseInt(period)) {
-                case 0 : return "natt";
-                case 1 : return "morgen";
-                case 2 : return "dag";
-                case 3 : return "kveld";
+                case 0 : return ["natt", 25, "left"];
+                case 1 : return ["morgen", 32, "left"];
+                case 2 : return ["dag", 15, "left"];
+                case 3 : return ["kveld", 28, "left"];
+                default : throw new Error("Unknown period: " + period);
             }
         };
         //let row1 = times.map(time => `${timestampRegex.exec(time.from)[4]}-${timestampRegex.exec(time.to)[4]}`).join(" ");
-        let row1 = times.map(time => time.period).map(periodText).map((periodText, idx) => (
-            {text : periodText, start : idx * 31, end : idx * 31 + 31, animation: {animationName: "NoAnimation",  timeoutTicks : 100, alignment : 'left'}}
-        ));
+        let lastStop = 0;
+        let elements = [];
+        times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments], idx : number, array : Array<[string, number, Alignments]>) =>
+            {
+                const width = Math.round(periodTextAndPctWidth[1] * 128 / 100);
+                let el = [periodTextAndPctWidth[0], lastStop, lastStop + width, periodTextAndPctWidth[2]];
+                lastStop = lastStop + width;
+                elements.push(el);
+            }
+        );
+
+        let row1 = elements.map((periodTextPosAndPxWidth : [string, number, number, Alignments]) => (
+                {
+                    text : periodTextPosAndPxWidth[0],
+                    start : periodTextPosAndPxWidth[1],
+                    end : periodTextPosAndPxWidth[2],
+                    animation: {animationName: "NoAnimation",  timeoutTicks : 100, alignment : periodTextPosAndPxWidth[3]}
+                }
+            )
+        );
         let row2 = times.map((time, idx) => ( {
-                text : `${time.temperature.value}°  ${time.symbol.numberEx}`,
-                start : 127 + idx * 31,
-                end : 127 + idx * 31 + 31,
+                text : `${time.temperature.value}° ${time.symbol.numberEx}`,
+                start : row1[idx].start + 128,
+                end : row1[idx].end + 128,
                 animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 50}
         } ));
 
