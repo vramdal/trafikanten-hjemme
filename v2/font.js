@@ -1143,45 +1143,45 @@ function init() {
         "    ",
         "    "
     );
-    registerCharacter(30829, 8, // Day)
-        "XX XX XX",
-        " XX  XX ",
-        "  XXXX  ",
-        "XXXXXXXX",
-        "XXXXXXXX",
-        "  XXXX  ",
-        " XX  XX ",
-        "XX XX XX"
+    registerCharacter(30829, 7, // Day)
+        "X  X  X",
+        " X   X ",
+        "  XXX  ",
+        "XXXXXXX",
+        "  XXX  ",
+        " X   X ",
+        "X  X  X",
+        "       "
     );
-    registerCharacter(12192, 8, // Morning)
-        "XX X    ",
-        " XX     ",
-        "  XX    ",
-        "XXXX    ",
-        "XXXX    ",
-        "  XX    ",
-        " XX     ",
-        "XX X    "
+    registerCharacter(12192, 7, // Morning)
+        "X  X   ",
+        " X     ",
+        "  XX   ",
+        "XXXX   ",
+        "  XX   ",
+        " X     ",
+        "X  X   ",
+        "       "
     );
-    registerCharacter(12067, 8, // Evening)
-        "    X XX",
-        "     XX ",
-        "    XX  ",
-        "    XXXX",
-        "    XXXX",
-        "    XX  ",
-        "     XX ",
-        "    X XX"
+    registerCharacter(12067, 7, // Evening)
+        "   X  X",
+        "     X ",
+        "   XX  ",
+        "   XXXX",
+        "   XX  ",
+        "     X ",
+        "   X  X",
+        "       "
     );
-    registerCharacter(22812, 8, // Night)
-        "        ",
-        "  XXXX  ",
-        " X    X ",
-        "X      X",
-        "X      X",
-        " X    X ",
-        "  XXXX  ",
-        "        "
+    registerCharacter(22812, 7, // Night)
+        "  XXX  ",
+        " X   X ",
+        "X     X",
+        "X     X",
+        "X     X",
+        " X   X ",
+        "  XXX  ",
+        "       "
     );
 
     let requiredWidth = 0;
