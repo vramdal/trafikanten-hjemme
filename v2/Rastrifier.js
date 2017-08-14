@@ -1,7 +1,8 @@
 // @flow
 const font = require("./font");
 const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
-const LinebreakingCharacterProcessor = require("./rendering/SoftLinebreakingCharacterProcessor.js");
+const SoftLinebreakingCharacterProcessor = require("./rendering/SoftLinebreakingCharacterProcessor.js");
+const HardLinebreakingCharacterProcessor = require("./rendering/HardLinebreakingCharacterProcessor.js");
 const SimpleTypes = require("./SimpleTypes.js");
 import type {AnnotatedBitmap} from './Bitmap';
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";
@@ -34,8 +35,9 @@ function rastrifyFrame(text: string): AnnotatedBitmap {
     "use strict";
 
     let fontCharacterProcessor = new FontCharacterProcessor(font);
-    let linebreakingCharacterProcessor = new LinebreakingCharacterProcessor();
-    let characterProcessors : Array<CharacterProcessor> = [linebreakingCharacterProcessor, fontCharacterProcessor];
+    let softLinebreakingCharacterProcessor = new SoftLinebreakingCharacterProcessor();
+    let hardLinebreakingCharacterProcessor = new HardLinebreakingCharacterProcessor();
+    let characterProcessors : Array<CharacterProcessor> = [hardLinebreakingCharacterProcessor, softLinebreakingCharacterProcessor, fontCharacterProcessor];
     parseString(text, characterProcessors);
 
     let glyphs = fontCharacterProcessor.glyphs;

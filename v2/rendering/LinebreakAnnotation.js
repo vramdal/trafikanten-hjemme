@@ -10,7 +10,7 @@ class LinebreakAnnotation implements BitmapAnnotation {
     end : number;
     type: LinebreakType;
 
-    constructor(start: number, end: number, type : LinebreakType) {
+    constructor(start: number, end: number, type : LinebreakType = "Soft") {
         this.start = start;
         this.end = end;
         this.type = type;
