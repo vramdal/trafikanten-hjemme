@@ -67,25 +67,42 @@ class TextLayout {
                     .map(annotation => ((annotation : any) : FontCharacterAnnotation).char): Array<any>)
                     .join("");
                 this._charPages.push(characters);
+
+                // Assert that the page has frameWidth length
+                const source = this._pages[this._pages.length -1];
+                this._pages[this._pages.length - 1] = this.transfer(source, frameWidth);
                 previousPageStart = cursor;
             }
         }
 
         for (let i = 0; i < this._pages.length; i++) {
-            let page = this._pages[i];
-            this.applyAlignmentToPage(alignment, frameWidth, page, pageContentLengths[i]);
+            this.applyAlignmentToPage(alignment, frameWidth, this._pages[i], pageContentLengths[i]);
         }
     }
 
-    // TODO: Test
+    // noinspection JSMethodCanBeStatic
+    transfer(source : Bitmap, length : number) : Bitmap {
+        let destination = new Uint8Array(length);
+
+        for (let i = 0; i < source.length; i++) {
+            destination[i] = source[i];
+        }
+        return destination;
+    }
+
+// TODO: Test
     // TODO: Test center
     //noinspection JSMethodCanBeStatic
-    applyAlignmentToPage(alignment : Alignments, frameWidth : number, page : Bitmap, contentLength : number) {
+    applyAlignmentToPage(alignment : Alignments, frameWidth : number, page : Bitmap, contentLength : number) : Bitmap {
         let leading = Alignment[alignment](frameWidth, contentLength);
         if (leading !== 0) {
             page.copyWithin(leading, 0);
             page.fill(0, 0, leading);
+            return page;
+        } else {
+            return page;
         }
+
     }
 
     extractHardPage(source : AnnotatedBitmap, _hardLinebreak : ?LinebreakAnnotation, hCursor : number) : AnnotatedBitmap {

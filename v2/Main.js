@@ -38,6 +38,12 @@ fetchService.start().then(() => {
     let loop = function () {
         return Promise.all([/*trafikanten1.getContent(), */yr.getContent()])
             .then(messageSpecs => {
+/*
+                let tempMessageSpecs = [[Object.assign({},
+                    { start: 0, end: 127, text: "aaa\nbbb", lines: 1},
+                    { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"}})]];
+
+*/
                 const messages = messageSpecs.map(framer.parse);
                 display.playlist = new Playlist(display.eventEmitter, messages);
             })

@@ -192,7 +192,7 @@ class Yr implements ContentProvider {
             )
         );
         let row2 = times.map((time, idx) => ( {
-                text : `${time.temperature.value}°|\n${time.symbol.numberEx}`,
+                text : `${time.temperature.value}°\n${time.symbol.numberEx}`,
                 start : row1[idx].start + 128,
                 end : row1[idx].end + 128,
                 animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 100, alignment: "center"}

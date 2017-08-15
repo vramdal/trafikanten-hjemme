@@ -25,7 +25,7 @@ describe('TextLayout', () => {
             source.annotations = [new LinebreakAnnotation(1, 1)];
             let textlayout = new TextLayout(source, 2);
             expect(textlayout.pages).to.have.lengthOf(2);
-            expect(textlayout.pages[0]).to.eql({'0': 1});
+            expect(textlayout.pages[0]).to.eql({'0': 1, '1': 0});
             expect(textlayout.pages[1]).to.eql({'0': 2, '1': 3});
 
             expect(textlayout._overflows[0]).to.be.undefined();
@@ -40,7 +40,7 @@ describe('TextLayout', () => {
             expect(textlayout.pages[0]).to.eql({'0': 1, '1': 2});
             expect(textlayout.pages[1]).to.eql({'0': 4, '1': 5});
             expect(textlayout.pages[2]).to.eql({'0': 7, '1': 8});
-            expect(textlayout.pages[3]).to.eql({'0': 14 });
+            expect(textlayout.pages[3]).to.eql({'0': 14 , '1': 0});
 
             expect(textlayout._overflows[0]).to.eql({'0': 3});
             expect(textlayout._overflows[1]).to.eql({'0': 6});
@@ -55,7 +55,7 @@ describe('TextLayout', () => {
             source.annotations = [new LinebreakAnnotation(1, 1, "Hard")];
             let textlayout = new TextLayout(source, 2);
             expect(textlayout.pages).to.have.lengthOf(2);
-            expect(textlayout.pages[0]).to.eql({'0': 1});
+            expect(textlayout.pages[0]).to.eql({'0': 1, '1': 0});
             expect(textlayout.pages[1]).to.eql({'0': 2, '1': 3});
 
             expect(textlayout._overflows[0]).to.be.undefined();
@@ -67,7 +67,7 @@ describe('TextLayout', () => {
             source.annotations = [new LinebreakAnnotation(1, 1, "Hard"), new LinebreakAnnotation(2, 3, "Soft")];
             let textlayout = new TextLayout(source, 2);
             expect(textlayout.pages).to.have.lengthOf(2);
-            expect(textlayout.pages[0]).to.eql({'0': 1});
+            expect(textlayout.pages[0]).to.eql({'0': 1, '1': 0});
             expect(textlayout.pages[1]).to.eql({'0': 2, '1': 3});
 
             expect(textlayout._overflows[0]).to.be.undefined();

@@ -44,7 +44,7 @@ class NoAnimation implements Animation {
     }
     //noinspection JSUnusedGlobalSymbols
     getTranslated(idx : number) {
-        let offsetTranslated = idx + this._alignmentOffset;
+        let offsetTranslated = idx + this._alignmentOffset * -1;
         if (offsetTranslated < 0) {
             return 0;
         } else if (offsetTranslated >= this._source.length) {

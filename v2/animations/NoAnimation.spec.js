@@ -62,7 +62,7 @@ describe('NoAnimation', () => {
                 );
             });
             it('should center a long message, and let it overflow on both sides', () => {
-                expect(createAndSetBitmap(FRAME_WIDTH + 2)).to.eql(
+                expect(createAndSetBitmap(FRAME_WIDTH + 2, 0, 1, 2, 3, 4)).to.eql(
                     [2, 2, 2, 2, 2]
                 );
             });
