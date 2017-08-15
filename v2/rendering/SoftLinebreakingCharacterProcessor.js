@@ -30,7 +30,7 @@ class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
             return 0;
         }
         let restStr: Char = text.substring(chIdx);
-        let match = restStr.match(/^(\s+).+/);
+        let match = restStr.match(/^([^\S\n]+).+/);
         if (match) {
             const linebreaker = match[1];
             this.characterMap.push({chIdx, str: linebreaker});

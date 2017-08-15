@@ -40,12 +40,13 @@ function rastrifyFrame(text: string): AnnotatedBitmap {
     let characterProcessors : Array<CharacterProcessor> = [hardLinebreakingCharacterProcessor, softLinebreakingCharacterProcessor, fontCharacterProcessor];
     parseString(text, characterProcessors);
 
-    let glyphs = fontCharacterProcessor.glyphs;
+    let glyphs = fontCharacterProcessor.glyphs; // TODO: Rewrite so that HardLinebreakingCharacterProcessor also can return 'glyphs' in sequence
     let glyphsCombinedWidth = mapCharactersToPositions(glyphs, characterProcessors);
 
     let arrayBuffer = new ArrayBuffer(glyphsCombinedWidth);
     let bitmap : any = new Uint8Array(arrayBuffer);
     bitmap.annotations = [];
+    bitmap.sourceString = text;
     for (let characterProcessor of characterProcessors) {
         characterProcessor.place(bitmap, glyphsCombinedWidth);
     }

@@ -975,6 +975,16 @@ function init() {
             " XXXXXX ",
             "        "
     );
+    registerCharacter(62246, 9, // Light rain
+            "         ",
+            "     X   ",
+            "    X    ",
+            "   X     ",
+            "         ",
+            "     X   ",
+            "    X    ",
+            "   X     "
+    );
     registerCharacter(62247, 9, // Medium rain
             "         ",
             "  X     X",
@@ -1004,6 +1014,16 @@ function init() {
             " ",
             " ",
             " "
+    );
+    registerCharacter(8203, 0,  // Zero-width space
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
     );
     registerCharacter(9829, 7,
           " XX XX ",

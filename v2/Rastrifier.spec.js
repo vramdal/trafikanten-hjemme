@@ -27,4 +27,15 @@ describe('Rastrifier', () => {
         expect(result[0]).to.equal(0x7e);
         expect(bitmapTo8Lines(result)).to.equal(expectedResult);
     });
+
+    describe('a case', () => {
+        it('is a case', () => {
+            let str = "a\na\na";
+            const result = Rastrifier.rastrify(str);
+            console.log("result.annotations = ", result.annotations);
+            expect(result.annotations).to.have.lengthOf(7);
+            bitmapTo8Lines(result);
+
+        });
+    });
 });

@@ -20,12 +20,16 @@ class VerticalScrollingAnimation implements Animation {
     _holdOnLine : number;
     _waitTicksOnLastLine: number;
     _alignment: Alignments;
+    _scrollIn: boolean;
+    _scrollOut: boolean;
 
 
-    constructor(waitTicksOnLine : number, waitTicksOnLastLine? : number, alignment : Alignments) {
+    constructor(waitTicksOnLine : number, waitTicksOnLastLine? : number, alignment? : Alignments, scrollIn? : boolean = true, scrollOut? : boolean = true) {
         this._waitTicksOnLine = waitTicksOnLine || WAIT_TICKS_ON_LINE;
         this._waitTicksOnLastLine = waitTicksOnLastLine || 0;
-        this._alignment = alignment;
+        this._alignment = alignment || "left";
+        this._scrollIn = scrollIn;
+        this._scrollOut = scrollOut;
     }
 
     setSource(source : AnnotatedBitmap, frameWidth: number, lines : number = 1) : void {
@@ -43,16 +47,13 @@ class VerticalScrollingAnimation implements Animation {
 
     tick() : void {
         this._totalTicked++;
-        let alignedAtLine = (this._currentTick - this.viewportHeight) >= 0
-            && (this._currentTick - this.viewportHeight) % this.lineHeight === 0
+        let alignedAtLine = (this._currentTick - (this._scrollIn ? this.viewportHeight : 0)) >= 0
+            && (this._currentTick - (this._scrollIn ? this.viewportHeight : 0)) % this.lineHeight === 0
             && (this._currentTick < (this.numLines + 1) * this.ticksPerLine);
 
         if (alignedAtLine && this._holdOnLine === 0) {
             this._currentTick++;
             let startingOnLastLine = this._currentTick >  (this.numLines - 1) * this.ticksPerLine;
-            if (startingOnLastLine) {
-                console.log("startingOnLastLine = ", startingOnLastLine);
-            }
             this._holdOnLine = startingOnLastLine && this._waitTicksOnLastLine || this._waitTicksOnLine;
         } else if (alignedAtLine) {
             this._holdOnLine--;
@@ -64,7 +65,7 @@ class VerticalScrollingAnimation implements Animation {
     getAnimationRemaining(): number {
         return (this._waitTicksOnLastLine ? this._waitTicksOnLastLine : this._waitTicksOnLine + this.viewportHeight)
             + (this.numLines - 1) * this.ticksPerLine
-            + this.viewportHeight
+            + (this._scrollOut ? this.viewportHeight : 0)
         - this._totalTicked;
     }
 
@@ -112,11 +113,15 @@ class VerticalScrollingAnimation implements Animation {
             .map(byte => byte.toString(2))
             .map(str => this.padByteStr(str))
             .join("00");
-        for (let i = 0; i < this.scrollHeight; i++) {
-            str = "0" + str;
+        if (this._scrollIn) {
+            for (let i = 0; i < this.scrollHeight; i++) {
+                str = "0" + str;
+            }
         }
-        for (let i = 0; i < this.scrollHeight; i++) {
-            str = str + "0";
+        if (this._scrollOut) {
+            for (let i = 0; i < this.scrollHeight; i++) {
+                str = str + "0";
+            }
         }
         let windowStartY = this._currentTick;
 

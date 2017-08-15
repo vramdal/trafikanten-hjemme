@@ -153,4 +153,66 @@ describe('VerticalScrollingAnimation', () => {
         console.log("animation.getAnimationRemaining() = ", animation.getAnimationRemaining());
         expect(animation.getAnimationRemaining()).to.equal(0);
     });
+    describe('no scrollIn', () => {
+        it('should start on line 1 when scrollIn = false in a multiline', () => {
+            let source = new Uint8Array(18)
+                .fill(parseInt("11111111", 2), 0, FRAME_WIDTH)
+                .fill(parseInt("10101111", 2), FRAME_WIDTH);
+            source.annotations = [new LinebreakAnnotation(FRAME_WIDTH + 1, FRAME_WIDTH + 1, 'Soft')];
+            let animation = new VerticalScrolling(2, 10, undefined, false);
+            animation.setSource(source, FRAME_WIDTH, 2);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
+            tick(3, animation);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111110);
+            tick(9, animation);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b10101111);
+            tick(28, animation);
+            expect(animation.getAnimationRemaining()).to.equal(0);
+
+        });
+        it('should start on line 1 when scrollIn = false in a single line', () => {
+            let source = new Uint8Array(9)
+                .fill(parseInt("11111111", 2), 0, FRAME_WIDTH);
+            source.annotations = [];
+            let animation = new VerticalScrolling(2, 10, undefined, false);
+            animation.setSource(source, FRAME_WIDTH, 1);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
+            tick(3, animation);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111110);
+            tick(9, animation);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b00000000);
+            tick(6, animation);
+            expect(animation.getAnimationRemaining()).to.equal(0);
+        });
+
+    });
+    describe('no scrollOut', () => {
+        it('should end on line 2 when scrollOut = false in a multiline', () => {
+            let source = new Uint8Array(18)
+                .fill(parseInt("11111111", 2), 0, FRAME_WIDTH)
+                .fill(parseInt("10101111", 2), FRAME_WIDTH);
+            source.annotations = [new LinebreakAnnotation(FRAME_WIDTH + 1, FRAME_WIDTH + 1, 'Soft')];
+            let animation = new VerticalScrolling(2, 10, undefined, true, false);
+            animation.setSource(source, FRAME_WIDTH, 2);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b00000000);
+            tick(30, animation);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b10101111);
+            tick(10, animation);
+            expect(animation.getAnimationRemaining()).to.equal(-18);
+        });
+        it('should not scroll out a single line', () => {
+            let source = new Uint8Array(9)
+                .fill(parseInt("11111111", 2), 0, FRAME_WIDTH);
+            source.annotations = [];
+            let animation = new VerticalScrolling(2, 10, undefined, true, false);
+            animation.setSource(source, FRAME_WIDTH, 1);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b00000000);
+            tick(8, animation);
+            expect(animation.getTranslatedOnLine(0, 0)).to.equal(0b11111111);
+            tick(10, animation);
+            expect(animation.getAnimationRemaining()).to.equal(-8);
+        });
+
+
+    });
 });

@@ -17,9 +17,11 @@ class TextLayout {
     _pages: MultilineBitmap;
     _charPages : Array<Char>;
     _overflows: MultilineBitmap;
+    _sourceString : ?string;
 
     constructor(source : AnnotatedBitmap, frameWidth: number, alignment : Alignments = "left") {
         this.reset();
+        this._sourceString = source.sourceString;
         const hardLinebreakAnnotations = this.extractLinebreakAnnotations(source, "Hard");
 
         let splitByHardLinebreaks : Array<AnnotatedBitmap> = [];

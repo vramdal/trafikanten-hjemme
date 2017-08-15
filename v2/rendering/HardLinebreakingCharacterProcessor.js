@@ -24,13 +24,14 @@ class HardLinebreakingCharacterProcessor implements CharacterProcessor {
         let match = restStr.match(/^(\n+).+/);
         if (match) {
             this.characterMap.push({chIdx, str: match[1]});
-            return 1;
+            return 0;
         }
         return 0;
     }
 
     mapCharacterToPosition(chIdx : number, x : number) {
-        this.linebreaks = this.linebreaks.concat(this.characterMap.filter(ch => ch.chIdx === chIdx).map(ch => ({chStart : ch.chIdx, chEnd : chIdx + 1, xStart : x, xEnd : x})));
+        this.linebreaks = this.linebreaks.concat(this.characterMap.filter(ch => ch.chIdx === chIdx)
+            .map(ch => ({chStart : ch.chIdx, chEnd : chIdx + 1, xStart : x, xEnd : x})));
     }
 
     //noinspection JSUnusedGlobalSymbols

@@ -24,7 +24,9 @@ class FontCharacterProcessor implements CharacterProcessor {
     processCharacter(text : string, chIdx : number) : number {
         let ch = text[chIdx];
         let glyph = this._font[ch] ||
-            this._font[ch.charCodeAt(0)] && typeof this._font[ch.charCodeAt(0)].char === "number" && this._font[ch.charCodeAt(0)];
+            this._font[ch.charCodeAt(0)] && typeof this._font[ch.charCodeAt(0)].char === "number" && this._font[ch.charCodeAt(0)] ||
+                ch === "\n" && Object.assign({}, this._font[8203], {char: "\n"})
+        ;
         if (glyph) {
             this.glyphs.push(glyph);
             return 1;

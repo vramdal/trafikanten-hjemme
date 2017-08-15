@@ -181,6 +181,7 @@ class Yr implements ContentProvider {
                 case 2 : return '░';
                 case 9 : return '▓' + String.fromCharCode(62247);
                 case 10 : return '▓' + String.fromCharCode(62248);
+                case 46 : return '▓' + String.fromCharCode(62246);
                 default : return symbolNum + "";
             }
         };
@@ -205,10 +206,10 @@ class Yr implements ContentProvider {
             )
         );
         let row2 = times.map((time, idx) => ( {
-                text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}`,
+                text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}\n${time.temperature.value}°`,
                 start : row1[idx].start + 128,
                 end : row1[idx].end + 128,
-                animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 100, alignment: "center"}
+                animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 1, alignment: "center", scrollIn : false, scrollOut: false}
         } ));
 
         return row1.concat(row2);
