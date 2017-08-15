@@ -3,6 +3,7 @@
 import type {Animation} from "./Animation";
 import type {Byte} from "../SimpleTypes";
 import type {AnnotatedBitmap} from "../Bitmap";
+import type {Alignments} from "./Types";
 
 const TextLayout = require("./TextLayout.js");
 
@@ -18,15 +19,17 @@ class VerticalScrollingAnimation implements Animation {
     _totalTicked : number;
     _holdOnLine : number;
     _waitTicksOnLastLine: number;
+    _alignment: Alignments;
 
 
-    constructor(waitTicksOnLine : number, waitTicksOnLastLine? : number) {
+    constructor(waitTicksOnLine : number, waitTicksOnLastLine? : number, alignment : Alignments) {
         this._waitTicksOnLine = waitTicksOnLine || WAIT_TICKS_ON_LINE;
         this._waitTicksOnLastLine = waitTicksOnLastLine || 0;
+        this._alignment = alignment;
     }
 
     setSource(source : AnnotatedBitmap, frameWidth: number, lines : number = 1) : void {
-        this._textLayout = new TextLayout(source, frameWidth);
+        this._textLayout = new TextLayout(source, frameWidth, this._alignment);
         this._frameWidth = frameWidth;
         this._lines = lines;
         this.reset();

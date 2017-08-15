@@ -18,7 +18,7 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
         case "NoAnimation" : return new NoAnimation(animationSpec.timeoutTicks, animationSpec.alignment);
         case "PagingAnimation" : return new PagingAnimation(animationSpec.ticksPerPage);
         case "ScrollingAnimation": return new Scrolling();
-        case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine, animationSpec.holdOnLastLine);
+        case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine, animationSpec.holdOnLastLine, animationSpec.alignment);
         default: throw new Error("Unknown animation type: " + animationSpec.animationName);
     }
 };

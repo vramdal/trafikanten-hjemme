@@ -2,10 +2,13 @@
 
 const LinebreakAnnotation = require("../rendering/LinebreakAnnotation.js");
 const FontCharacterAnnotation = require("../rendering/FontCharacterAnnotation.js");
+const Alignment = require("./Alignment.js");
 
 const MultilineBitmap = require("../Bitmap.js").MultilineBitmap;
 
 import type {AnnotatedBitmap, BitmapAnnotation, Bitmap} from "../Bitmap";
+
+import type {Alignments} from "./Types.js";
 
 import type {Char} from "../SimpleTypes";
 
@@ -15,7 +18,7 @@ class TextLayout {
     _charPages : Array<Char>;
     _overflows: MultilineBitmap;
 
-    constructor(source : AnnotatedBitmap, frameWidth: number) {
+    constructor(source : AnnotatedBitmap, frameWidth: number, alignment : Alignments = "left") {
         this.reset();
         const hardLinebreakAnnotations = this.extractLinebreakAnnotations(source, "Hard");
 
@@ -26,6 +29,9 @@ class TextLayout {
             hCursor = hardLinebreak.end;
         }
         splitByHardLinebreaks.push(this.extractHardPage(source, null, hCursor));
+
+
+        let pageContentLengths : Array<number> = [];
 
         for (let hardPage of splitByHardLinebreaks) {
 
@@ -38,14 +44,17 @@ class TextLayout {
                 let canFitRestInOneFrame = rest < frameWidth;
                 if (canFitRestInOneFrame) {
                     this._pages.push(hardPage.subarray(cursor));
+                    pageContentLengths.push(rest);
                     cursor = hardPage.length;
                 } else {
                     let linebreakAnnotation = annotationsReversed.find(annotation => annotation.start > cursor && annotation.start < cursor + frameWidth);
                     if (linebreakAnnotation) {
                         this._pages.push(hardPage.subarray(cursor, linebreakAnnotation.start));
+                        pageContentLengths.push(linebreakAnnotation.start - cursor);
                         cursor = linebreakAnnotation.end;
                     } else {
                         this._pages.push(hardPage.subarray(cursor, cursor + frameWidth));
+                        pageContentLengths.push(frameWidth);
                         let nextBreak = softLinebreakAnnotations.find(annotation => annotation.start > cursor);
                         cursor = nextBreak && nextBreak.end
                             || hardPage.length;
@@ -60,6 +69,22 @@ class TextLayout {
                 this._charPages.push(characters);
                 previousPageStart = cursor;
             }
+        }
+
+        for (let i = 0; i < this._pages.length; i++) {
+            let page = this._pages[i];
+            this.applyAlignmentToPage(alignment, frameWidth, page, pageContentLengths[i]);
+        }
+    }
+
+    // TODO: Test
+    // TODO: Test center
+    //noinspection JSMethodCanBeStatic
+    applyAlignmentToPage(alignment : Alignments, frameWidth : number, page : Bitmap, contentLength : number) {
+        let leading = Alignment[alignment](frameWidth, contentLength);
+        if (leading !== 0) {
+            page.copyWithin(leading, 0);
+            page.fill(0, 0, leading);
         }
     }
 

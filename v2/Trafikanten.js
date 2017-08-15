@@ -87,7 +87,7 @@ class Trafikanten implements ContentProvider {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    getContent() : MessageType {
+    getContent() : ?MessageType {
         return this.currentMessage;
     }
 
@@ -103,7 +103,6 @@ class Trafikanten implements ContentProvider {
             .then(currentMessage => {
                 const str = JSON.stringify(currentMessage);
                 if (this.currentContent !== str) {
-                    console.info("Oppdatert innhold");
                     this.currentContent = str;
                 }
                 this.currentMessage = currentMessage;
@@ -136,7 +135,7 @@ class Trafikanten implements ContentProvider {
             Trafikanten.createFormatSpecifier(128, 255), {animation: {animationName: "ScrollingAnimation"}}
         );
         let message : MessageType = [part1, part2, secondLine];
-        message.id = "trafikanten-1";
+        message.messageId = "trafikanten-1";
         return message;
     }
 

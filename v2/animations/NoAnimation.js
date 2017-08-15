@@ -6,13 +6,9 @@ import type {Alignments} from "./Types";
 
 // type AlignmentFunc = (frameWidth : number, contentPixelLength : number) => number;
 
-//noinspection JSUnusedGlobalSymbols
-const alignments = {
-    "left": (frameWidth : number, contentPixelLength: number) => 0,
-    "center": (frameWidth : number, contentPixelLength: number) => Math.floor((contentPixelLength - frameWidth) / 2),
-    "right": (frameWidth : number, contentPixelLength: number) => contentPixelLength - frameWidth
-};
+const Alignment = require("./Alignment.js");
 
+//noinspection JSUnusedGlobalSymbols
 class NoAnimation implements Animation {
     _source: Bitmap;
     _frameWidth: number;
@@ -34,7 +30,7 @@ class NoAnimation implements Animation {
         }
         this._source = source;
         this._frameWidth = frameWidth;
-        this._alignmentOffset = alignments[this._alignment](this._frameWidth, this._source.length);
+        this._alignmentOffset = Alignment[this._alignment](this._frameWidth, this._source.length);
         this.reset();
     }
 
