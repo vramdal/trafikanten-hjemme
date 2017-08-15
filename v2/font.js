@@ -985,6 +985,16 @@ function init() {
             " X     X ",
             "X     X  "
     );
+    registerCharacter(62248, 9, // Heavy rain
+            "         ",
+            "  X  X  X",
+            " X  X  X ",
+            "X  X  X  ",
+            "         ",
+            "  X  X  X",
+            " X  X  X ",
+            "X  X  X  "
+    );
     registerCharacter(8202, 1,  // Hair space
             " ",
             " ",

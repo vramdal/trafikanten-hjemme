@@ -180,6 +180,7 @@ class Yr implements ContentProvider {
                 case 3 : return '▒';
                 case 2 : return '░';
                 case 9 : return '▓' + String.fromCharCode(62247);
+                case 10 : return '▓' + String.fromCharCode(62248);
                 default : return symbolNum + "";
             }
         };
