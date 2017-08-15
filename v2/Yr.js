@@ -1,5 +1,7 @@
 // @flow
 
+import type {Char} from "./SimpleTypes";
+
 const fetch = require("node-fetch");
 const xml2json = require("xml2json");
 const Trafikanten = require("./Trafikanten.js");
@@ -171,6 +173,16 @@ class Yr implements ContentProvider {
                 default : throw new Error("Unknown period: " + period);
             }
         };
+
+        let symbol = (symbolNum : (number | string)) : string => {
+            switch (parseInt(symbolNum, 10)) {
+                case 4 : return '▓';
+                case 3 : return '▒';
+                case 2 : return '░';
+                case 9 : return '▓' + String.fromCharCode(62247);
+                default : return symbolNum + "";
+            }
+        };
         let lastStop = 0;
         let elements = [];
         times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) =>
@@ -192,7 +204,7 @@ class Yr implements ContentProvider {
             )
         );
         let row2 = times.map((time, idx) => ( {
-                text : `${time.temperature.value}°\n${time.symbol.numberEx}`,
+                text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}`,
                 start : row1[idx].start + 128,
                 end : row1[idx].end + 128,
                 animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 100, alignment: "center"}

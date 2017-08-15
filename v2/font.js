@@ -946,33 +946,44 @@ function init() {
             "X      X");
     registerCharacter('▓', 8, // Sky, fylt
             "        ",
-            "        ",
             "    XX  ",
             " XXXXXX ",
             " XXXXXX ",
             "XXXXXXXX",
             "XXXXXXXX",
-            " XXXXXX "
+            " XXXXXX ",
+            "        "
+
+    );
+    registerCharacter('▒', 8, // Sky, halvfylt
+            "        ",
+            "    XX  ",
+            " XXX  X ",
+            " XXX  X ",
+            "XXXX   X",
+            "XXXX   X",
+            " XXXXXX ",
+            "        "
     );
     registerCharacter('░', 8, // Sky, hul
-            "        ",
             "        ",
             "    XX  ",
             " XXX  X ",
             " X    X ",
             "X      X",
             "X      X",
-            " XXXXXX "
+            " XXXXXX ",
+            "        "
     );
-    registerCharacter('▒', 9, // SunLightRain
-            "X  X     ",
-            " XX      ",
-            " XX      ",
-            "X  X     ",
+    registerCharacter(62247, 9, // Medium rain
             "         ",
-            "  X  X  X",
-            " X  X  X ",
-            "X  X  X  "
+            "  X     X",
+            " X     X ",
+            "X     X  ",
+            "         ",
+            "  X     X",
+            " X     X ",
+            "X     X  "
     );
     registerCharacter(8202, 1,  // Hair space
             " ",
