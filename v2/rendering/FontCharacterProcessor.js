@@ -26,7 +26,7 @@ class FontCharacterProcessor implements CharacterProcessor {
         let glyph = this._font[ch] ||
             this._font[ch.charCodeAt(0)] && typeof this._font[ch.charCodeAt(0)].char === "number" && this._font[ch.charCodeAt(0)];
         if (glyph) {
-            this.glyphs.push(glyph);
+            this.glyphs[chIdx] = glyph;
             return [glyph];
         } else {
             this.glyphs.push(null);
@@ -46,7 +46,6 @@ class FontCharacterProcessor implements CharacterProcessor {
         let annotations : Array<FontCharacterAnnotation> = [];
         let str = "";
         this.glyphsAtPosition.forEach((glyphAtPosition, idx) => {
-            console.log("idx = ", idx);
             let char = glyphAtPosition.glyph.char;
             str += char;
             annotations.push(new FontCharacterAnnotation(glyphAtPosition.x, glyphAtPosition.x + glyphAtPosition.glyph.width, char, idx));
