@@ -8,7 +8,6 @@ const HardLinebreakingCharacterProcessor = require("./rendering/HardLinebreaking
 const SimpleTypes = require("./SimpleTypes.js");
 import type {AnnotatedBitmap} from './Bitmap';
 import type {CharacterProcessor} from "./rendering/CharacterProcessor";
-import type {Char} from "./SimpleTypes";
 
 function parseString(text : string, characterProcessors : Array<CharacterProcessor>) : Array<?FontCharSpec> {
     let glyphs : Array<?FontCharSpec> = [];
@@ -29,13 +28,16 @@ function parseString(text : string, characterProcessors : Array<CharacterProcess
 }
 
 function mapCharactersToPositions(glyphs : Array<?FontCharSpec>, characterProcessors) : number {
-    let lastChar : ?(Char | number);
     return glyphs.map(glyph => glyph && glyph.width || 0).reduce((accumulator, currentValue, currentIndex, array) => {
         for (let characterProcessor of characterProcessors) {
             characterProcessor.mapCharacterToPosition(currentIndex, accumulator);
         }
-        //let isLast = currentIndex >= array.length - 1;
-        return accumulator + currentValue + (1);
+        let isLast = currentIndex >= array.length - 1;
+        let spacing = currentValue > 0 && !isLast? 1 : 0;
+        if (!isLast && array[currentIndex + 1] === 0) {
+            spacing = 0;
+        }
+        return accumulator + currentValue + spacing;
     }, 0);
 }
 
@@ -48,7 +50,6 @@ function rastrifyFrame(text: string): AnnotatedBitmap {
     let characterProcessors : Array<CharacterProcessor> = [hardLinebreakingCharacterProcessor, softLinebreakingCharacterProcessor, fontCharacterProcessor];
     let glyphs = parseString(text, characterProcessors);
 
-    //let glyphs = fontCharacterProcessor.glyphs; // TODO: Rewrite so that HardLinebreakingCharacterProcessor also can return 'glyphs' in sequence
     let glyphsCombinedWidth = mapCharactersToPositions(glyphs, characterProcessors);
 
     let arrayBuffer = new ArrayBuffer(glyphsCombinedWidth);
