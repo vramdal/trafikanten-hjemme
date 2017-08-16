@@ -69,8 +69,7 @@ describe('FontCharacterProcessor', () => {
 
         beforeEach(() => {
             fcp.glyphsAtPosition = [{x : 0, glyph: font[("a" : any)]}, {x : 10, glyph: font[("b" : any)]}];
-            let arrayBuffer = new ArrayBuffer(20);
-            let aBitmap : any = new Uint8Array(arrayBuffer);
+            let aBitmap : any = new Uint8Array(new ArrayBuffer(20));
             aBitmap.annotations = [];
             aBitmap.sourceString = "a\nb";
             bitmap = aBitmap;

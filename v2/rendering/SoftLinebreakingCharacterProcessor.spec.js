@@ -17,7 +17,7 @@ describe('SoftLinebreakingCharacterProcessor', () => {
             const text = "Hello, world!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(0);
+                expect(charactersConsumed).to.eql([]);
             }
             expect(processor.characterMap).to.have.lengthOf(1);
             const characterAtPosition = processor.characterMap[0];
@@ -27,7 +27,7 @@ describe('SoftLinebreakingCharacterProcessor', () => {
             const text = "Hello, world, again!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(0);
+                expect(charactersConsumed).to.eql([]);
             }
             expect(processor.characterMap).to.have.lengthOf(2);
             expect(processor.characterMap[0]).to.eql({chIdx: 6, str: ' '});
@@ -37,7 +37,7 @@ describe('SoftLinebreakingCharacterProcessor', () => {
             const text = "Hello,   world!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(0);
+                expect(charactersConsumed).to.eql([]);
             }
             expect(processor.characterMap).to.have.lengthOf(1);
             expect(processor.characterMap[0]).to.eql({chIdx: 6, str: '   '});
@@ -46,7 +46,7 @@ describe('SoftLinebreakingCharacterProcessor', () => {
             const text = "Hello,   world,  again!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(0);
+                expect(charactersConsumed).to.eql([]);
             }
             expect(processor.characterMap).to.have.lengthOf(2);
             expect(processor.characterMap[0]).to.eql({chIdx: 6, str: '   '});
@@ -56,7 +56,7 @@ describe('SoftLinebreakingCharacterProcessor', () => {
            const text = "Hello, world! ";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(0);
+                expect(charactersConsumed).to.eql([]);
             }
             expect(processor.characterMap).to.have.lengthOf(1);
             expect(processor.characterMap[0]).to.eql({chIdx: 6, str: ' '});

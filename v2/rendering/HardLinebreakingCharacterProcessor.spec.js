@@ -1,6 +1,7 @@
 // @flow
 const expect = require("chai").expect;
 const HardLinebreakingCharacterProcessor = require("./HardLinebreakingCharacterProcessor.js");
+import type {AnnotatedBitmap} from "../Bitmap";
 
 describe('HardLinebreakingCharacterProcessor', () => {
 
@@ -15,7 +16,7 @@ describe('HardLinebreakingCharacterProcessor', () => {
             const text = "Hello,\nworld!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(i === 6 ? 0 : 0);
+                expect(charactersConsumed).to.eql(i === 6 ? [null] : []);
             }
             expect(processor.characterMap).to.have.lengthOf(1);
             const characterAtPosition = processor.characterMap[0];
@@ -25,7 +26,7 @@ describe('HardLinebreakingCharacterProcessor', () => {
             const text = "Hello,\nworld,\nand you!";
             for (let i = 0; i < text.length; i++) {
                 const charactersConsumed = processor.processCharacter(text, i);
-                expect(charactersConsumed).to.equal(i === 6 || i === 13 ? 0 : 0);
+                expect(charactersConsumed).to.eql(i === 6 || i === 13 ? [null] : []);
             }
             expect(processor.characterMap).to.have.lengthOf(2);
             expect(processor.characterMap[0]).to.eql({chIdx:  6, str: '\n'});
@@ -48,6 +49,27 @@ describe('HardLinebreakingCharacterProcessor', () => {
             expect(processor.linebreaks[0]).to.eql(
                 {chStart: 6, chEnd: 7, xStart: 60, xEnd: 60}
             );
+        });
+    });
+
+    describe('place', () => {
+
+        let bitmap : AnnotatedBitmap;
+
+        beforeEach(() => {
+            let aBitmap : any = new Uint8Array(new ArrayBuffer(20));
+            aBitmap.annotations = [];
+            aBitmap.sourceString = "a\nb";
+            bitmap = aBitmap;
+
+        });
+
+        it('should place linebreak annotations', () => {
+            processor.linebreaks = [{chStart: 6, chEnd: 7, xStart: 60, xEnd: 60}, {chStart: 10, chEnd: 11, xStart: 80, xEnd: 90}];
+            processor.place(bitmap);
+            expect(bitmap.annotations).to.have.lengthOf(2);
+            expect(bitmap.annotations[0]).to.eql({start: 60, end: 60, type : "Hard"});
+            expect(bitmap.annotations[1]).to.eql({start: 80, end: 90, type : "Hard"});
         });
     });
 });
