@@ -11,7 +11,7 @@ type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 
 
 class FontCharacterProcessor implements CharacterProcessor {
-    glyphs : Array<FontCharSpec>;
+    glyphs : Array<?FontCharSpec>;
     glyphsAtPosition : Array<GlyphAtPosition>;
     _font: FontMap;
 
@@ -21,21 +21,24 @@ class FontCharacterProcessor implements CharacterProcessor {
         this.glyphsAtPosition = [];
     }
 
-    processCharacter(text : string, chIdx : number) : number {
+    processCharacter(text : string, chIdx : number) : Array<any> {
         let ch = text[chIdx];
         let glyph = this._font[ch] ||
-            this._font[ch.charCodeAt(0)] && typeof this._font[ch.charCodeAt(0)].char === "number" && this._font[ch.charCodeAt(0)] ||
-                ch === "\n" && Object.assign({}, this._font[8203], {char: "\n"})
-        ;
+            this._font[ch.charCodeAt(0)] && typeof this._font[ch.charCodeAt(0)].char === "number" && this._font[ch.charCodeAt(0)];
         if (glyph) {
             this.glyphs.push(glyph);
-            return 1;
+            return [glyph];
+        } else {
+            this.glyphs.push(null);
         }
-        return 0;
+        return [];
     }
 
     mapCharacterToPosition(chIdx : number, x : number) {
-        this.glyphsAtPosition.push({x: x, glyph: this.glyphs[chIdx]});
+        const fontCharSpec = this.glyphs[chIdx];
+        if (fontCharSpec) {
+            this.glyphsAtPosition.push({x: x, glyph: fontCharSpec});
+        }
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -43,6 +46,7 @@ class FontCharacterProcessor implements CharacterProcessor {
         let annotations : Array<FontCharacterAnnotation> = [];
         let str = "";
         this.glyphsAtPosition.forEach((glyphAtPosition, idx) => {
+            console.log("idx = ", idx);
             let char = glyphAtPosition.glyph.char;
             str += char;
             annotations.push(new FontCharacterAnnotation(glyphAtPosition.x, glyphAtPosition.x + glyphAtPosition.glyph.width, char, idx));

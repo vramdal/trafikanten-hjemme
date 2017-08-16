@@ -30,7 +30,7 @@ describe('Rastrifier', () => {
 
     describe('a case', () => {
         it('is a case', () => {
-            let str = "a\na\na";
+            let str = "a\nb\nc";
             const result = Rastrifier.rastrify(str);
             console.log("result.annotations = ", result.annotations);
             expect(result.annotations).to.have.lengthOf(7);

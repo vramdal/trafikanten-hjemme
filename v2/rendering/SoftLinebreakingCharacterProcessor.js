@@ -24,10 +24,10 @@ class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
         this.softLinebreakUnderCreation = undefined;
     }
 
-    processCharacter(text : string, chIdx : number) : number {
+    processCharacter(text : string, chIdx : number) : Array<any> {
         "use strict";
         if (chIdx < this.skipUntilCharacterWhenProcessing) {
-            return 0;
+            return [];
         }
         let restStr: Char = text.substring(chIdx);
         let match = restStr.match(/^([^\S\n]+).+/);
@@ -36,7 +36,7 @@ class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
             this.characterMap.push({chIdx, str: linebreaker});
             this.skipUntilCharacterWhenProcessing = chIdx + linebreaker.length;
         }
-        return 0;
+        return [];
     }
 
     mapCharacterToPosition(chIdx : number, x : number) {

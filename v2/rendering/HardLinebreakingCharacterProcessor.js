@@ -10,7 +10,7 @@ type LinebreakAtPosition = {chStart : number, chEnd: number, xStart : number, xE
 
 class HardLinebreakingCharacterProcessor implements CharacterProcessor {
 
-    characterMap : Array<{chIdx: number}>;
+    characterMap : Array<?{chIdx: number}>;
     linebreaks: Array<LinebreakAtPosition>;
 
     constructor() {
@@ -18,20 +18,22 @@ class HardLinebreakingCharacterProcessor implements CharacterProcessor {
         this.linebreaks = [];
     }
 
-    processCharacter(text : string, chIdx : number) : number {
+    processCharacter(text : string, chIdx : number) : Array<any> {
         "use strict";
         let restStr: Char = text.substring(chIdx);
         let match = restStr.match(/^(\n+).+/);
         if (match) {
             this.characterMap.push({chIdx, str: match[1]});
-            return 0;
+            return [null];
         }
-        return 0;
+        return [];
     }
 
     mapCharacterToPosition(chIdx : number, x : number) {
-        this.linebreaks = this.linebreaks.concat(this.characterMap.filter(ch => ch.chIdx === chIdx)
-            .map(ch => ({chStart : ch.chIdx, chEnd : chIdx + 1, xStart : x, xEnd : x})));
+        const linebreak = this.characterMap.find(ch => ch && ch.chIdx === chIdx);
+        if (linebreak) {
+            this.linebreaks.push({chStart : linebreak.chIdx, chEnd : chIdx + 1, xStart : x, xEnd : x});
+        }
     }
 
     //noinspection JSUnusedGlobalSymbols
