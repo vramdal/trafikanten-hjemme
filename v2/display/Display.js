@@ -1,6 +1,6 @@
 // @flow
 
-const Playlist = require("../Playlist.js");
+const Playlist = require("../PlaylistDisplay.js");
 
 const DisplayEventEmitter = require("../DisplayEventEmitter.js");
 import type {Layout} from "../Frame";
@@ -55,7 +55,7 @@ class Display implements DisplayInterface {
         if (this._playlist) {
             this._playlist.play().then(() => {
                 this._isPlaying = true;
-                console.log("Playlist exhausted");
+                console.log("PlaylistDisplay exhausted");
                 this._eventEmitter.emit(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED);
                 this.play();
             }).catch(err => {

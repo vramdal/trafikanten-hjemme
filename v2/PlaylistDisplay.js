@@ -6,7 +6,7 @@ const Frame = require("./Frame.js");
 const Display = require("./display/Display.js");
 const DisplayEventEmitter = require("./DisplayEventEmitter.js");
 
-class Playlist {
+class PlaylistDisplay {
 
     _messages: Array<Message>;
     _playlistItemIdx: number ;
@@ -56,4 +56,4 @@ class Playlist {
     }
 }
 
-module.exports = Playlist;
+module.exports = PlaylistDisplay;

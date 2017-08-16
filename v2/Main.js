@@ -6,7 +6,7 @@ memwatch.on('leak', (info) => {
 });
 
 const Display = require("./display/Display");
-const Playlist = require("./Playlist.js");
+const PlaylistDisplay = require("./PlaylistDisplay.js");
 const Framer = require("./Framer.js");
 const ConsoleDisplay = require("./display/ConsoleDisplay.js");
 const WebsocketDisplay = require("./display/WebsocketDisplay.js");
@@ -45,7 +45,7 @@ fetchService.start().then(() => {
 
 */
                 const messages = messageSpecs.map(framer.parse);
-                display.playlist = new Playlist(display.eventEmitter, messages);
+                display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
             })
             .catch(err => console.error(err));
     };
@@ -82,7 +82,7 @@ start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnima
 
 
 
-    display.playlist = new Playlist(display.eventEmitter, messages);
+    display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
 
     display.play();
 
