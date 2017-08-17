@@ -31,12 +31,23 @@ let fetchService = new FetchService();
 let yr = new Yr("yr-1", fetchService);
 
 let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
-let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
+//let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
 
 fetchService.start().then(() => {
     "use strict";
     let loop = function () {
-        return Promise.all([trafikanten1.getMessage(), yr.getPlaylist()])
+        return Promise.all([
+            trafikanten1.getMessage(),
+            yr.getPlaylist()/*,
+                Promise.resolve([{
+                    start: 127,
+                    end: 255,
+                    text: "           ▂ ▂ ▂ ▂ ▂ ▂                                                                             ▃ ▃ ▃ ▃ ▃ ▃▅ ▅ ▅ ▅ ▅ ▅█ █ █ █ █ ██ █ █ █ █ █",
+                    lines: 1,
+                    animation: {animationName: "NoAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"},
+                    messageId: "staticMessage"
+                }])*/
+            ])
             .then(messageSpecs => {
 /*
                 let tempMessageSpecs = [[Object.assign({},

@@ -29,14 +29,12 @@ function parseString(text : string, characterProcessors : Array<CharacterProcess
 
 function mapCharactersToPositions(glyphs : Array<?FontCharSpec>, characterProcessors) : number {
     return glyphs.map(glyph => glyph && glyph.width || 0).reduce((accumulator, currentValue, currentIndex, array) => {
+        let advanceCursor = 0;
         for (let characterProcessor of characterProcessors) {
-            characterProcessor.mapCharacterToPosition(currentIndex, accumulator);
+            advanceCursor += characterProcessor.mapCharacterToPosition(currentIndex, accumulator);
         }
         let isLast = currentIndex >= array.length - 1;
-        let spacing = currentValue > 0 && !isLast? 1 : 0;
-        if (!isLast && array[currentIndex + 1] === 0) {
-            spacing = 0;
-        }
+        let spacing = currentValue > 0 && !isLast? advanceCursor : 0;
         return accumulator + currentValue + spacing;
     }, 0);
 }

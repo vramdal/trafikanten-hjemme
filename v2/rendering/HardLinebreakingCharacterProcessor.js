@@ -29,11 +29,12 @@ class HardLinebreakingCharacterProcessor implements CharacterProcessor {
         return [];
     }
 
-    mapCharacterToPosition(chIdx : number, x : number) {
+    mapCharacterToPosition(chIdx : number, x : number) : number {
         const linebreak = this.characterMap.find(ch => ch && ch.chIdx === chIdx);
         if (linebreak) {
             this.linebreaks.push({chStart : linebreak.chIdx, chEnd : chIdx + 1, xStart : x, xEnd : x});
         }
+        return 0;
     }
 
     //noinspection JSUnusedGlobalSymbols

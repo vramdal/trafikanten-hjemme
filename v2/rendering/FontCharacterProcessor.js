@@ -5,7 +5,7 @@ import type {FontCharSpec, FontMap} from "../font";
 import type {AnnotatedBitmap} from "../Bitmap";
 
 const FontCharacterAnnotation = require("./FontCharacterAnnotation.js");
-
+const Font = require("../font.js");
 
 type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 
@@ -34,11 +34,15 @@ class FontCharacterProcessor implements CharacterProcessor {
         return [];
     }
 
-    mapCharacterToPosition(chIdx : number, x : number) {
+    mapCharacterToPosition(chIdx : number, x : number) : number {
         const fontCharSpec = this.glyphs[chIdx];
         if (fontCharSpec) {
             this.glyphsAtPosition.push({x: x, glyph: fontCharSpec});
         }
+        const nextGlyph = this.glyphs.length > chIdx + 1 && this.glyphs[chIdx + 1];
+        return nextGlyph && fontCharSpec
+            ? Font.kerning(fontCharSpec.char, nextGlyph.char)
+            : 0;
     }
 
     //noinspection JSUnusedGlobalSymbols

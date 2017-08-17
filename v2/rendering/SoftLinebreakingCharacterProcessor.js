@@ -39,7 +39,7 @@ class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
         return [];
     }
 
-    mapCharacterToPosition(chIdx : number, x : number) {
+    mapCharacterToPosition(chIdx : number, x : number) : number {
         if (this.softLinebreakUnderCreation && this.softLinebreakUnderCreation.chEnd <= chIdx) {
             this.softLinebreaksAtPositions.push({
                 chStart: this.softLinebreakUnderCreation.chStart,
@@ -58,6 +58,7 @@ class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
                 };
             }
         }
+        return 0;
     }
 
     //noinspection JSUnusedGlobalSymbols
