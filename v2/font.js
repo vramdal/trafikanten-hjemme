@@ -780,15 +780,15 @@ function init() {
             "   X",
             "XXX ",
             "    ");
-    registerCharacter('t', 5,
-            "     ",
-            "  X  ",
-            "XXXXX",
-            "  X  ",
-            "  X  ",
-            "  X  ",
-            "   XX",
-            "     ");
+    registerCharacter('t', 3,
+            "   ",
+            " X ",
+            "XXX",
+            " X ",
+            " X ",
+            " X ",
+            "  X",
+            "   ");
     registerCharacter('u', 5,
             "     ",
             "     ",
@@ -1232,16 +1232,30 @@ function init() {
         positions[fontCharSpec.char] = requiredWidth;
         requiredWidth += fontCharSpec.width;
     }
-    const noKerningSet = [8202, 9601, 9602, 9603, 9604, 9605, 9606, 9607, 9608];
+    const noSpacingSet = [8202, 9601, 9602, 9603, 9604, 9605, 9606, 9607, 9608];
+    const kernPairs : Array<[string | number, string | number, number]> = [
+        ["r", "s", 0],
+        ["e", "t", 0],
+        ["r", "å", 0],
+        ["r", "a", 0]
+    ];
+
     // Create a mother Uint8Array, that will hold all character sprites
     let map : FontMap = {
         byteArray: new Uint8Array(requiredWidth),
         bytes: {},
         kerning: (ch1 : string | number, ch2 : string | number) => {
-            if (noKerningSet.includes(ch1) && noKerningSet.includes(ch2)) {
+            if (noSpacingSet.includes(ch1) && noSpacingSet.includes(ch2)) {
                 return 0;
             } else {
-                return 1;
+                let kernPair = kernPairs
+                    .filter((tuple: [string | number, string | number, number]) => tuple[0] === ch1 && tuple[1] === ch2)
+                    .find(tuple => true);
+                if (kernPair) {
+                    return kernPair[2]
+                } else {
+                    return 1;
+                }
             }
         }};
     for (let i = 0; i < characters.length; i++) {

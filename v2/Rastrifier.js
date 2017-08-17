@@ -28,14 +28,14 @@ function parseString(text : string, characterProcessors : Array<CharacterProcess
 }
 
 function mapCharactersToPositions(glyphs : Array<?FontCharSpec>, characterProcessors) : number {
-    return glyphs.map(glyph => glyph && glyph.width || 0).reduce((accumulator, currentValue, currentIndex, array) => {
+    return glyphs.reduce((accumulator : number, glyph : ?FontCharSpec, currentIndex : number, glyphs : Array<?FontCharSpec>) => {
         let advanceCursor = 0;
         for (let characterProcessor of characterProcessors) {
             advanceCursor += characterProcessor.mapCharacterToPosition(currentIndex, accumulator);
         }
-        let isLast = currentIndex >= array.length - 1;
-        let spacing = currentValue > 0 && !isLast? advanceCursor : 0;
-        return accumulator + currentValue + spacing;
+        let isLast = currentIndex >= glyphs.length - 1;
+        let spacing = glyph && glyph.width || 0 > 0 && !isLast? advanceCursor : 0;
+        return accumulator + (glyph && glyph.width) + spacing;
     }, 0);
 }
 
