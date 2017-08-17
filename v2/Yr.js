@@ -169,6 +169,7 @@ class Yr implements PlaylistProvider {
                 case 9 : return '▓' + String.fromCharCode(62247);
                 case 10 : return '▓' + String.fromCharCode(62248);
                 case 46 : return '▓' + String.fromCharCode(62246);
+                case 40 : return '▒' + String.fromCharCode(62246);
                 default : return symbolNum + "";
             }
         };
