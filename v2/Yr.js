@@ -12,7 +12,6 @@ const PreemptiveCache = require("./fetch/PreemptiveCache.js");
 import type {MessageType, PlaylistType} from "./message/MessageType";
 import type {Alignments} from "./animations/Types";
 import type {CachedValueProvider} from "./fetch/Cache";
-import type {ContentProvider} from "./provider/ContentProvider";
 
 const nowPrecipitationUrl = "http://www.yr.no/sted/Norge/Oslo/Oslo/Kampen/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Telemark/Bamble/Bamble/varsel_nu.xml";

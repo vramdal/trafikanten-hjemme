@@ -16,7 +16,6 @@ type MonitoredCall = {
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
 import type {MessageProvider} from "./provider/MessageProvider";
 import type {CachedValueProvider} from "./fetch/Cache";
-import type {ContentProvider} from "./provider/ContentProvider";
 
 
 type MonitoredVehicleJourney = {
