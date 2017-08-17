@@ -25,7 +25,7 @@ describe('Framer', () => {
     describe('parseFrameSpec', () => {
         it('should set correct start, end and animation', () => {
             "use strict";
-            let result = framer.parse(MESSAGE_SPEC);
+            let result = framer.parse(MESSAGE_SPEC)[0];
             expect(result.parts).to.have.lengthOf(1);
             let part = result.parts[0];
             expect(part.text).to.equal(TEXT_1);
@@ -50,7 +50,7 @@ describe('Framer', () => {
                     alignment: "left"
                 }
             }];
-            let result = framer.parse(messageSpec);
+            let result = framer.parse(messageSpec)[0];
             expect(result.parts).to.have.lengthOf(2);
         })
     });

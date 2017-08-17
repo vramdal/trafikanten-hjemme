@@ -26,7 +26,7 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
 class Framer {
 
   parse(messageOrPlaylistType : (MessageType | PlaylistType)) : Array<Message> {
-      let messageType : MessageType = messageOrPlaylistType[0];
+      let messageType : MessageType = messageOrPlaylistType.playlistId ?  messageOrPlaylistType[0] : messageOrPlaylistType;
       return [new Message(messageType.map(part => ({
           frame : new Frame(part.start, part.end - part.start, animationFactory((part.animation : AnimationType)), part.lines),
           text: part.text,
