@@ -36,7 +36,7 @@ let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
 fetchService.start().then(() => {
     "use strict";
     let loop = function () {
-        return Promise.all([/*trafikanten1.getContent(), */yr.getContent()])
+        return Promise.all([/*trafikanten1.getContent(), */yr.getPlaylist()])
             .then(messageSpecs => {
 /*
                 let tempMessageSpecs = [[Object.assign({},
@@ -44,8 +44,8 @@ fetchService.start().then(() => {
                     { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"}})]];
 
 */
-                const messages = messageSpecs.map(framer.parse);
-                display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
+                const playlists = messageSpecs.map(framer.parse); // TODO: framer.parse returnerer nå en array av Message
+                display.playlist = new PlaylistDisplay(display.eventEmitter, playlists[0]);
             })
             .catch(err => console.error(err));
     };

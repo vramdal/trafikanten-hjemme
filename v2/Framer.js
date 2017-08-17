@@ -2,7 +2,7 @@
 
 const SimpleTypes = require("./SimpleTypes.js");
 import type {Animation} from "./animations/Animation";
-import type {AnimationType, MessageType} from "./message/MessageType";
+import type {AnimationType, MessageType, PlaylistType} from "./message/MessageType";
 //import type {TextInFrame} from "./Message";
 
 const NoAnimation = require("./animations/NoAnimation.js");
@@ -25,12 +25,13 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
 
 class Framer {
 
-  parse(messageType : MessageType) : Message {
-      return new Message(messageType.map(part => ({
+  parse(messageOrPlaylistType : (MessageType | PlaylistType)) : Array<Message> {
+      let messageType : MessageType = messageOrPlaylistType[0];
+      return [new Message(messageType.map(part => ({
           frame : new Frame(part.start, part.end - part.start, animationFactory((part.animation : AnimationType)), part.lines),
           text: part.text,
 
-      })));
+      })))];
   }
 
 }

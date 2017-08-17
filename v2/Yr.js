@@ -1,6 +1,7 @@
 // @flow
 
 import type {Char} from "./SimpleTypes";
+import type {PlaylistProvider} from "./provider/PlaylistProvider";
 
 const fetch = require("node-fetch");
 const xml2json = require("xml2json");
@@ -8,7 +9,7 @@ const Trafikanten = require("./Trafikanten.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
-import type {MessageType} from "./message/MessageType";
+import type {MessageType, PlaylistType} from "./message/MessageType";
 import type {Alignments} from "./animations/Types";
 import type {CachedValueProvider} from "./fetch/Cache";
 import type {ContentProvider} from "./provider/ContentProvider";
@@ -108,13 +109,19 @@ type ForecastType = {
 
 export type YrForecastResponse = YrResponseType<ForecastType>;
 
-class Yr implements ContentProvider {
+class Yr implements PlaylistProvider {
 
     _nowPrecipitationValueProvider : CachedValueProvider<YrPrecipitationResponse>;
     _id : string;
     _nowPrecipitationUrl : string;
     _forecastUrl : string;
     _forecastValueProvider : CachedValueProvider<YrForecastResponse>;
+    _formattedForecastValueProvider : CachedValueProvider<MessageType>;
+    _formattedPrecipitationValueProvider : CachedValueProvider<MessageType>;
+
+
+    _forecastMessage : MessageType;
+    _precipitationMessage : MessageType;
 
     constructor(id : string, dataStore : PreemptiveCache) {
         this._id = id;
@@ -122,6 +129,9 @@ class Yr implements ContentProvider {
         this._forecastUrl = "http://www.yr.no/sted/" + place + "/varsel.xml";
         this._nowPrecipitationValueProvider = dataStore.registerFetcher(this.fetchNowPrecipitation.bind(this), this._nowPrecipitationUrl, 120, 3);
         this._forecastValueProvider = dataStore.registerFetcher(this.fetchForecast.bind(this), this._forecastUrl, 60*10, 3);
+
+        this._formattedForecastValueProvider = dataStore.registerFetcher(this.formatForecast.bind(this), id + "-forecast-formatter", 10, 3);
+        this._formattedPrecipitationValueProvider = dataStore.registerFetcher(this.formatPrecipitation.bind(this), id + "-precipitation-formatter", 10, 3);
     }
 
     fetchNowPrecipitation() {
@@ -138,7 +148,7 @@ class Yr implements ContentProvider {
             .then(json => JSON.parse(json))
     }
 
-    getContent() {
+    getPlaylist() : PlaylistType {
 /*        return [{
             text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt",
             start: 0, end: 128, lines: 2,
@@ -146,113 +156,118 @@ class Yr implements ContentProvider {
                 animationName: "VerticalScrollingAnimation",
                 holdOnLine: 5
             }}].concat(*/
-/*
-        return this._nowPrecipitationValueProvider()
-            .then(response => this.formatPrecipitation(response))
-            .catch(err => [Object.assign({},
-                { start: 0, end: 127, text: "Loading data for " + this._id, lines: 2},
-                { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})])
-*/
+        let playlist : PlaylistType = [this._forecastMessage, this._precipitationMessage];
+        playlist.playlistId = "yr-playlist-1";
+        return playlist;
+    }
+
+    formatForecast() : Promise<MessageType> {
         return this._forecastValueProvider()
-            .then(response => this.formatForecast(response))
+            .then((yrForecast : YrForecastResponse) => {
+                const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
+                let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
+                let periodText = (period : number) : [string, number, Alignments, number] => {
+                    switch (parseInt(period)) {
+                        case 0 : return ["natt", 25, "center", 22812];
+                        case 1 : return ["morgen", 25, "center", 12192];
+                        case 2 : return ["dag", 25, "center", 30829];
+                        case 3 : return ["kveld", 25, "center", 12067];
+                        default : throw new Error("Unknown period: " + period);
+                    }
+                };
+
+                let symbol = (symbolNum : (number | string)) : string => {
+                    switch (parseInt(symbolNum, 10)) {
+                        case 4 : return '▓';
+                        case 3 : return '▒';
+                        case 2 : return '░';
+                        case 9 : return '▓' + String.fromCharCode(62247);
+                        case 10 : return '▓' + String.fromCharCode(62248);
+                        case 46 : return '▓' + String.fromCharCode(62246);
+                        default : return symbolNum + "";
+                    }
+                };
+                let lastStop = 0;
+                let elements = [];
+                times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) =>
+                {
+                    const width = Math.round(periodTextAndPctWidth[1] * 128 / 100);
+                    let el = [String.fromCharCode(periodTextAndPctWidth[3]), lastStop, lastStop + width, periodTextAndPctWidth[2]];
+                    lastStop = lastStop + width;
+                    elements.push(el);
+                }
+                );
+
+                let row1 = elements.map((periodTextPosAndPxWidth : [string, number, number, Alignments]) => (
+                    {
+                        text : periodTextPosAndPxWidth[0],
+                        start : periodTextPosAndPxWidth[1],
+                        end : periodTextPosAndPxWidth[2],
+                        animation: {animationName: "NoAnimation",  timeoutTicks : 100, alignment : periodTextPosAndPxWidth[3]}
+                    }
+                )
+                );
+                let row2 = times.map((time, idx) => ( {
+                    text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}\n${time.temperature.value}°`,
+                    start : row1[idx].start + 128,
+                    end : row1[idx].end + 128,
+                    animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 1, alignment: "center", scrollIn : false, scrollOut: false}
+                } ));
+
+
+                this._forecastMessage = row1.concat(row2);
+                return this._forecastMessage;
+            })
             .catch(err => [Object.assign({},
                 { start: 0, end: 127, text: "Loading data for " + this._id, lines: 2},
-                { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})]
-            )
+                { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})]);
+
     }
 
-    formatForecast(yrForecast : YrForecastResponse) : MessageType {
-        const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
-        let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
-        let periodText = (period : number) : [string, number, Alignments, number] => {
-            switch (parseInt(period)) {
-                case 0 : return ["natt", 25, "center", 22812];
-                case 1 : return ["morgen", 25, "center", 12192];
-                case 2 : return ["dag", 25, "center", 30829];
-                case 3 : return ["kveld", 25, "center", 12067];
-                default : throw new Error("Unknown period: " + period);
-            }
-        };
+    formatPrecipitation() : Promise<MessageType> {
 
-        let symbol = (symbolNum : (number | string)) : string => {
-            switch (parseInt(symbolNum, 10)) {
-                case 4 : return '▓';
-                case 3 : return '▒';
-                case 2 : return '░';
-                case 9 : return '▓' + String.fromCharCode(62247);
-                case 10 : return '▓' + String.fromCharCode(62248);
-                case 46 : return '▓' + String.fromCharCode(62246);
-                default : return symbolNum + "";
-            }
-        };
-        let lastStop = 0;
-        let elements = [];
-        times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) =>
-            {
-                const width = Math.round(periodTextAndPctWidth[1] * 128 / 100);
-                let el = [String.fromCharCode(periodTextAndPctWidth[3]), lastStop, lastStop + width, periodTextAndPctWidth[2]];
-                lastStop = lastStop + width;
-                elements.push(el);
-            }
-        );
+        return this._nowPrecipitationValueProvider().then((yrPrecipitation: YrPrecipitationResponse) => {
 
-        let row1 = elements.map((periodTextPosAndPxWidth : [string, number, number, Alignments]) => (
-                {
-                    text : periodTextPosAndPxWidth[0],
-                    start : periodTextPosAndPxWidth[1],
-                    end : periodTextPosAndPxWidth[2],
-                    animation: {animationName: "NoAnimation",  timeoutTicks : 100, alignment : periodTextPosAndPxWidth[3]}
-                }
-            )
-        );
-        let row2 = times.map((time, idx) => ( {
-                text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}\n${time.temperature.value}°`,
-                start : row1[idx].start + 128,
-                end : row1[idx].end + 128,
-                animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 1, alignment: "center", scrollIn : false, scrollOut: false}
-        } ));
+            const barWidth = 6; //Math.floor(128 / yrPrecipitation.weatherdata.forecast.time.length / 2);
+            let noPrecipitation = true;
 
-        return row1.concat(row2);
-    }
+            const graph = yrPrecipitation.weatherdata.forecast.time && yrPrecipitation.weatherdata.forecast.time
+                    .map(precipitationTime => parseFloat(precipitationTime.precipitation.value))
+                    .map(value => {
+                        if (value > 0) {
+                            noPrecipitation = false;
+                        }
+                        return value;
+                    })
+                    .map(value => Math.ceil(Math.min(value / 1, 1) * 8))
+                    .map(value => {
+                        console.log(value);
+                        return value;
+                    })
+                    .map(eights => eights === 0 ? 8202 : 9600 + eights)
+                    .map(charCode => new Array(barWidth).fill(String.fromCharCode(charCode)).join(String.fromCharCode(8202)))
+                    .join("")
+                || "Nå-varsel utilgjengelig";
 
-    formatPrecipitation(yrPrecipitation : YrPrecipitationResponse) : MessageType {
+            let part1 = Object.assign(
+                {},
+                {text: "Nedbør neste 90 min"},
+                Trafikanten.createFormatSpecifier(0, 128),
+                {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "center"}}
+            );
 
-        const barWidth = 6; //Math.floor(128 / yrPrecipitation.weatherdata.forecast.time.length / 2);
-        let noPrecipitation = true;
+            let part2 = Object.assign(
+                {},
+                {text: (noPrecipitation ? "Ingen" : graph)},
+                Trafikanten.createFormatSpecifier(128, 255),
+                {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "center"}}
+            );
 
-        const graph = yrPrecipitation.weatherdata.forecast.time && yrPrecipitation.weatherdata.forecast.time
-            .map(precipitationTime => parseFloat(precipitationTime.precipitation.value))
-            .map(value => {
-                if (value > 0) {
-                    noPrecipitation = false;
-                }
-                return value;
-            })
-            .map(value => Math.ceil(Math.min(value / 1, 1) * 8))
-            .map(value => {
-                console.log(value);
-                return value;
-            })
-            .map(eights => eights === 0 ? 8202 : 9600 + eights)
-            .map(charCode => new Array(barWidth).fill(String.fromCharCode(charCode)).join(String.fromCharCode(8202)))
-            .join("")
-        || "Nå-varsel utilgjengelig";
-
-        let part1 = Object.assign(
-            {},
-            {text: "Nedbør neste 90 min"},
-            Trafikanten.createFormatSpecifier(0, 128),
-            {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "center"}}
-        );
-
-        let part2 = Object.assign(
-            {},
-            {text: (noPrecipitation ? "Ingen" : graph)},
-            Trafikanten.createFormatSpecifier(128, 255),
-            {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "center"}}
-        );
-        
-        return [part1, part2];
+            this._precipitationMessage = [part1, part2];
+            return this._precipitationMessage;
+        }).catch(err => [Object.assign({},
+            { start: 0, end: 127, text: "Loading data for " + this._id, lines: 2},
+            { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50}})]);
     }
 
 }
