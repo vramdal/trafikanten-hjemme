@@ -3,11 +3,12 @@
 const SimpleTypes = require("./SimpleTypes.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
-const testdata1 = require("./testdata/ensjø-departures-1.json");
-const testdata2 = require("./testdata/ensjø-departures-2.json");
+//const testdata1 = require("./testdata/ensjø-departures-1.json");
+//const testdata2 = require("./testdata/ensjø-departures-2.json");
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
 const fetch = require("node-fetch");
-
+const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
+const JsonFetcher = require("./fetch/ValueFetcherAndFormatter.js").JsonFetcher;
 
 type MonitoredCall = {
     ExpectedDepartureTime : string
@@ -15,7 +16,6 @@ type MonitoredCall = {
 
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
 import type {MessageProvider} from "./provider/MessageProvider";
-import type {CachedValueProvider} from "./fetch/Cache";
 
 
 type MonitoredVehicleJourney = {
@@ -41,77 +41,38 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 class Trafikanten implements MessageProvider {
 
-    _content : MessageType;
     id : string;
-    _rawValueProvider : CachedValueProvider<GetDeparturesResponse>;
-    _formattedValueProvider : CachedValueProvider<MessageType>;
-    maxErrorCount : number;
-    currentContent : string;
-    currentMessage : MessageType;
-    loadingMessage : MessageType;
+    _valueFetcher : ValueFetcherAndFormatter<GetDeparturesResponse>;
 
     static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
     }
 
     constructor(id : string, dataStore : PreemptiveCache) {
-        this._content = [];
         this.id = id;
-        this._rawValueProvider = dataStore.registerFetcher(this.fetch.bind(this), id, 30, 3);
-        this._formattedValueProvider = dataStore.registerFetcher(this.formatContent.bind(this), id + "-formatter", 10, 3);
-        this.currentContent = "";
-        this.loadingMessage = [Object.assign({},
-            {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
-            {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})];
-        this.currentMessage = this.loadingMessage;
-
-    }
-
-    //noinspection JSUnusedGlobalSymbols,JSMethodCanBeStatic
-    fetch() : Promise<GetDeparturesResponse> {
-        return fetch("http://reisapi.ruter.no/StopVisit/GetDepartures/3011430")
-            .then(res => res.json())
-
-
-        /*
-                let shouldError = Math.random() > 0.9;
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        if (shouldError) {
-                            return reject(new Error("Trafikanten fetching error"));
-                        }
-                        resolve(this.id === "1" ? testdata1 : testdata2);
-                    }, Math.random() * (2000 - 1000) + 1000);
-                });
-        */
+        this._valueFetcher = new ValueFetcherAndFormatter(id,
+                dataStore,
+                JsonFetcher("http://reisapi.ruter.no/StopVisit/GetDepartures/3011430"),
+                30,
+                this.format.bind(this),
+                10,
+                [Object.assign({},
+                    {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
+                    {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]
+            );
     }
 
     //noinspection JSUnusedGlobalSymbols
     getMessage() : ?MessageType {
-        return this.currentMessage;
+        return this._valueFetcher.getValue();
     }
 
-    formatContent() : Promise<MessageType> {
+    format(getDeparturesResponse : GetDeparturesResponse) : Promise<MessageType> {
         let now = new Date().getTime();
-        return this._rawValueProvider()
-            .then((departures : GetDeparturesResponse) =>
-                departures.filter(departure =>
-                    new Date(departure.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime).getTime() > now + 5 * 60 * 1000
-            ))
-            .then(departures => this.format(departures))
-            .catch(err => this.loadingMessage)
-            .then(currentMessage => {
-                const str = JSON.stringify(currentMessage);
-                if (this.currentContent !== str) {
-                    this.currentContent = str;
-                }
-                this.currentMessage = currentMessage;
-                return currentMessage
-            })
-    }
-
-    format(getDeparturesResponse : GetDeparturesResponse) : MessageType {
-        let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
+        let departures = getDeparturesResponse.filter(departure =>
+            new Date(departure.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime).getTime() > now + 5 * 60 * 1000
+        );
+        let firstDeparture : MonitoredVehicleJourney = departures[0].MonitoredVehicleJourney;
         let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"};
         let part1 : MessagePartType = Object.assign(
             {},
@@ -125,7 +86,7 @@ class Trafikanten implements MessageProvider {
             Trafikanten.createFormatSpecifier(100, 127),
             {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"}}
         );
-        let formatted = getDeparturesResponse.slice(1).slice(0, 5).map((monitoredStopVisit : MonitoredStopVisit) => {
+        let formatted = departures.slice(1).slice(0, 5).map((monitoredStopVisit : MonitoredStopVisit) => {
             let journey = monitoredStopVisit.MonitoredVehicleJourney;
             return this.formatJourney(journey);
         });
@@ -136,7 +97,7 @@ class Trafikanten implements MessageProvider {
         );
         let message : MessageType = [part1, part2, secondLine];
         message.messageId = "trafikanten-1";
-        return message;
+        return Promise.resolve(message);
     }
 
     formatJourney(journey : MonitoredVehicleJourney) {
