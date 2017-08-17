@@ -26,13 +26,29 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
 class Framer {
 
   parse(messageOrPlaylistType : (MessageType | PlaylistType)) : Array<Message> {
-      let messageType : MessageType = messageOrPlaylistType.playlistId ?  messageOrPlaylistType[0] : messageOrPlaylistType;
-      return [new Message(messageType.map(part => ({
-          frame : new Frame(part.start, part.end - part.start, animationFactory((part.animation : AnimationType)), part.lines),
-          text: part.text,
-
-      })))];
+      let playlistType = this.assertPlaylist(messageOrPlaylistType);
+      return playlistType.map(this.createMessage);
   }
+
+    //noinspection JSMethodCanBeStatic
+    assertPlaylist(messageOrPlaylistType : (MessageType | PlaylistType)) {
+        let playlistType: PlaylistType;
+        if (messageOrPlaylistType.playlistId) {
+            playlistType = messageOrPlaylistType;
+        } else {
+            let playlistArray: PlaylistType = [messageOrPlaylistType];
+            playlistArray.playlistId = (messageOrPlaylistType: MessageType).messageId + "-playlist";
+            playlistType = playlistArray;
+        }
+        return playlistType;
+    }
+
+    createMessage(messageType : MessageType) {
+        return new Message(messageType.map(part => ({
+            frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType)), part.lines),
+            text: part.text
+        })));
+    }
 
 }
 

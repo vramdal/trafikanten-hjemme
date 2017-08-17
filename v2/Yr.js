@@ -208,10 +208,10 @@ class Yr implements PlaylistProvider {
                 )
                 );
                 let row2 = times.map((time, idx) => ( {
-                    text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}\n${time.temperature.value}°`,
+                    text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}\n${time.temperature.value}°\n${symbol(time.symbol.numberEx)}`,
                     start : row1[idx].start + 128,
                     end : row1[idx].end + 128,
-                    animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 1, alignment: "center", scrollIn : false, scrollOut: false}
+                    animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 50, alignment: "center", scrollIn : false, scrollOut: false}
                 } ));
 
 
@@ -253,7 +253,7 @@ class Yr implements PlaylistProvider {
                 {},
                 {text: "Nedbør neste 90 min"},
                 Trafikanten.createFormatSpecifier(0, 128),
-                {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "center"}}
+                {animation: {animationName: "NoAnimation", timeoutTicks: 100, alignment: "center"}}
             );
 
             let part2 = Object.assign(

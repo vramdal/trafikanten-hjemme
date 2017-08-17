@@ -14,6 +14,7 @@ type MonitoredCall = {
 }
 
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
+import type {MessageProvider} from "./provider/MessageProvider";
 import type {CachedValueProvider} from "./fetch/Cache";
 import type {ContentProvider} from "./provider/ContentProvider";
 
@@ -39,7 +40,7 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
-class Trafikanten implements ContentProvider {
+class Trafikanten implements MessageProvider {
 
     _content : MessageType;
     id : string;
@@ -87,7 +88,7 @@ class Trafikanten implements ContentProvider {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    getContent() : ?MessageType {
+    getMessage() : ?MessageType {
         return this.currentMessage;
     }
 
