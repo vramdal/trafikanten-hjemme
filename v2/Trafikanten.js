@@ -67,13 +67,22 @@ class Trafikanten implements MessageProvider {
         return this._valueFetcher.getValue();
     }
 
+
     format(getDeparturesResponse : GetDeparturesResponse) : Promise<MessageType> {
         let now = new Date().getTime();
         let departures = getDeparturesResponse.filter(departure =>
             new Date(departure.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime).getTime() > now + 5 * 60 * 1000
         );
+        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 20, alignment: "left"};
+        if (departures.length === 0) {
+            return Promise.resolve([Object.assign(
+                {},
+                {text: `${this.id}: Ingen avganger`},
+                Trafikanten.createFormatSpecifier(0, 100),
+                {animation: noAnimation}
+            )])
+        }
         let firstDeparture : MonitoredVehicleJourney = departures[0].MonitoredVehicleJourney;
-        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"};
         let part1 : MessagePartType = Object.assign(
             {},
             {text: firstDeparture.LineRef + " " + firstDeparture.DestinationName},
