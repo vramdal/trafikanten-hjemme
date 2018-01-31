@@ -1,12 +1,9 @@
 // @flow
 
-const SimpleTypes = require("./SimpleTypes.js");
-const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
 //const testdata1 = require("./testdata/ensjø-departures-1.json");
 //const testdata2 = require("./testdata/ensjø-departures-2.json");
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
-const fetch = require("node-fetch");
 const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
 const JsonFetcher = require("./fetch/ValueFetcherAndFormatter.js").JsonFetcher;
 
@@ -36,8 +33,19 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
         end: end,
         lines: 1
     }
+};
+
+const abbreviations = {
+    "Vestli via Majorstuen" : "Majorstuen/Vestli",
+    "Ringen via Tøyen" : "Tøyen/Ringen",
+    "Ringen via Storo" : "Storo/Ringen",
+    "Sognsvann via Tøyen": "Tøyen/Sognsvann"
 
 };
+
+function abbreviate(str : string) : string {
+    return abbreviations[str] || str;
+}
 
 class Trafikanten implements MessageProvider {
 
@@ -83,9 +91,11 @@ class Trafikanten implements MessageProvider {
             )])
         }
         let firstDeparture : MonitoredVehicleJourney = departures[0].MonitoredVehicleJourney;
+        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"};
+
         let part1 : MessagePartType = Object.assign(
             {},
-            {text: firstDeparture.LineRef + " " + firstDeparture.DestinationName},
+            {text: firstDeparture.LineRef + " " + abbreviate(firstDeparture.DestinationName)},
             Trafikanten.createFormatSpecifier(0, 100),
             {animation: noAnimation}
         );
@@ -110,7 +120,7 @@ class Trafikanten implements MessageProvider {
     }
 
     formatJourney(journey : MonitoredVehicleJourney) {
-        return journey.LineRef + " " + journey.DestinationName + "  " + this.formatTime(new Date(journey.MonitoredCall.ExpectedDepartureTime).getTime());
+        return journey.LineRef + " " + abbreviate(journey.DestinationName) + "  " + this.formatTime(new Date(journey.MonitoredCall.ExpectedDepartureTime).getTime());
     }
 
 
