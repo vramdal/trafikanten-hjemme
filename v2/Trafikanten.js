@@ -91,7 +91,6 @@ class Trafikanten implements MessageProvider {
             )])
         }
         let firstDeparture : MonitoredVehicleJourney = departures[0].MonitoredVehicleJourney;
-        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"};
 
         let part1 : MessagePartType = Object.assign(
             {},
