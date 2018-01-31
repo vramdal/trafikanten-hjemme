@@ -1,30 +1,40 @@
 // @flow
 
 import type {BytePosition} from "./BytePosition.js";
+import type {Wedge} from "./BytePosition";
 
 class PositionTranslator {
 
-    _targetWidth : number;
-    _targetHeight : number;
+    _canvasWidth : number;
+    _canvasHeight : number;
+    _horizontalWedges : Array<Wedge>;
     translate : (x : number, y : number) => BytePosition;
 
 
-    constructor(targetWidth: number, targetHeight: number) {
-        this._targetWidth = targetWidth;
-        this._targetHeight = targetHeight;
+    constructor(canvasWidth: number, canvasHeight: number, wedges : Array<Wedge> = []) {
+        this._canvasWidth = canvasWidth;
+        this._canvasHeight = canvasHeight;
         this.translate = this._translate.bind(this);
+        this._horizontalWedges = wedges.filter((wedge : Wedge) => wedge[0] === 'Horizontal').sort((wedgeA : Wedge, wedgeB : Wedge) => wedgeA[1] - wedgeB[1]);
     }
 
     _translate(x : number, y : number) : BytePosition {
-        if (x >= this._targetWidth) {
-            throw new Error(`x ${x} is too wide for width ${this._targetWidth}`);
-        } else if (y >= this._targetHeight) {
-            throw new Error(`y ${y} is too high for height ${this._targetHeight}`);
+        if (x >= this._canvasWidth) {
+            throw new Error(`x ${x} is too wide for width ${this._canvasWidth}`);
+        } else if (y >= this._canvasHeight) {
+            throw new Error(`y ${y} is too high for height ${this._canvasHeight}`);
         }
-        if (y > 7) {
-            return [x + this._targetWidth, y % 8];
+        if (this._horizontalWedges.some((wedge : Wedge) => wedge[1] <= y && wedge[1] + wedge[2] > y)) {
+            return undefined;
+        }
+        let wedgesWidth = this._horizontalWedges
+            .filter((wedge : Wedge) => wedge[1] <= y)
+            .reduce((sum : number, wedge : Wedge) => wedge[2] + sum, 0);
+        let yWithoutWedges = y - wedgesWidth;
+        if (yWithoutWedges > 7) {
+            return [x + this._canvasWidth, yWithoutWedges % 8];
         } else {
-            return [x, y];
+            return [x, yWithoutWedges];
         }
     }
 }
