@@ -34,7 +34,7 @@ class Frame {
         this._bitmaps = bitmaps;
     }
 
-    translateCoordinates(line : number, x : number) {
+    translateCoordinates(line : number, x : number) { // TODO: PositionTranslator
         let idx = x + line * this._width;
         if (this._animation.getTranslatedOnLine) {
             return this._animation.getTranslatedOnLine(x, line);

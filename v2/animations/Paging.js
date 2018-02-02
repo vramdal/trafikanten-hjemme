@@ -46,7 +46,7 @@ class PagingAnimation implements Animation {
         );
     }
 
-    getTranslated(idx : number) : Byte {
+    getTranslated(idx : number) : Byte { // TODO: PositionTranslator
         let pageDelta = Math.floor(idx / this._frameWidth);
         if (pageDelta + this.currentPageIdx > this._lines) {
             return 0;
