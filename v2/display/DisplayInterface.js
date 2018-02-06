@@ -1,5 +1,7 @@
 // @flow
 
+import type {BytePosition} from "./BytePosition";
 export interface DisplayInterface {
-    output() : void
+    output() : void;
+    getPositionTranslator() : (x : number, y : number) => BytePosition
 }

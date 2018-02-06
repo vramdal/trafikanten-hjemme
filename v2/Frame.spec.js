@@ -48,4 +48,26 @@ describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
         });
     });
 
+    describe('constructor parameters', () => {
+        it('should assume 1 line', () => {
+            let frame = new Frame(0, 3, animation);
+            expect(frame.lines).to.equal(1);
+            expect(frame.isLineConstrained).to.equal(true);
+            expect(frame.heightPx).to.equal(8);
+        });
+        it('should allow setting multiple lines', () => {
+            let frame = new Frame(0, 3, animation, 2);
+            expect(frame.lines).to.equal(2);
+            expect(frame.isLineConstrained).to.equal(true);
+            expect(frame.heightPx).to.equal(18);
+        });
+        it('should allow setting a height in pixels', () => {
+            let frame = new Frame(0, 3, animation, null, 10);
+            expect(frame.lines).to.equal(null);
+            expect(frame.isLineConstrained).to.equal(false);
+            expect(frame.heightPx).to.equal(10);
+
+        });
+    });
+
 });

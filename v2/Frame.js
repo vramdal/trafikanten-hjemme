@@ -2,6 +2,7 @@
 
 import type {AnnotatedBitmap, Bitmap} from "./Bitmap";
 import type {Animation} from "./animations/Animation";
+import type {Rectangle} from "./Rectangle";
 
 const BitmapProxy = require("./BitmapProxy.js");
 /**
@@ -14,15 +15,31 @@ class Frame {
     // TODO: Support multi-line
     _width : number;
     _x: number;
+    _y: number;
     _animation: Animation;
     _bitmaps: Array<Bitmap>;
     _lines: number;
+    _isLineConstrained : boolean;
+    _heightPx: number;
 
-    constructor(x: number, width : number, animation : Animation, lines : number = 1) {
+    constructor(x: number, width : number, animation : Animation, lines : number = 1, heightPx : ?number) {
         this._x = x;
+        this._y = 0; // TODO
         this._width = width;
         this._animation = animation;
         this._lines = lines;
+/*        if (lines !== undefined && heightPx !== undefined) {
+            throw new Error("Either lines or heightPx must be specified, but not both");
+        } else */
+        if (heightPx != null) {
+            this._heightPx = heightPx;
+        } else if (lines !== undefined) {
+            this._isLineConstrained = lines !== undefined;
+            this._heightPx = lines * 10 - 2;
+        }
+        if (lines === undefined && heightPx === undefined) {
+            throw new Error("Either lines or heightPx must be specified");
+        }
     }
 
     setBitmap(source: AnnotatedBitmap) {
@@ -67,6 +84,14 @@ class Frame {
         return this._width;
     }
 
+    get heightPx() : number {
+        if (this.isLineConstrained) {
+            return this._lines * 10 - 2;
+        } else {
+            return this._heightPx;
+        }
+    }
+
     get lines(): number {
         return this._lines;
     }
@@ -75,12 +100,24 @@ class Frame {
         return this._bitmaps[0];
     }
 
+    get isLineConstrained() : boolean {
+        return this._isLineConstrained;
+    }
+
     getBitmap(lineIdx : number) : Bitmap {
         return this._bitmaps[lineIdx];
     }
 
     get x(): number {
         return this._x;
+    }
+
+    get y(): number {
+        return this._y;
+    }
+
+    get rectangle() : Rectangle {
+        return {x: this._x, y: this._y, width: this._width, height: this._heightPx};
     }
 }
 

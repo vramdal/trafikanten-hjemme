@@ -4,6 +4,7 @@ const Playlist = require("../PlaylistDisplay.js");
 
 const DisplayEventEmitter = require("../DisplayEventEmitter.js");
 import type {Layout} from "../Frame";
+import type {BytePosition} from "./BytePosition";
 import type {Bitmap} from "../Bitmap";
 import type {DisplayInterface} from './DisplayInterface';
 const Collage = require("../Collage.js");
@@ -28,14 +29,19 @@ class Display implements DisplayInterface {
         return this._eventEmitter;
     }
 
-    set playlist(playlist : Playlist) {
+    set playlist(playlist : Playlist, ) {
         this._playlist = playlist;
     }
 
     onBitmapUpdated(layout : Layout) : void {
         let collage : Collage = new Collage(layout);
-        collage.pasteTo(this._buffer);
+        // TODO: Use PositionTranslator
+        collage.pasteTo(this._buffer, this.getPositionTranslator());
         this.output();
+    }
+
+    getPositionTranslator() : (x : number, y : number) => BytePosition {
+        throw new Error("getPositionTranslator should have been overridden");
     }
 
     clear() : void {

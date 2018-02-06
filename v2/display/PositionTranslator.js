@@ -1,41 +1,40 @@
 // @flow
 
-import type {BytePosition} from "./BytePosition.js";
-import type {Wedge} from "./BytePosition";
+import type {Rectangle} from "../Rectangle";
+import type {Bitmap} from "../Bitmap";
 
 class PositionTranslator {
 
     _canvasWidth : number;
     _canvasHeight : number;
-    _horizontalWedges : Array<Wedge>;
-    translate : (x : number, y : number) => BytePosition;
+    _deadZones : Array<Rectangle>;
+    translate : (bitmap : Bitmap, rectangle : Rectangle) => {bitmap : Bitmap, rectangle : Rectangle};
 
 
-    constructor(canvasWidth: number, canvasHeight: number, wedges : Array<Wedge> = []) {
+    constructor(canvasWidth: number, canvasHeight: number, deadZones : Array<Rectangle> = []) {
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
         this.translate = this._translate.bind(this);
-        this._horizontalWedges = wedges.filter((wedge : Wedge) => wedge[0] === 'Horizontal').sort((wedgeA : Wedge, wedgeB : Wedge) => wedgeA[1] - wedgeB[1]);
+        this._deadZones = deadZones.sort((deadZoneA : Rectangle, deadZoneB : Rectangle) => deadZoneA.x - deadZoneB.x);
     }
 
-    _translate(x : number, y : number) : BytePosition {
+    _translate(bitmap : Bitmap, rectangle : Rectangle) : {bitmap : Bitmap, rectangle : Rectangle} {
+        
+/*
         if (x >= this._canvasWidth) {
             throw new Error(`x ${x} is too wide for width ${this._canvasWidth}`);
         } else if (y >= this._canvasHeight) {
             throw new Error(`y ${y} is too high for height ${this._canvasHeight}`);
         }
-        if (this._horizontalWedges.some((wedge : Wedge) => wedge[1] <= y && wedge[1] + wedge[2] > y)) {
-            return undefined;
+        if (this._deadZones.some((deadZone : Rectangle) => this.isInRectangle(deadZone, x, y))) {
+            return null;
         }
-        let wedgesWidth = this._horizontalWedges
-            .filter((wedge : Wedge) => wedge[1] <= y)
-            .reduce((sum : number, wedge : Wedge) => wedge[2] + sum, 0);
-        let yWithoutWedges = y - wedgesWidth;
-        if (yWithoutWedges > 7) {
-            return [x + this._canvasWidth, yWithoutWedges % 8];
-        } else {
-            return [x, yWithoutWedges];
-        }
+        return {x: x + (y > 7 ? this._canvasWidth : 0), y: 0};
+*/
+    }
+
+    isInRectangle(rectangle : Rectangle, x : number, y : number) : boolean {
+        return x >= rectangle.x && x < rectangle.x + rectangle.width && y >= rectangle.y && y < rectangle.y + rectangle.height;
     }
 }
 
