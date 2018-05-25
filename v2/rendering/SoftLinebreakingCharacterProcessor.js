@@ -8,7 +8,7 @@ import type {CharacterProcessor} from "./CharacterProcessor";
 
 type SoftLinebreakAtPosition = {chStart : number, chEnd: number, xStart : number, xEnd: number};
 
-class LinebreakingCharacterProcessor implements CharacterProcessor {
+class SoftLinebreakingCharacterProcessor implements CharacterProcessor {
 
     characterMap : Array<{chIdx: number, str: string}>;
     softLinebreaksAtPositions: Array<SoftLinebreakAtPosition>;
@@ -24,22 +24,22 @@ class LinebreakingCharacterProcessor implements CharacterProcessor {
         this.softLinebreakUnderCreation = undefined;
     }
 
-    processCharacter(text : string, chIdx : number) : number {
+    processCharacter(text : string, chIdx : number) : Array<any> {
         "use strict";
         if (chIdx < this.skipUntilCharacterWhenProcessing) {
-            return 0;
+            return [];
         }
         let restStr: Char = text.substring(chIdx);
-        let match = restStr.match(/^(\s+).+/);
+        let match = restStr.match(/^([^\S\n]+).+/);
         if (match) {
             const linebreaker = match[1];
             this.characterMap.push({chIdx, str: linebreaker});
             this.skipUntilCharacterWhenProcessing = chIdx + linebreaker.length;
         }
-        return 0;
+        return [];
     }
 
-    mapCharacterToPosition(chIdx : number, x : number) {
+    mapCharacterToPosition(chIdx : number, x : number) : number {
         if (this.softLinebreakUnderCreation && this.softLinebreakUnderCreation.chEnd <= chIdx) {
             this.softLinebreaksAtPositions.push({
                 chStart: this.softLinebreakUnderCreation.chStart,
@@ -58,15 +58,16 @@ class LinebreakingCharacterProcessor implements CharacterProcessor {
                 };
             }
         }
+        return 0;
     }
 
     //noinspection JSUnusedGlobalSymbols
     place(bitmap: AnnotatedBitmap): void {
         for (let softLinebreakAtPosition of this.softLinebreaksAtPositions) {
-            bitmap.annotations.push(new LinebreakAnnotation(softLinebreakAtPosition.xStart, softLinebreakAtPosition.xEnd));
+            bitmap.annotations.push(new LinebreakAnnotation(softLinebreakAtPosition.xStart, softLinebreakAtPosition.xEnd, 'Soft'));
         }
     }
 
 }
 
-module.exports = LinebreakingCharacterProcessor;
+module.exports = SoftLinebreakingCharacterProcessor;

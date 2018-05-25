@@ -12,7 +12,8 @@ export interface BitmapAnnotation {
 }
 
 export type AnnotatedBitmap = Bitmap & {
-    annotations: Array<BitmapAnnotation>
+    annotations: Array<BitmapAnnotation>,
+    sourceString? : string
 }
 
 //noinspection JSUnusedLocalSymbols

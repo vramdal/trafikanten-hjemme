@@ -3,6 +3,7 @@
 import type {Animation} from "./Animation";
 import type {Byte} from "../SimpleTypes";
 import type {AnnotatedBitmap} from "../Bitmap";
+import type {Alignments} from "./Types";
 
 const TextLayout = require("./TextLayout.js");
 
@@ -15,15 +16,24 @@ class VerticalScrollingAnimation implements Animation {
     _textLayout : TextLayout;
     _lines : number;
     _currentTick : number;
+    _totalTicked : number;
     _holdOnLine : number;
+    _waitTicksOnLastLine: number;
+    _alignment: Alignments;
+    _scrollIn: boolean;
+    _scrollOut: boolean;
 
 
-    constructor(holdOnLine : number) {
-        this._waitTicksOnLine = holdOnLine || WAIT_TICKS_ON_LINE;
+    constructor(waitTicksOnLine : number, waitTicksOnLastLine? : number, alignment? : Alignments, scrollIn? : boolean = true, scrollOut? : boolean = true) {
+        this._waitTicksOnLine = waitTicksOnLine || WAIT_TICKS_ON_LINE;
+        this._waitTicksOnLastLine = waitTicksOnLastLine || 0;
+        this._alignment = alignment || "left";
+        this._scrollIn = scrollIn;
+        this._scrollOut = scrollOut;
     }
 
     setSource(source : AnnotatedBitmap, frameWidth: number, lines : number = 1) : void {
-        this._textLayout = new TextLayout(source, frameWidth);
+        this._textLayout = new TextLayout(source, frameWidth, this._alignment);
         this._frameWidth = frameWidth;
         this._lines = lines;
         this.reset();
@@ -32,16 +42,19 @@ class VerticalScrollingAnimation implements Animation {
     reset() : void {
         this._currentTick = 0;
         this._holdOnLine = this._waitTicksOnLine;
+        this._totalTicked = 0;
     }
 
     tick() : void {
-        let alignedAtLine = (this._currentTick - this.viewportHeight) >= 0
-            && (this._currentTick - this.viewportHeight) % this.lineHeight === 0
-            && (this._currentTick < this.numLines * this.ticksPerLine);
+        this._totalTicked++;
+        let alignedAtLine = (this._currentTick - (this._scrollIn ? this.viewportHeight : 0)) >= 0
+            && (this._currentTick - (this._scrollIn ? this.viewportHeight : 0)) % this.lineHeight === 0
+            && (this._currentTick < (this.numLines + 1) * this.ticksPerLine);
 
         if (alignedAtLine && this._holdOnLine === 0) {
             this._currentTick++;
-            this._holdOnLine = this._waitTicksOnLine;
+            let startingOnLastLine = this._currentTick >  (this.numLines - 1) * this.ticksPerLine;
+            this._holdOnLine = startingOnLastLine && this._waitTicksOnLastLine || this._waitTicksOnLine;
         } else if (alignedAtLine) {
             this._holdOnLine--;
         } else {
@@ -50,7 +63,10 @@ class VerticalScrollingAnimation implements Animation {
     }
 
     getAnimationRemaining(): number {
-        return this.numLines * this.lineHeight + this.scrollHeight - this._currentTick;
+        return (this._waitTicksOnLastLine ? this._waitTicksOnLastLine : this._waitTicksOnLine + this.viewportHeight)
+            + (this.numLines - 1) * this.ticksPerLine
+            + (this._scrollOut ? this.viewportHeight : 0)
+        - this._totalTicked;
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -97,11 +113,15 @@ class VerticalScrollingAnimation implements Animation {
             .map(byte => byte.toString(2))
             .map(str => this.padByteStr(str))
             .join("00");
-        for (let i = 0; i < this.scrollHeight; i++) {
-            str = "0" + str;
+        if (this._scrollIn) {
+            for (let i = 0; i < this.scrollHeight; i++) {
+                str = "0" + str;
+            }
         }
-        for (let i = 0; i < this.scrollHeight; i++) {
-            str = str + "0";
+        if (this._scrollOut) {
+            for (let i = 0; i < this.scrollHeight; i++) {
+                str = str + "0";
+            }
         }
         let windowStartY = this._currentTick;
 

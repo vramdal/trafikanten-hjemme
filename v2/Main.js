@@ -38,8 +38,23 @@ fetchService.start().then(() => {
     let loop = function () {
         return Promise.all([
             trafikanten1.getMessage(),
-            yr.getPlaylist()])
+            yr.getPlaylist()/*,
+                Promise.resolve([{
+                    start: 127,
+                    end: 255,
+                    text: "           ▂ ▂ ▂ ▂ ▂ ▂                                                                             ▃ ▃ ▃ ▃ ▃ ▃▅ ▅ ▅ ▅ ▅ ▅█ █ █ █ █ ██ █ █ █ █ █",
+                    lines: 1,
+                    animation: {animationName: "NoAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"},
+                    messageId: "staticMessage"
+                }])*/
+            ])
             .then(messageSpecs => {
+/*
+                let tempMessageSpecs = [[Object.assign({},
+                    { start: 0, end: 127, text: "aaa\nbbb", lines: 1},
+                    { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"}})]];
+
+*/
                 const playlists = messageSpecs.map(framer.parse.bind(framer));
                 let mergedPlaylist = [].concat.apply([], playlists);
                 display.playlist = new PlaylistDisplay(display.eventEmitter, mergedPlaylist);
@@ -53,16 +68,33 @@ fetchService.start().then(() => {
 });
 
 
-        // framer.parse(new Trafikanten().formatMessage(testdata))
+//noinspection JSUnusedLocalSymbols
+/*yr.fetch().then(json => {
+    const messages : Array<Message> = [
+        // framer.parse(
+        //     SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x01\x02" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" +
+        //     SimpleTypes.FORMAT_SPECIFIER_START + "\x0A\x7F\x01\x02" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!"),
+        // framer.parse(yr.format(json)),
+        // framer.parse([{text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt", start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", ticksPerPage: 100}}]
+        framer.parse([{text: "Eld han tarv " +
+            "som inn er komen "+
+            "og um kne kulsar. "+
+                "Til mat og klæde "+
+            "den mann hev trong "+
+            "som hev i fjell fari. ",
+start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 20}}]
+        ),
+        //framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x01\xFF\x01" + SimpleTypes.FORMAT_SPECIFIER_END + "░░ God natt! ░░"
+        //framer.parse(new Trafikanten().formatMessage(testdata))
 
 
 
-    // ];
+    ];
 
 
 
 
-/*    display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
+    display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
 
     display.play();
 
@@ -79,26 +111,6 @@ setTimeout(() => {
     display.stop();
 }, 300000);
 */
-
-//noinspection JSUnusedLocalSymbols
-/*yr.fetch().then(json => {
- const messages : Array<Message> = [
- // framer.parse(
- //     SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x0A\x01\x02" + SimpleTypes.FORMAT_SPECIFIER_END + "Laks!" +
- //     SimpleTypes.FORMAT_SPECIFIER_START + "\x0A\x7F\x01\x02" + SimpleTypes.FORMAT_SPECIFIER_END + "Hei på deg!"),
- // framer.parse(yr.format(json)),
- // framer.parse([{text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt", start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", ticksPerPage: 100}}]
- /*
- framer.parse([{text: "Eld han tarv " +
- "som inn er komen "+
- "og um kne kulsar. "+
- "Til mat og klæde "+
- "den mann hev trong "+
- "som hev i fjell fari. ",
- start: 0, end: 128, lines: 2, animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 20}}]
- ),
- */
-//framer.parse(SimpleTypes.FORMAT_SPECIFIER_START + "\x00\x7F\x01\x01\xFF\x01" + SimpleTypes.FORMAT_SPECIFIER_END + "░░ God natt! ░░"
 /*
  framer.parse([{text: "Eld han tarv " +
  "som inn er komen "+

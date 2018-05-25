@@ -780,15 +780,15 @@ function init() {
             "   X",
             "XXX ",
             "    ");
-    registerCharacter('t', 5,
-            "     ",
-            "  X  ",
-            "XXXXX",
-            "  X  ",
-            "  X  ",
-            "  X  ",
-            "   XX",
-            "     ");
+    registerCharacter('t', 3,
+            "   ",
+            " X ",
+            "XXX",
+            " X ",
+            " X ",
+            " X ",
+            "  X",
+            "   ");
     registerCharacter('u', 5,
             "     ",
             "     ",
@@ -946,29 +946,60 @@ function init() {
             "X      X");
     registerCharacter('▓', 8, // Sky, fylt
             "        ",
-            "        ",
             "    XX  ",
             " XXXXXX ",
             " XXXXXX ",
             "XXXXXXXX",
             "XXXXXXXX",
-            " XXXXXX "
+            " XXXXXX ",
+            "        "
+
+    );
+    registerCharacter('▒', 8, // Sky, halvfylt
+            "        ",
+            "    XX  ",
+            " XXX  X ",
+            " XXX  X ",
+            "XXXX   X",
+            "XXXX   X",
+            " XXXXXX ",
+            "        "
     );
     registerCharacter('░', 8, // Sky, hul
-            "        ",
             "        ",
             "    XX  ",
             " XXX  X ",
             " X    X ",
             "X      X",
             "X      X",
-            " XXXXXX "
+            " XXXXXX ",
+            "        "
     );
-    registerCharacter('▒', 9, // SunLightRain
-            "X  X     ",
-            " XX      ",
-            " XX      ",
-            "X  X     ",
+    registerCharacter(62246, 9, // Light rain
+            "         ",
+            "     X   ",
+            "    X    ",
+            "   X     ",
+            "         ",
+            "     X   ",
+            "    X    ",
+            "   X     "
+    );
+    registerCharacter(62247, 9, // Medium rain
+            "         ",
+            "  X     X",
+            " X     X ",
+            "X     X  ",
+            "         ",
+            "  X     X",
+            " X     X ",
+            "X     X  "
+    );
+    registerCharacter(62248, 9, // Heavy rain
+            "         ",
+            "  X  X  X",
+            " X  X  X ",
+            "X  X  X  ",
             "         ",
             "  X  X  X",
             " X  X  X ",
@@ -983,6 +1014,16 @@ function init() {
             " ",
             " ",
             " "
+    );
+    registerCharacter(8203, 0,  // Zero-width space
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
     );
     registerCharacter(9829, 7,
           " XX XX ",
@@ -1133,6 +1174,56 @@ function init() {
         "X",
         "X"
     );
+    registerCharacter(176, 4, // °, degree sign)
+        " XX ",
+        "X  X",
+        " XX ",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+    );
+    registerCharacter(30829, 7, // Day)
+        "X  X  X",
+        " X   X ",
+        "  XXX  ",
+        "XXXXXXX",
+        "  XXX  ",
+        " X   X ",
+        "X  X  X",
+        "       "
+    );
+    registerCharacter(12192, 7, // Morning)
+        "X  X   ",
+        " X     ",
+        "  XX   ",
+        "XXXX   ",
+        "  XX   ",
+        " X     ",
+        "X  X   ",
+        "       "
+    );
+    registerCharacter(12067, 7, // Evening)
+        "   X  X",
+        "     X ",
+        "   XX  ",
+        "   XXXX",
+        "   XX  ",
+        "     X ",
+        "   X  X",
+        "       "
+    );
+    registerCharacter(22812, 7, // Night)
+        "  XXX  ",
+        " X   X ",
+        "X     X",
+        "X     X",
+        "X     X",
+        " X   X ",
+        "  XXX  ",
+        "       "
+    );
 
     let requiredWidth = 0;
     let positions : {[string | number] : number} = {};
@@ -1141,16 +1232,30 @@ function init() {
         positions[fontCharSpec.char] = requiredWidth;
         requiredWidth += fontCharSpec.width;
     }
-    const noKerningSet = [8202, 9601, 9602, 9603, 9604, 9605, 9606, 9607, 9608];
+    const noSpacingSet = [8202, 9601, 9602, 9603, 9604, 9605, 9606, 9607, 9608];
+    const kernPairs : Array<[string | number, string | number, number]> = [
+        ["r", "s", 0],
+        ["e", "t", 0],
+        ["r", "å", 0],
+        ["r", "a", 0]
+    ];
+
     // Create a mother Uint8Array, that will hold all character sprites
     let map : FontMap = {
         byteArray: new Uint8Array(requiredWidth),
         bytes: {},
         kerning: (ch1 : string | number, ch2 : string | number) => {
-            if (noKerningSet.includes(ch1) && noKerningSet.includes(ch2)) {
+            if (noSpacingSet.includes(ch1) && noSpacingSet.includes(ch2)) {
                 return 0;
             } else {
-                return 1;
+                let kernPair = kernPairs
+                    .filter((tuple: [string | number, string | number, number]) => tuple[0] === ch1 && tuple[1] === ch2)
+                    .find(tuple => true);
+                if (kernPair) {
+                    return kernPair[2]
+                } else {
+                    return 1;
+                }
             }
         }};
     for (let i = 0; i < characters.length; i++) {

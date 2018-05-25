@@ -5,13 +5,13 @@ import type {FontCharSpec, FontMap} from "../font";
 import type {AnnotatedBitmap} from "../Bitmap";
 
 const FontCharacterAnnotation = require("./FontCharacterAnnotation.js");
-
+const Font = require("../font.js");
 
 type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 
 
 class FontCharacterProcessor implements CharacterProcessor {
-    glyphs : Array<FontCharSpec>;
+    glyphs : Array<?FontCharSpec>;
     glyphsAtPosition : Array<GlyphAtPosition>;
     _font: FontMap;
 
@@ -21,19 +21,28 @@ class FontCharacterProcessor implements CharacterProcessor {
         this.glyphsAtPosition = [];
     }
 
-    processCharacter(text : string, chIdx : number) : number {
+    processCharacter(text : string, chIdx : number) : Array<any> {
         let ch = text[chIdx];
         let glyph = this._font[ch] ||
             this._font[ch.charCodeAt(0)] && typeof this._font[ch.charCodeAt(0)].char === "number" && this._font[ch.charCodeAt(0)];
         if (glyph) {
-            this.glyphs.push(glyph);
-            return 1;
+            this.glyphs[chIdx] = glyph;
+            return [glyph];
+        } else {
+            this.glyphs.push(null);
         }
-        return 0;
+        return [];
     }
 
-    mapCharacterToPosition(chIdx : number, x : number) {
-        this.glyphsAtPosition.push({x: x, glyph: this.glyphs[chIdx]});
+    mapCharacterToPosition(chIdx : number, x : number) : number {
+        const fontCharSpec = this.glyphs[chIdx];
+        if (fontCharSpec) {
+            this.glyphsAtPosition.push({x: x, glyph: fontCharSpec});
+        }
+        const nextGlyph = this.glyphs.length > chIdx + 1 && this.glyphs[chIdx + 1];
+        return nextGlyph && fontCharSpec
+            ? Font.kerning(fontCharSpec.char, nextGlyph.char)
+            : 0;
     }
 
     //noinspection JSUnusedGlobalSymbols

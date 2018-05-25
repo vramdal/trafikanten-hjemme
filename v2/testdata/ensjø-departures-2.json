@@ -1,0 +1,202 @@
+[
+  {
+    "RecordedAtTime": "2017-07-03T15:03:10.5+02:00",
+    "MonitoringRef": "3011430",
+    "MonitoredVehicleJourney": {
+      "LineRef": "3",
+      "DirectionRef": "1",
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": "2017-07-03",
+        "DatedVehicleJourneyRef": "7125"
+      },
+      "PublishedLineName": "3",
+      "DirectionName": "1",
+      "OperatorRef": "me",
+      "OriginName": "Helsfyr",
+      "OriginRef": "2190450",
+      "DestinationRef": "3010950",
+      "DestinationName": "Sognsvann",
+      "OriginAimedDepartureTime": "0001-01-01T00:00:00",
+      "DestinationAimedArrivalTime": "0001-01-01T00:00:00",
+      "Monitored": true,
+      "InCongestion": false,
+      "Delay": "PT65S",
+      "TrainBlockPart": {
+        "NumberOfBlockParts": 6
+      },
+      "BlockRef": "305:TSH01",
+      "VehicleRef": "275",
+      "VehicleMode": 4,
+      "VehicleJourneyName": "300030094",
+      "MonitoredCall": {
+        "VisitNumber": 23,
+        "VehicleAtStop": false,
+        "DestinationDisplay": "Sognsvann",
+        "AimedArrivalTime": "2017-07-03T15:05:39+02:00",
+        "ExpectedArrivalTime": "2017-07-03T15:06:44+02:00",
+        "AimedDepartureTime": "2017-07-03T15:05:39+02:00",
+        "ExpectedDepartureTime": "2017-07-03T15:06:44+02:00",
+        "DeparturePlatformName": "1 (Retning øst)"
+      },
+      "VehicleFeatureRef": ""
+    },
+    "Extensions": {
+      "IsHub": false,
+      "OccupancyData": null,
+      "Deviations": [],
+      "LineColour": "EC700C",
+      "DepartureNamePreMapping": "1"
+    },
+    "StopVisitNote": []
+  },
+  {
+    "RecordedAtTime": "2017-07-03T15:03:10.5+02:00",
+    "MonitoringRef": "3011430",
+    "MonitoredVehicleJourney": {
+      "LineRef": "3",
+      "DirectionRef": "2",
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": "2017-07-03",
+        "DatedVehicleJourneyRef": "7074"
+      },
+      "PublishedLineName": "3",
+      "DirectionName": "2",
+      "OperatorRef": "me",
+      "OriginName": "Sognsvann",
+      "OriginRef": "3010950",
+      "DestinationRef": "2190450",
+      "DestinationName": "Helsfyr",
+      "OriginAimedDepartureTime": "0001-01-01T00:00:00",
+      "DestinationAimedArrivalTime": "0001-01-01T00:00:00",
+      "Monitored": true,
+      "InCongestion": false,
+      "Delay": "PT4S",
+      "TrainBlockPart": {
+        "NumberOfBlockParts": 6
+      },
+      "BlockRef": "302:TSH01",
+      "VehicleRef": "272",
+      "VehicleMode": 4,
+      "VehicleJourneyName": "300030097",
+      "MonitoredCall": {
+        "VisitNumber": 12,
+        "VehicleAtStop": false,
+        "DestinationDisplay": "Helsfyr",
+        "AimedArrivalTime": "2017-07-03T15:08:06+02:00",
+        "ExpectedArrivalTime": "2017-07-03T15:08:10+02:00",
+        "AimedDepartureTime": "2017-07-03T15:08:06+02:00",
+        "ExpectedDepartureTime": "2017-07-03T15:08:10+02:00",
+        "DeparturePlatformName": "2 (Retning sentrum)"
+      },
+      "VehicleFeatureRef": ""
+    },
+    "Extensions": {
+      "IsHub": false,
+      "OccupancyData": null,
+      "Deviations": [],
+      "LineColour": "EC700C",
+      "DepartureNamePreMapping": "2"
+    },
+    "StopVisitNote": []
+  },
+  {
+    "RecordedAtTime": "2017-07-03T15:03:10.5+02:00",
+    "MonitoringRef": "3011430",
+    "MonitoredVehicleJourney": {
+      "LineRef": "1",
+      "DirectionRef": "1",
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": "2017-07-03",
+        "DatedVehicleJourneyRef": "6395"
+      },
+      "PublishedLineName": "1",
+      "DirectionName": "1",
+      "OperatorRef": "me",
+      "OriginName": "Frognerseteren",
+      "OriginRef": "3012630",
+      "DestinationRef": "3011440",
+      "DestinationName": "Helsfyr",
+      "OriginAimedDepartureTime": "0001-01-01T00:00:00",
+      "DestinationAimedArrivalTime": "0001-01-01T00:00:00",
+      "Monitored": true,
+      "InCongestion": false,
+      "Delay": "-PT5S",
+      "TrainBlockPart": {
+        "NumberOfBlockParts": 3
+      },
+      "BlockRef": "101:TSH01",
+      "VehicleRef": "248",
+      "VehicleMode": 4,
+      "VehicleJourneyName": "300010229",
+      "MonitoredCall": {
+        "VisitNumber": 26,
+        "VehicleAtStop": false,
+        "DestinationDisplay": "Helsfyr",
+        "AimedArrivalTime": "2017-07-03T15:09:39+02:00",
+        "ExpectedArrivalTime": "2017-07-03T15:09:34+02:00",
+        "AimedDepartureTime": "2017-07-03T15:09:39+02:00",
+        "ExpectedDepartureTime": "2017-07-03T15:09:34+02:00",
+        "DeparturePlatformName": "1 (Retning øst)"
+      },
+      "VehicleFeatureRef": ""
+    },
+    "Extensions": {
+      "IsHub": false,
+      "OccupancyData": null,
+      "Deviations": [],
+      "LineColour": "EC700C",
+      "DepartureNamePreMapping": "1"
+    },
+    "StopVisitNote": []
+  },
+  {
+    "RecordedAtTime": "2017-07-03T15:03:10.5+02:00",
+    "MonitoringRef": "3011430",
+    "MonitoredVehicleJourney": {
+      "LineRef": "4",
+      "DirectionRef": "2",
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": "2017-07-03",
+        "DatedVehicleJourneyRef": "7779"
+      },
+      "PublishedLineName": "4",
+      "DirectionName": "2",
+      "OperatorRef": "me",
+      "OriginName": "Ringen",
+      "OriginRef": "3011030",
+      "DestinationRef": "3012120",
+      "DestinationName": "Vestli via Majorstuen",
+      "OriginAimedDepartureTime": "0001-01-01T00:00:00",
+      "DestinationAimedArrivalTime": "0001-01-01T00:00:00",
+      "Monitored": true,
+      "InCongestion": false,
+      "Delay": "PT7S",
+      "TrainBlockPart": {
+        "NumberOfBlockParts": 6
+      },
+      "BlockRef": "409:TSH01",
+      "VehicleRef": "294",
+      "VehicleMode": 4,
+      "VehicleJourneyName": "300040173",
+      "MonitoredCall": {
+        "VisitNumber": 12,
+        "VehicleAtStop": false,
+        "DestinationDisplay": "Vestli via Majorstuen",
+        "AimedArrivalTime": "2017-07-03T15:10:06+02:00",
+        "ExpectedArrivalTime": "2017-07-03T15:10:13+02:00",
+        "AimedDepartureTime": "2017-07-03T15:10:06+02:00",
+        "ExpectedDepartureTime": "2017-07-03T15:10:13+02:00",
+        "DeparturePlatformName": "2 (Retning sentrum)"
+      },
+      "VehicleFeatureRef": ""
+    },
+    "Extensions": {
+      "IsHub": false,
+      "OccupancyData": null,
+      "Deviations": [],
+      "LineColour": "EC700C",
+      "DepartureNamePreMapping": "2"
+    },
+    "StopVisitNote": []
+  }
+]

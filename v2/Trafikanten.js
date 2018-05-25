@@ -3,12 +3,19 @@
 const SimpleTypes = require("./SimpleTypes.js");
 const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
-//import type {Animation} from "./animations/Animation";
+//const testdata1 = require("./testdata/ensjø-departures-1.json");
+//const testdata2 = require("./testdata/ensjø-departures-2.json");
+const PreemptiveCache = require("./fetch/PreemptiveCache.js");
+const fetch = require("node-fetch");
+const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
+const JsonFetcher = require("./fetch/ValueFetcherAndFormatter.js").JsonFetcher;
+
 type MonitoredCall = {
     ExpectedDepartureTime : string
 }
 
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
+import type {MessageProvider} from "./provider/MessageProvider";
 
 
 type MonitoredVehicleJourney = {
@@ -32,34 +39,54 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
-class Trafikanten {
+class Trafikanten implements MessageProvider {
+
+    id : string;
+    _valueFetcher : ValueFetcherAndFormatter<GetDeparturesResponse>;
 
     static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
     }
 
-    formatMessage(getDeparturesResponse : GetDeparturesResponse) : MessageType {
-        let firstDeparture : MonitoredVehicleJourney = getDeparturesResponse[0].MonitoredVehicleJourney;
-        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"};
+    constructor(id : string, dataStore : PreemptiveCache) {
+        this.id = id;
+        this._valueFetcher = new ValueFetcherAndFormatter(id,
+                dataStore,
+                JsonFetcher("http://reisapi.ruter.no/StopVisit/GetDepartures/3011430"),
+                30,
+                this.format.bind(this),
+                10,
+                [Object.assign({},
+                    {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
+                    {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]
+            );
+    }
+
+    //noinspection JSUnusedGlobalSymbols
+    getMessage() : ?MessageType {
+        return this._valueFetcher.getValue();
+    }
+
+    format(getDeparturesResponse : GetDeparturesResponse) : Promise<MessageType> {
+        let now = new Date().getTime();
+        let departures = getDeparturesResponse.filter(departure =>
+            new Date(departure.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime).getTime() > now + 5 * 60 * 1000
+        );
+        let firstDeparture : MonitoredVehicleJourney = departures[0].MonitoredVehicleJourney;
+        let noAnimation : AnimationType = {animationName : "NoAnimation", timeoutTicks: 5, alignment: "left"};
         let part1 : MessagePartType = Object.assign(
             {},
-            {text: firstDeparture.LineRef},
-            Trafikanten.createFormatSpecifier(0, 12),
+            {text: firstDeparture.LineRef + " " + firstDeparture.DestinationName},
+            Trafikanten.createFormatSpecifier(0, 100),
             {animation: noAnimation}
         );
-        let part2 : MessagePartType = Object.assign(
-            {},
-            {text: firstDeparture.DestinationName},
-            Trafikanten.createFormatSpecifier(17, 100),
-            {animation: noAnimation}
-        );
-        let part3 : MessagePartType= Object.assign(
+        let part2 : MessagePartType= Object.assign(
             {},
             { text: this.formatTime(new Date(firstDeparture.MonitoredCall.ExpectedDepartureTime).getTime())},
             Trafikanten.createFormatSpecifier(100, 127),
-            {animation: noAnimation}
+            {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"}}
         );
-        let formatted = getDeparturesResponse.slice(1).map((monitoredStopVisit : MonitoredStopVisit) => {
+        let formatted = departures.slice(1).slice(0, 5).map((monitoredStopVisit : MonitoredStopVisit) => {
             let journey = monitoredStopVisit.MonitoredVehicleJourney;
             return this.formatJourney(journey);
         });
@@ -68,7 +95,9 @@ class Trafikanten {
             {text: formatted.join("  -  ")},
             Trafikanten.createFormatSpecifier(128, 255), {animation: {animationName: "ScrollingAnimation"}}
         );
-        return [part1, part2, part3, secondLine];
+        let message : MessageType = [part1, part2, secondLine];
+        message.messageId = "trafikanten-1";
+        return Promise.resolve(message);
     }
 
     formatJourney(journey : MonitoredVehicleJourney) {

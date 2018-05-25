@@ -2,7 +2,7 @@
 
 const SimpleTypes = require("./SimpleTypes.js");
 import type {Animation} from "./animations/Animation";
-import type {AnimationType, MessageType} from "./message/MessageType";
+import type {AnimationType, MessageType, PlaylistType} from "./message/MessageType";
 //import type {TextInFrame} from "./Message";
 
 const NoAnimation = require("./animations/NoAnimation.js");
@@ -18,20 +18,37 @@ let animationFactory = (animationSpec : AnimationType) : Animation => {
         case "NoAnimation" : return new NoAnimation(animationSpec.timeoutTicks, animationSpec.alignment);
         case "PagingAnimation" : return new PagingAnimation(animationSpec.ticksPerPage);
         case "ScrollingAnimation": return new Scrolling();
-        case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine);
+        case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine, animationSpec.holdOnLastLine, animationSpec.alignment, animationSpec.scrollIn, animationSpec.scrollOut);
         default: throw new Error("Unknown animation type: " + animationSpec.animationName);
     }
 };
 
 class Framer {
 
-  parse(messageType : MessageType) : Message { // TODO: Provide sensible default when spec characters are not present
-      return new Message(messageType.map(part => ({
-          frame : new Frame(part.start, part.end - part.start, animationFactory((part.animation : AnimationType)), part.lines),
-          text: part.text,
-
-      })));
+  parse(messageOrPlaylistType : (MessageType | PlaylistType)) : Array<Message> {
+      let playlistType = this.assertPlaylist(messageOrPlaylistType);
+      return playlistType.map(this.createMessage);
   }
+
+    //noinspection JSMethodCanBeStatic
+    assertPlaylist(messageOrPlaylistType : (MessageType | PlaylistType)) {
+        let playlistType: PlaylistType;
+        if (messageOrPlaylistType.playlistId) {
+            playlistType = messageOrPlaylistType;
+        } else {
+            let playlistArray: PlaylistType = [messageOrPlaylistType];
+            playlistArray.playlistId = (messageOrPlaylistType: MessageType).messageId + "-playlist";
+            playlistType = playlistArray;
+        }
+        return playlistType;
+    }
+
+    createMessage(messageType : MessageType) {
+        return new Message(messageType.map(part => ({
+            frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType)), part.lines),
+            text: part.text
+        })));
+    }
 
 }
 
