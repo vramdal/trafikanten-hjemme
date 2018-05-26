@@ -65,15 +65,23 @@ class ValueFetcherAndFormatter<R> {
     }
 }
 
-const JsonFetcher = (url : string) =>
-    () => fetch(url)
+const JsonFetcher = (url : string, options : ?{}) =>
+    () => fetch(url, options)
         .then(res => res.json());
 
-const XmlFetcher = (url : string) =>
-    () => fetch(url)
+const XmlFetcher = (url : string, options : ?{}) =>
+    () => fetch(url, options)
         .then(res => res.text())
         .then(body => Promise.resolve(xml2json.toJson(body)))
         .then(json => JSON.parse(json));
 
+const GraphQLFetcher = (url : string, headers: ?{}, graphQLQuery : string, variableFactory : () => {}) => {
+    const client = require('graphql-client')({url: url, headers: headers});
+    return () => client.query(graphQLQuery, variableFactory(), (req, res) => {
+        if (res.status === 401) {
+            throw new Error("Noe feil");
+        }
+    }).then(body => body.data);
+};
 
-module.exports = {ValueFetcherAndFormatter, JsonFetcher, XmlFetcher};
+module.exports = {ValueFetcherAndFormatter, JsonFetcher, XmlFetcher, GraphQLFetcher};

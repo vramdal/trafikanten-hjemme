@@ -16,6 +16,7 @@ const Trafikanten = require("./Trafikanten.js");
 const Yr = require("./Yr.js");
 //const displayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+const Entur = require("./Entur");
 
 
 
@@ -30,15 +31,19 @@ let fetchService = new FetchService();
 
 let yr = new Yr("yr-1", fetchService);
 
-let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
+let entur = new Entur("entur-1", fetchService);
+
+// let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
 //let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
 
 fetchService.start().then(() => {
     "use strict";
     let loop = function () {
         return Promise.all([
-            trafikanten1.getMessage(),
-            yr.getPlaylist()/*,
+            // trafikanten1.getMessage(),
+            entur.getMessage(),
+            // yr.getPlaylist()
+                /*,
                 Promise.resolve([{
                     start: 127,
                     end: 255,

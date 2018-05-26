@@ -105,7 +105,7 @@ class Trafikanten implements MessageProvider {
     }
 
 
-//noinspection JSMethodCanBeStatic
+    //noinspection JSMethodCanBeStatic
     formatTime(timestamp : number) {
         let departureTime = {
             seconds: timestamp / 1000,
