@@ -21,6 +21,7 @@ const Entur = require("./Entur");
 
 
 const FetchService = require("./fetch/PreemptiveCache.js");
+const IcsScheduleProvider = require("./schedule/IcsScheduleProvider");
 
 let framer = new Framer();
 
@@ -32,6 +33,8 @@ let fetchService = new FetchService();
 let yr = new Yr("yr-1", fetchService);
 
 let entur = new Entur("entur-1", fetchService);
+
+new IcsScheduleProvider("ics-1", fetchService);
 
 // let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
 //let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);

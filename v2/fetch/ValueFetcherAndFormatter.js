@@ -6,6 +6,8 @@ import type {CachedValueProvider} from "./Cache";
 const PreemptiveCache = require("./PreemptiveCache.js");
 const fetch = require("node-fetch");
 const xml2json = require("xml2json");
+const graphqlClient = require('graphql-client');
+const moment = require("moment");
 
 
 class ValueFetcherAndFormatter<R> {
@@ -76,12 +78,15 @@ const XmlFetcher = (url : string, options : ?{}) =>
         .then(json => JSON.parse(json));
 
 const GraphQLFetcher = (url : string, headers: ?{}, graphQLQuery : string, variableFactory : () => {}) => {
-    const client = require('graphql-client')({url: url, headers: headers});
+    const client = graphqlClient({url: url, headers: headers});
     return () => client.query(graphQLQuery, variableFactory(), (req, res) => {
         if (res.status === 401) {
             throw new Error("Noe feil");
         }
     }).then(body => body.data);
 };
+
+// https://github.com/mifi/ical-expander0
+
 
 module.exports = {ValueFetcherAndFormatter, JsonFetcher, XmlFetcher, GraphQLFetcher};
