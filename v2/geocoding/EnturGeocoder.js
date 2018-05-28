@@ -1,5 +1,6 @@
 // @flow
 const fetch = require("node-fetch");
+const settings = require("../settings");
 import type {Geocoder} from "./index";
 
 const CachedFetcher = require("../fetch/Cache.js").CachedFetcher;
@@ -13,8 +14,9 @@ class EnturGeocoder implements Geocoder {
     fetcher: CachedFetcher<string, Coordinates>;
 
     constructor() {
+        const home = settings.get("home");
         this.fetcher = new CachedFetcher({}, (placeStr) => {
-            const url = `https://api.entur.org/api/geocoder/1.1/search?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=59.91&focus.point.lon=10.76&lang=en`;
+            const url = `https://api.entur.org/api/geocoder/1.1/search?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=${home.lat}&focus.point.lon=${home.long}&lang=en`;
             return fetch(url, headers)
                 .then(res => res.json())
                 .then(json => {
