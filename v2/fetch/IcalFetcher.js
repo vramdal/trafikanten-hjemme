@@ -20,7 +20,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
                 }));
                 const allEvents = [].concat(mappedEvents, mappedOccurrences);
                 return Promise.all(
-                    mappedOccurrences.map(occurrence => occurrence.location).map(locationStr => geocoder(locationStr))
+                    allEvents.map(occurrence => occurrence.location).map(locationStr => geocoder(locationStr))
                 ).then(locationsCoordinates => {
                     const eventsWithCoordinates = allEvents.map((event, idx) => Object.assign({}, event, {coordinates: locationsCoordinates[idx]}));
                     console.log("eventsWithCoordinates", eventsWithCoordinates.map(e => `${e.startDate.toJSDate().toISOString()} - ${e.summary} - ${e.location} - ${JSON.stringify(e.coordinates)}`).join('\n'));

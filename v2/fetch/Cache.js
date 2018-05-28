@@ -23,12 +23,11 @@ class CachedFetcher<Key, Value> {
     getValue(key : Key) : Promise<Value> {
         let cached : Value = this.cache.get(key);
         if (cached === undefined) {
-            return this.fetcher(key).then((value) => {
-                this.cache.set(key, value);
-                return Promise.resolve(value);
-            });
+            let promise = this.fetcher(key);
+            this.cache.set(key, promise);
+            return promise;
         } else {
-            return Promise.resolve(cached);
+            return cached;
         }
     }
 }
