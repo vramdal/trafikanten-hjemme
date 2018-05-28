@@ -5,7 +5,7 @@ const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter").Va
 const IcalFetcher = require("../fetch/IcalFetcher");
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const IcalExpander = require("ical-expander");
-const UserSettings = require('user-settings');
+const settings = require('../settings');
 
 const fetchIntervalSeconds = 60;
 const formatIntervalSeconds = 60;
@@ -24,7 +24,6 @@ class IcalScheduleProvider {
     _formattedValueProvider : CachedValueProvider<Schedule>;
 
     constructor(id : string, dataStore : PreemptiveCache) {
-        const settings = UserSettings.file('.trafikanten-hjemme');
         let calendarUrl = settings.get("calendarUrl");
         this.id = id;
         this._fetcher = IcalFetcher(calendarUrl);
