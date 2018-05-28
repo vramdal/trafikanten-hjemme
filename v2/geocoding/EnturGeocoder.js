@@ -14,7 +14,7 @@ class EnturGeocoder implements Geocoder {
 
     constructor() {
         let fetcher = new CachedFetcher({}, (placeStr) => {
-            const url = `https://api.entur.org/api/geocoder/1.1/search?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=59.91&focus.point.lon=10.76&lang=en`;
+            const url = `https://api.entur.org/api/geocoder/1.1/autocomplete?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=59.91&focus.point.lon=10.76&lang=en`;
             return fetch(url, headers)
                 .then(res => res.json())
                 .then(json => {
