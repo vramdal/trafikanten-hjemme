@@ -5,13 +5,12 @@ import type {MessageProvider} from "./provider/MessageProvider";
 const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
 const GraphQLFetcher = require("./fetch/ValueFetcherAndFormatter.js").GraphQLFetcher;
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
-
 const apiUrl = "https://api.entur.org/journeyplanner/2.0/index/graphql";
-const telemarksvingenLatLong = [59.914240562735536,10.783734648356184];
+// const telemarksvingenLatLong = [59.914240562735536,10.783734648356184];
 //noinspection JSUnusedLocalSymbols
 const fokushallenLatLong = [59.89906, 10.8105978];
 const jobbLatLong = [59.9151881,10.7521706];
-
+const settings = require("./settings");
 const graphQlQuery = `
 # Welcome to GraphiQL
 ##################
@@ -86,14 +85,16 @@ query ($dateTime: DateTime!, $from: Location!, $to: Location!)
   }
 }`;
 
+const home = settings.get("home");
+
 const variables = {
     //"dateTime": "2018-06-04T12:51:14.000+0100",
     "dateTime": new Date().toISOString(),
     "from": {
         "name": "Telemarksvingen 8, Oslo",
         "coordinates": {
-            "latitude": telemarksvingenLatLong[0],
-            "longitude":telemarksvingenLatLong[1]
+            "latitude": home.lat,
+            "longitude":home.long
         }
     },
     "to": {
