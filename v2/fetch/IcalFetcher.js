@@ -8,20 +8,19 @@ const fetch = require("node-fetch");
 const geocoder = require("../geocoding/EnturGeocoder");
 
 export type CalendarEvent = {
-    startDate : object,
-    endDate : object,
+    startDate : Date,
+    endDate : Date,
     summary: string,
-    location: ?string,
+    location: ?Location,
     locationString: ?string,
     id: string,
     lastModified: string
-
 };
 
 
 
 const IcalFetcher = (url: string, options: ?{}) => {
-        return () => fetch(url, options)
+        return () : Promise<Array<CalendarEvent>> => fetch(url, options)
             .then(res => res.text())
             .then(ics => {
                 const day = moment();
@@ -46,25 +45,26 @@ const IcalFetcher = (url: string, options: ?{}) => {
                     lastModified : o.item.component.getFirstPropertyValue("last-modified").toString()
                 }));
 
-                function extractLocationString(str : string) : ?str {
+                function extractLocationString(str : string) : ?string {
                     // TODO
                     return str.indexOf("/") !== -1 ? str : undefined;
                 }
 
-                const allEvents : Array<CalendarEvent> = [].concat(mappedEvents, mappedOccurrences).map(icalEvent => ({
-                    startDate : new Date(icalEvent.startDate),
-                    endDate : new Date(icalEvent.endDate),
-                    summary: icalEvent.summary,
-                    location: undefined,
-                    locationString: extractLocationString(icalEvent.summary),
-                    id: icalEvent.id,
-                    lastModified: icalEvent.lastModified
-                }));
+                const allEvents : Array<*> = [].concat(mappedEvents, mappedOccurrences);
 
                 return Promise.all(
-                    allEvents.map(occurrence => occurrence.locationName).map(locationStr => geocoder(locationStr))
+                    allEvents.map(event => event.locationName).map(locationStr => geocoder(locationStr))
                 ).then((locations : Array<Location>) => {
-                    return allEvents.map((event, idx) => Object.assign({}, event, {location: locations[idx]}));
+                    return allEvents.map((event, idx) => Object.assign({}, event, {
+                        startDate : new Date(event.startDate),
+                        endDate : new Date(event.endDate),
+                        summary: event.summary,
+                        location: undefined,
+                        locationString: extractLocationString(event.summary),
+                        id: event.id,
+                        lastModified: event.lastModified,
+                        location: locations[idx]
+                    }));
                 });
             })
     }

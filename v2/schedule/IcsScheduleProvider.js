@@ -1,5 +1,5 @@
 // @flow
-import type {CachedValueProvider} from "../fetch/Cache";
+// import type {CachedValueProvider} from "../fetch/Cache";
 import type {MessageProvider, MessageProviderIcalAdapter} from "../provider/MessageProvider";
 import type {MessageType} from "../message/MessageType";
 import type {CalendarEvent} from "../fetch/IcalFetcher";
@@ -16,44 +16,40 @@ const formatIntervalSeconds = 60;
 export type LocationString = string;
 
 export type DisplayEvent = {
-    start: string,
-    end: string,
-    scheduleProviderId: string,
-    details: Location | LocationString
+    start: Date,
+    end: Date,
+    messageProviderFactory: MessageProviderIcalAdapter<*>,
+    details: (Location | LocationString)
 }
 
 
 class IcalScheduleProvider {
 
     id : string;
-    _valueFetcher : ValueFetcherAndFormatter<any>;
+    _valueFetcher : ValueFetcherAndFormatter<Array<CalendarEvent>>;
 
     _fetcher : () => Promise<IcalExpander>;
-    _rawValueProvider : CachedValueProvider<IcalExpander>;
-    _formattedValueProvider : CachedValueProvider<MessageType>;
     _messageProviderFactory: MessageProviderIcalAdapter<*>;
-    _messageProviders: {[any]: ?MessageProvider};
+    // _messageProviders: {[any]: ?MessageProvider};
 
     constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : MessageProviderIcalAdapter<*> ) {
         this.id = id;
-        this._messageProviders = {};
         this._messageProviderFactory = messageProviderFactory;
         this._fetcher = IcalFetcher(calendarUrl);
-        this._rawValueProvider = dataStore.registerFetcher(this._fetcher, id + "-fetcher", fetchIntervalSeconds);
-        this._formattedValueProvider = dataStore.registerFetcher(this.deduceSchema.bind(this), id + "-formatter", formatIntervalSeconds);
 
         this._valueFetcher = new ValueFetcherAndFormatter(id,
             dataStore,
             this._fetcher,
-            60,
-            this.deduceSchema.bind(this),
-            2,
+            fetchIntervalSeconds,
+            this.deduceSchema.bind(this, () => new Date()),
+            formatIntervalSeconds,
             [Object.assign({},
                 {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
                 {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]
         );
     }
 
+/*
     createMessageProvider(event : any) {
         const eventIdentifier = event.id + event.lastModified;
         if (!this._messageProviders[eventIdentifier]) {
@@ -61,13 +57,25 @@ class IcalScheduleProvider {
         }
         return this._messageProviders[eventIdentifier];
     }
-
+*/
 
     //noinspection JSMethodCanBeStatic
     // TODO Test
-    deduceSchema(events : Array<CalendarEvent>) : Array<DisplayEvent> {
-        let displayEvents : Array<DisplayEvent> = events.filter((event : CalendarEvent) => event.location).map(event => {});
+    deduceSchema(nowProvider : () => Date, events : Array<CalendarEvent>) : Promise<Array<DisplayEvent>> {
 
+        let now = nowProvider();
+        return Promise.resolve(
+            events
+                .filter(event => event.location)
+                .filter(event => event.endDate >= now)
+                .map((event : CalendarEvent) =>
+                    ({
+                        start: event.startDate,
+                        end: event.endDate,
+                        messageProviderFactory: this._messageProviderFactory,
+                        details: event.location
+                    })))
+    }
         // TODO: Prioritize
         // let providers = events.map(event => this.createMessageProvider(event)).filter((messageProvider : ?MessageProvider) => messageProvider);
 /*
@@ -85,7 +93,6 @@ class IcalScheduleProvider {
             return Promise.reject();
         }
 */
-    }
 
     getMessage() : ?MessageType {
         return this._valueFetcher.getValue();
