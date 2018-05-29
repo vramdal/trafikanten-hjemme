@@ -226,8 +226,8 @@ class Entur implements MessageProvider {
             "to": {
                 name: to.name,
                 coordinates: {
-                    latitude: 59.91087484057382 || to.coordinates.latitude,
-                    longitude: 10.750736100687611  || to.coordinates.longitude
+                    latitude: to.coordinates.latitude,
+                    longitude: to.coordinates.longitude
                 }
             } /*{
                 "coordinates": {
