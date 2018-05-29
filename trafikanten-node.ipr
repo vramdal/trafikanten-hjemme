@@ -16,7 +16,6 @@
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
-  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
   <component name="IdProvider" IDEtalkID="496A3CEC1CDE5007561FC6A42C70D4A1" />
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
@@ -219,6 +218,11 @@
     <dictionary name="vramdal">
       <words>
         <w>linebreaker</w>
+      </words>
+    </dictionary>
+    <dictionary name="e502955">
+      <words>
+        <w>ical</w>
       </words>
     </dictionary>
   </component>

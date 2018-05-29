@@ -11,23 +11,23 @@ const moment = require("moment");
 
 
 class ValueFetcherAndFormatter<R> {
-    _fetcher : () => Promise<R>;
+    _fetcher : () => Promise<CalendarEvent>;
     _fetchIntervalSeconds: number;
-    _formatter : (rawValue : R) => Promise<MessageType>;
+    _formatter : (rawValue : CalendarEvent) => Promise<MessageType>;
     _formatIntervalSeconds: number;
     _loadingMessage: MessageType;
     _id: string;
     _dataStore: PreemptiveCache;
-    _rawValueProvider : CachedValueProvider<R>;
+    _rawValueProvider : CachedValueProvider<CalendarEvent>;
     _formattedValueProvider : CachedValueProvider<MessageType>;
     _message : MessageType;
 
     constructor(
         id : string,
         dataStore : PreemptiveCache,
-        fetcher : () => Promise<R>,
+        fetcher : () => Promise<CalendarEvent>,
         fetchIntervalSeconds : number,
-        formatter : (rawValue : R) => Promise<MessageType>,
+        formatter : (rawValue : CalendarEvent) => Promise<MessageType>,
         formatIntervalSeconds : number = 10,
         loadingMessage : ?MessageType
     ) {
@@ -50,7 +50,7 @@ class ValueFetcherAndFormatter<R> {
 
     _format() {
         return this._rawValueProvider()
-            .then((rawValue : R) => this._formatter(rawValue))
+            .then((rawValue : CalendarEvent) => this._formatter(rawValue))
             .then((messageType : MessageType) => {
             this._message = messageType;
             return messageType;

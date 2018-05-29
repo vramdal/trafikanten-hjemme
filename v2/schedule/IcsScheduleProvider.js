@@ -2,7 +2,8 @@
 import type {CachedValueProvider} from "../fetch/Cache";
 import type {MessageProvider, MessageProviderIcalAdapter} from "../provider/MessageProvider";
 import type {MessageType} from "../message/MessageType";
-import type {PlaylistProvider} from "../provider/PlaylistProvider";
+import type {CalendarEvent} from "../fetch/IcalFetcher";
+import type {Location} from "../Place";
 
 const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter").ValueFetcherAndFormatter;
 const IcalFetcher = require("../fetch/IcalFetcher");
@@ -12,7 +13,15 @@ const IcalExpander = require("ical-expander");
 const fetchIntervalSeconds = 60;
 const formatIntervalSeconds = 60;
 
-type R = any;
+export type LocationString = string;
+
+export type DisplayEvent = {
+    start: string,
+    end: string,
+    scheduleProviderId: string,
+    details: Location | LocationString
+}
+
 
 class IcalScheduleProvider {
 
@@ -31,13 +40,13 @@ class IcalScheduleProvider {
         this._messageProviderFactory = messageProviderFactory;
         this._fetcher = IcalFetcher(calendarUrl);
         this._rawValueProvider = dataStore.registerFetcher(this._fetcher, id + "-fetcher", fetchIntervalSeconds);
-        this._formattedValueProvider = dataStore.registerFetcher(this.formatMessage.bind(this), id + "-formatter", formatIntervalSeconds);
+        this._formattedValueProvider = dataStore.registerFetcher(this.deduceSchema.bind(this), id + "-formatter", formatIntervalSeconds);
 
         this._valueFetcher = new ValueFetcherAndFormatter(id,
             dataStore,
             this._fetcher,
             60,
-            this.formatMessage.bind(this),
+            this.deduceSchema.bind(this),
             2,
             [Object.assign({},
                 {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
@@ -46,7 +55,7 @@ class IcalScheduleProvider {
     }
 
     createMessageProvider(event : any) {
-        const eventIdentifier = event.id + event.lastUpdate;
+        const eventIdentifier = event.id + event.lastModified;
         if (!this._messageProviders[eventIdentifier]) {
             this._messageProviders[eventIdentifier] = this._messageProviderFactory.createMessageProvider(event.id, event);
         }
@@ -55,9 +64,13 @@ class IcalScheduleProvider {
 
 
     //noinspection JSMethodCanBeStatic
-    formatMessage(events : R) : Promise<MessageType> {
-        let providers = events.map(event => this.createMessageProvider(event)).filter((messageProvider : ?MessageProvider) => messageProvider);
+    // TODO Test
+    deduceSchema(events : Array<CalendarEvent>) : Array<DisplayEvent> {
+        let displayEvents : Array<DisplayEvent> = events.filter((event : CalendarEvent) => event.location).map(event => {});
+
         // TODO: Prioritize
+        // let providers = events.map(event => this.createMessageProvider(event)).filter((messageProvider : ?MessageProvider) => messageProvider);
+/*
         if (providers.length > 0) {
             let provider : (MessageProvider | PlaylistProvider) = providers[0];
             if (typeof provider.getMessage === "function") {
@@ -71,6 +84,7 @@ class IcalScheduleProvider {
             console.warn("No events with usable providers", events);
             return Promise.reject();
         }
+*/
     }
 
     getMessage() : ?MessageType {

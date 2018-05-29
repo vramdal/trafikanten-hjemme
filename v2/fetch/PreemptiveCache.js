@@ -124,6 +124,22 @@ class PreemptiveCache implements Cache<string, *> {
             .catch(err => Promise.resolve(err));
     }
 
+    getFetcherState(fetcherId : string) : boolean {
+        let existingIndex = this._fetchers.findIndex(existing => existing.id === fetcherId);
+        if (existingIndex === -1) {
+            throw new Error("No fetcher with id " + fetcherId + " is registered");
+        }
+        if (fetcherSpec.content && fetcherSpec.errorCount === 0) {
+            return "HAS_DATA";
+        } else if (fetcherSpec.content && fetcherSpec.errorCount > 0) {
+            return "HAS_DATA_AND_ERROR";
+        } else if (!fetcherSpec.content && fetcherSpec.errorCount > 0) {
+            return "FAILED";
+        } else {
+            return "NOT_RUN";
+        }
+    }
+
     _runFetcher<V>(fetcherSpec : FetcherSpec<V>) : Promise<V> {
         console.log(`Fetching ${fetcherSpec.id}`);
         fetcherSpec.isFetching = new Promise((resolve, reject) => {
