@@ -14,27 +14,35 @@ const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 const Trafikanten = require("./Trafikanten.js");
 //const testdata = require("./testdata/ensjø-departures-1.json");
 const Yr = require("./Yr.js");
+const YrProviderFactory = require("./Yr.js").factory;
 //const displayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
 const Entur = require("./Entur");
-
-
+const EnturMessageProviderFactory = require("./Entur").factory;
+let MessageProviderFactoryRegistry = require("./MessageProviderFactoryRegistry");
 
 const FetchService = require("./fetch/PreemptiveCache.js");
+let fetchService = new FetchService();
 const IcsScheduleProvider = require("./schedule/IcsScheduleProvider");
+const settings = require('./settings');
+
+MessageProviderFactoryRegistry.register("entur", new EnturMessageProviderFactory(fetchService));
+MessageProviderFactoryRegistry.register("yr", new YrProviderFactory(fetchService));
+
 
 let framer = new Framer();
 
 let display : Display = new WebsocketDisplay();
 
 
-let fetchService = new FetchService();
+// let yr = new Yr("yr-1", fetchService);
 
-let yr = new Yr("yr-1", fetchService);
+// let entur = new Entur("entur-1", fetchService);
 
-let entur = new Entur("entur-1", fetchService);
+let calendarUrl = settings.get("calendarUrl");
 
-new IcsScheduleProvider("ics-1", fetchService);
+let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("entur"));
+// let yrIcalProvider = new IcsScheduleProvider("ics-2", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("yr"));
 
 // let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
 //let trafikanten2 = new Trafikanten("trafikanten-2", fetchService);
@@ -43,8 +51,9 @@ fetchService.start().then(() => {
     "use strict";
     let loop = function () {
         return Promise.all([
+            enturIcalProvider.getMessage(),
             // trafikanten1.getMessage(),
-            entur.getMessage(),
+            // entur.getMessage(),
             // yr.getPlaylist()
                 /*,
                 Promise.resolve([{

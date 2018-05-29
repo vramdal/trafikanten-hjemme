@@ -57,7 +57,7 @@ class ValueFetcherAndFormatter<R> {
         }).catch((error : Error) => {
                 console.error(`Error fetching ${this._id}`, error);
                 return [Object.assign({},
-                    {start: 0, end: 127, text: `Error fetching ${this._id}: ${error.message}`, lines: 2},
+                    {start: 0, end: 127, text: `Error fetching ${this._id}: ${error && error.message}`, lines: 2},
                     {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})];
             })
     }
@@ -79,11 +79,13 @@ const XmlFetcher = (url : string, options : ?{}) =>
 
 const GraphQLFetcher = (url : string, headers: ?{}, graphQLQuery : string, variableFactory : () => {}) => {
     const client = graphqlClient({url: url, headers: headers});
-    return () => client.query(graphQLQuery, variableFactory(), (req, res) => {
+    let variables = variableFactory();
+    return () => client.query(graphQLQuery, variables, (req, res) => {
         if (res.status === 401) {
             throw new Error("Noe feil");
         }
-    }).then(body => body.data);
+    }).then(body => body.data)
+        .catch(err => console.error("Error executing GraphQL query", err, "query", graphQLQuery, "variables", JSON.stringify(variables)));
 };
 
 // https://github.com/mifi/ical-expander0

@@ -27,7 +27,7 @@ class CachedFetcher<Key, Value> {
             this.cache.set(key, promise);
             return promise;
         } else {
-            return cached;
+            return Promise.resolve(cached);
         }
     }
 }

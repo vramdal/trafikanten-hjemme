@@ -2,6 +2,7 @@
 const fetch = require("node-fetch");
 const settings = require("../settings");
 import type {Geocoder} from "./index";
+import type {Location} from "../Place";
 
 const CachedFetcher = require("../fetch/Cache.js").CachedFetcher;
 
@@ -16,10 +17,14 @@ class EnturGeocoder implements Geocoder {
     constructor() {
         const home = settings.get("home");
         let fetcher = new CachedFetcher({}, (placeStr) => {
-            const url = `https://api.entur.org/api/geocoder/1.1/autocomplete?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=${home.lat}&focus.point.lon=${home.long}&lang=en`;
+            const url = `https://api.entur.org/api/geocoder/1.1/autocomplete?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=${home.coordinates.latitude}&focus.point.lon=${home.coordinates.longitude}&lang=en`;
             return fetch(url, headers)
                 .then(res => res.json())
                 .then(json => {
+                    if (json.geocoding.errors) {
+                        console.error("Entur Geocoder Error", json);
+                        throw new Error(json.geocoding.errors[0]);
+                    }
                     if (json.features.length === 0
                         && json.geocoding
                         && json.geocoding.query
@@ -31,10 +36,10 @@ class EnturGeocoder implements Geocoder {
                         console.info(`No match for "${placeStr}", cannot geocode"`);
                         return null;
                     } else {
-                        let coordinates = json.features.slice(0, 1)
+                        let locations = json.features.slice(0, 1)
                             .map(feature => feature.geometry)
-                            .map(geometry => ({lat: geometry.coordinates[0], long: geometry.coordinates[1]}));
-                        return coordinates[0] || null;
+                            .map((geometry : Location) => ({coordinates: {latitude: geometry.coordinates[0], longitude: geometry.coordinates[1]}, name: "Her kommer navn"}));
+                        return locations[0] || null;
                     }
                 });
         });

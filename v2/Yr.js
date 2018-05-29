@@ -1,6 +1,7 @@
 // @flow
 
 import type {PlaylistProvider} from "./provider/PlaylistProvider";
+import type {MessageProviderIcalAdapter} from "./provider/MessageProvider";
 
 const fetch = require("node-fetch");
 const xml2json = require("xml2json");
@@ -18,7 +19,7 @@ import type {Alignments} from "./animations/Types";
 // const url = "http://www.yr.no/sted/Norge/Sør-Trøndelag/Trondheim/Trondheim/varsel_nu.xml";
 // const url = "http://www.yr.no/sted//Norge/Finnmark/Vadsø/Vadsø/varsel_nu.xml";
 
-const place = "Norge/Oslo/Oslo/Kampen";
+const defaultPlace = "Norge/Oslo/Oslo/Kampen";
 
 type LinkType = {
     text: string,
@@ -114,13 +115,16 @@ class Yr implements PlaylistProvider {
     _forecastFetcher : ValueFetcherAndFormatter<YrForecastResponse>;
     _precipitationFetcher: ValueFetcherAndFormatter<YrPrecipitationResponse>;
 
-    constructor(id : string, dataStore : PreemptiveCache) {
+    static factory;
+
+    //noinspection JSUnusedLocalSymbols
+    constructor(id : string, dataStore : PreemptiveCache, place : string = defaultPlace) {
         this._id = id;
 
         this._forecastFetcher = new ValueFetcherAndFormatter(
             `${this._id}-forecast`,
             dataStore,
-            XmlFetcher("http://www.yr.no/sted/" + place + "/varsel.xml"),
+            XmlFetcher("http://www.yr.no/sted/" + defaultPlace + "/varsel.xml"),
             120,
             this.formatForecast.bind(this)
         );
@@ -128,13 +132,14 @@ class Yr implements PlaylistProvider {
         this._precipitationFetcher = new ValueFetcherAndFormatter(
             `${this._id}-precipitation`,
             dataStore,
-            XmlFetcher("http://www.yr.no/sted/" + place + "/varsel_nu.xml"),
+            XmlFetcher("http://www.yr.no/sted/" + defaultPlace + "/varsel_nu.xml"),
             120,
             this.formatPrecipitation.bind(this)
 
         )
     }
 
+    //noinspection JSUnusedGlobalSymbols
     getPlaylist() : PlaylistType {
         /*        return [{
          text: "Værvarsel fra Yr, levert av NRK og Meteorologisk institutt",
@@ -245,4 +250,19 @@ class Yr implements PlaylistProvider {
 
 }
 
+class YrProviderFactory implements MessageProviderIcalAdapter<Yr> {
+    _dataStore: PreemptiveCache;
+
+
+    constructor(dataStore : PreemptiveCache) {
+        this._dataStore = dataStore;
+    }
+
+    //noinspection JSUnusedGlobalSymbols
+    createMessageProvider(id : string, options : {placeString : string}) {
+        return new Yr(id, this._dataStore, options.placeString);
+    }
+}
+
 module.exports = Yr;
+module.exports.factory = YrProviderFactory;
