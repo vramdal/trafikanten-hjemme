@@ -22,8 +22,12 @@ export type DisplayEvent = {
     details: (Location | LocationString)
 }
 
+export interface ScheduleProvider {
+    id : string
+}
 
-class IcalScheduleProvider {
+
+class IcalScheduleProvider implements ScheduleProvider {
 
     id : string;
     _valueFetcher : ValueFetcherAndFormatter<Array<CalendarEvent>>;
@@ -41,7 +45,7 @@ class IcalScheduleProvider {
             dataStore,
             this._fetcher,
             fetchIntervalSeconds,
-            this.deduceSchema.bind(this, () => new Date()),
+            this.deduceDisplaySchedule.bind(this, () => new Date()),
             formatIntervalSeconds,
             [Object.assign({},
                 {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
@@ -61,7 +65,7 @@ class IcalScheduleProvider {
 
     //noinspection JSMethodCanBeStatic
     // TODO Test
-    deduceSchema(nowProvider : () => Date, events : Array<CalendarEvent>) : Promise<Array<DisplayEvent>> {
+    deduceDisplaySchedule(nowProvider : () => Date, events : Array<CalendarEvent>) : Promise<Array<DisplayEvent>> {
 
         let now = nowProvider();
         return Promise.resolve(

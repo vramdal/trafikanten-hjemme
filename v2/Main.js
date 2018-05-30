@@ -42,6 +42,7 @@ let display : Display = new WebsocketDisplay();
 let calendarUrl = settings.get("calendarUrl");
 
 let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("entur"));
+
 // let yrIcalProvider = new IcsScheduleProvider("ics-2", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("yr"));
 
 // let trafikanten1 = new Trafikanten("trafikanten-1", fetchService);
