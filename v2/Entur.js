@@ -204,6 +204,16 @@ type EnturTripResponseBodyData = {
     trip: Trip
 }
 
+type config = {
+    fetchIntervalSeconds?: number,
+    formatIntervalSeconds?: number,
+    graphQLFetcherFactory?: (apiUrl: string, headers: any, graphQLQuery: string, variables: any) => () => Promise<any>;
+}
+
+function graphQLFetcherFactory(apiUrl: string, headers, graphQLQuery: string, variables) {
+    return GraphQLFetcher(apiUrl, headers, graphQLQuery, () => variables);
+}
+
 class Entur implements MessageProvider {
 
     id : string;
@@ -212,7 +222,7 @@ class Entur implements MessageProvider {
     static factory;
 
     //noinspection JSUnusedLocalSymbols
-    constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location) {
+    constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location, config? : config = {}) {
         const variables = {
             //"dateTime": "2018-06-04T12:51:14.000+0100",
             "dateTime": new Date().toISOString(),
@@ -242,10 +252,10 @@ class Entur implements MessageProvider {
         };
         this._valueFetcher = new ValueFetcherAndFormatter(id,
             dataStore,
-            GraphQLFetcher(apiUrl, headers, graphQlQuery, () => variables),
-            30,
+            config.graphQLFetcherFactory ? config.graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variables) : graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variables),
+            config.fetchIntervalSeconds || 30,
             this.format.bind(this),
-            10,
+            config.formatIntervalSeconds || 10,
             [Object.assign({},
                 {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
                 {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]
@@ -283,8 +293,8 @@ class Entur implements MessageProvider {
         return this._valueFetcher.getValue();
     }
 
-    getMessageAsync() {
-        return this._valueFetcher.getMessageAsync();
+    getMessageAsync(fresh : boolean = false) {
+        return this._valueFetcher.getMessageAsync(fresh);
     }
 
     format(enturTripResponseBodyData : EnturTripResponseBodyData) : Promise<MessageType> {
@@ -406,15 +416,17 @@ class EnturMessageProviderFactory implements MessageProviderIcalAdapter<Entur> {
     home: Location;
 
     static displayName: string;
+    _config: config;
 
-    constructor(dataStore : PreemptiveCache) {
+    constructor(dataStore : PreemptiveCache, config : config = {}) {
         this.dataStore = dataStore;
+        this._config = config;
         this.home = settings.get("home");
     }
 
     //noinspection JSUnusedGlobalSymbols
     createMessageProvider(id : string, options: {location : Location}) : Entur {
-        return new Entur(id, this.dataStore, this.home, options.location);
+        return new Entur(id, this.dataStore, this.home, options.location, this._config);
     }
 }
 

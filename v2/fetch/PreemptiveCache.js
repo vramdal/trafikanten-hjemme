@@ -53,12 +53,21 @@ class PreemptiveCache implements Cache<string, *> {
         this._timer = 0;
     }
 
-    getValue<V>(fetcherId : string) : Promise<V> {
-        return this.getContent(fetcherId);
+    getValue<V>(fetcherId : string, fresh : boolean = false) : Promise<V> {
+        if (!fresh) {
+            return this.getContent(fetcherId);
+        } else {
+            const existing = this.findFetcher(fetcherId);
+            return this._runFetcher(existing);
+        }
+    }
+
+    findFetcher<V>(fetcherId : string) : FetcherSpec<V> {
+        return ((this._fetchers.find(existing => existing.id === fetcherId): any): FetcherSpec<V>);
     }
 
     getContent<V>(fetcherId : string) : Promise<V> {
-        const existing  = ((this._fetchers.find(existing => existing.id === fetcherId): any) : FetcherSpec<V> );
+        const existing  = this.findFetcher(fetcherId);
         if (existing && existing.isFetching) {
             return existing.isFetching;
         } else if (existing && existing.errorCount > existing.maxErrorCount) {
@@ -144,7 +153,7 @@ class PreemptiveCache implements Cache<string, *> {
     }
 
     _runFetcher<V>(fetcherSpec : FetcherSpec<V>) : Promise<V> {
-        console.log(`Fetching ${fetcherSpec.id}`);
+        console.debug(`Fetching ${fetcherSpec.id}`);
         fetcherSpec.isFetching = new Promise((resolve, reject) => {
             const errorhandler = (error : Error) => {
                 console.error(`Error fetching ${fetcherSpec.id}. Retrying ${fetcherSpec.maxErrorCount - fetcherSpec.errorCount} more times.`, error);
@@ -166,7 +175,7 @@ class PreemptiveCache implements Cache<string, *> {
             };
             try {
                 this.doFetch(fetcherSpec).then(data => {
-                    console.log(`Fetched ${fetcherSpec.id}`);
+                    console.debug(`Fetched ${fetcherSpec.id}`);
                     fetcherSpec.content = data;
                     fetcherSpec.lastFetchedSecond = this._tick;
                     fetcherSpec.errorCount = 0;

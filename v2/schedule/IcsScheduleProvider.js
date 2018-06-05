@@ -5,7 +5,6 @@ import type {CalendarEvent} from "../fetch/IcalFetcher";
 import type {Location} from "../Place";
 import type {CachedValueProvider} from "../fetch/Cache";
 
-const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter").ValueFetcherAndFormatter;
 const IcalFetcher = require("../fetch/IcalFetcher");
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const IcalExpander = require("ical-expander");
@@ -15,7 +14,6 @@ const values = require("lodash").values;
 const keyBy = require("lodash").keyBy;
 const autoBind = require("auto-bind");
 const fetchIntervalSeconds = 60;
-const formatIntervalSeconds = 60;
 
 export type LocationString = string;
 
@@ -30,9 +28,6 @@ export type DisplayEvent = {
     }
 }
 
-type IcsDisplayEvent = DisplayEvent & {internal: {lastModified: moment}};
-
-
 export interface ScheduleProvider {
     id : string
 }
@@ -46,7 +41,6 @@ export type DisplayEventChangeset = {
 class IcalScheduleProvider implements ScheduleProvider {
 
     id : string;
-    _valueFetcher : ValueFetcherAndFormatter<Array<DisplayEvent>>;
     _valueProvider : CachedValueProvider<Array<CalendarEvent>>;
 
     _fetcher : () => Promise<IcalExpander>;
@@ -85,13 +79,29 @@ class IcalScheduleProvider implements ScheduleProvider {
                     .map(this.displayEventToChangeItem)
                     .filter(changeItem => changeItem.messageProvider);
 
-                let valueProviderKeys: {} = keyBy(calendarEvents, "id");
                 let calendarEventIds = calendarEvents.map(calendarEvent => calendarEvent.id);
                 let removed = keys(this._messageProviders).filter(calendarEventId => calendarEventIds.indexOf(calendarEventId) === -1);
                 this._calendarEventsById = keyBy(calendarEvents, calendarEvent => calendarEvent.id);
-                //let newMessageProviders = ([].concat(...added).concat(...updated)).map(changeItem => changeItem.messageProvider).forEach(messageProvider => messageProvider.getMessageAsync());
-                return {added, updated, removed};
+                let newMessageProviders = [...added, ...updated]
+                    .map(changeItem => changeItem.messageProvider)
+                    .map(messageProvider => IcalScheduleProvider.getMessageAsyncOrPlaylistAsync(messageProvider))
+                    .map(promise => promise.then(result => result).catch(err => new Error(err)));
+                return Promise.all(newMessageProviders)
+                    .then(() => ({added, updated, removed}))
+                    .catch(err => {
+                        throw new Error(err.toString())
+                    });
             });
+    }
+
+    static getMessageAsyncOrPlaylistAsync(provider : ProviderUnion) {
+        if (typeof provider.getMessageAsync === "function") {
+            return provider.getMessageAsync(true);
+        } else if (typeof provider.getPlaylistAsync === "function") {
+            return provider.getPlaylistAsync(true);
+        } else {
+            throw new Error(`Not a provider: ${provider.toString()}`);
+        }
     }
 
     displayEventToChangeItem(displayEvent : DisplayEvent) : { calendarEventId: string, displayEvent: DisplayEvent, messageProvider : ProviderUnion } {

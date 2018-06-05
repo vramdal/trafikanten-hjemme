@@ -6,7 +6,7 @@ import type {MessageType} from "../message/MessageType";
 export interface MessageProvider {
 
     getMessage() : MessageType,
-    getMessageAsync() : Promise<MessageType>;
+    getMessageAsync(fresh : boolean) : Promise<MessageType>;
     shutdown() : void;
 
 }

@@ -50,8 +50,9 @@ class ValueFetcherAndFormatter<R> {
         this._message = this._loadingMessage;
     }
     
-    getMessageAsync() {
-        return this._dataStore.getValue(this._formatterId);
+    getMessageAsync(fresh : boolean = false) {
+        return this._dataStore.getValue(this._id + "-fetcher", fresh)
+            .then(() => this._dataStore.getValue(this._formatterId, fresh));
     }
 
     _format() {
@@ -72,6 +73,7 @@ class ValueFetcherAndFormatter<R> {
         return this._message;
     }
 
+    // noinspection JSUnusedGlobalSymbols
     getState() : FetcherState {
         return this._dataStore.getFetcherState(this._formatterId);
     }
@@ -106,4 +108,5 @@ const GraphQLFetcher = (url : string, headers: ?{}, graphQLQuery : string, varia
 // https://github.com/mifi/ical-expander0
 
 
+// noinspection JSUnusedGlobalSymbols
 module.exports = {ValueFetcherAndFormatter, JsonFetcher, XmlFetcher, GraphQLFetcher};

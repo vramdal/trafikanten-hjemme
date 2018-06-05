@@ -6,7 +6,7 @@ import type {PlaylistType} from "../message/MessageType";
 export interface PlaylistProvider {
 
     getPlaylist() : PlaylistType,
-    getPlaylistAsync() : Promise<PlaylistType>;
+    getPlaylistAsync(fresh : boolean) : Promise<PlaylistType>;
     shutdown() : void;
 
 }
