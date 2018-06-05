@@ -118,11 +118,11 @@ class PreemptiveCache implements Cache<string, *> {
         return fetcherSpec.lastFetchedSecond === -1 || fetcherSpec.lastFetchedSecond + fetcherSpec.fetchIntervalSeconds < this._tick;
     }
 
-    _runFetchers() {
+    _runFetchers(refresh : boolean = false) {
         this._tick++;
         let isNotAlreadyFetchingFilter = fetcherSpec => !fetcherSpec.isFetching;
         let promises = this._fetchers
-            .filter(this._staleFetcherFilter.bind(this))
+            .filter(fetcherSpec => refresh || this._staleFetcherFilter(fetcherSpec))
             .filter(isNotAlreadyFetchingFilter)
             .map(fetcherSpec => this._runFetcher(fetcherSpec))
             .map(PreemptiveCache.reflect);

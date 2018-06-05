@@ -64,7 +64,8 @@ const IcalFetcher = (url: string, options: ?{}) => {
                         id: event.id,
                         lastModified: event.lastModified,
                         location: locations[idx]
-                    }));
+                    }))
+                        .filter(event => event.endDate > moment().toDate());
                 });
             })
     }

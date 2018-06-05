@@ -1,0 +1,50 @@
+[
+  {
+    "startDate": "2018-06-05T12:15:00.000Z",
+    "endDate": "2018-06-05T12:16:00.000Z",
+    "summary": "Varer ett minutt",
+    "locationName": "Kolsås, Norge",
+    "id": "2tamqejahnn9d6uvllqiuekk9u@google.com",
+    "lastUpdate": "2018-06-05T12:18:52Z",
+    "lastModified": "2018-06-05T12:13:54Z",
+    "location": {
+      "coordinates": {
+        "longitude": 10.501127,
+        "latitude": 59.914192
+      },
+      "name": "Her kommer navn"
+    }
+  },
+  {
+    "startDate": "2018-06-05T00:00:00.000Z",
+    "endDate": "2018-06-06T00:00:00.000Z",
+    "summary": "Til Tonsenhagen",
+    "locationName": "Tonsenhagen, Oslo, Norge",
+    "id": "7tfq73d98q438d36ua5p11fm35@google.com",
+    "lastUpdate": "2018-06-05T12:18:52Z",
+    "lastModified": "2018-06-05T12:11:43Z",
+    "location": {
+      "coordinates": {
+        "longitude": 10.828274,
+        "latitude": 59.94616
+      },
+      "name": "Her kommer navn"
+    }
+  },
+  {
+    "startDate": "2018-06-06T00:00:00.000Z",
+    "endDate": "2018-06-07T00:00:00.000Z",
+    "summary": "Jepp",
+    "locationName": "Sognsvann, Oslo kommune, Norge",
+    "id": "4oi7op2gq53323aluab2pbur88_R20180605@google.com",
+    "lastUpdate": "2018-06-05T12:18:52Z",
+    "lastModified": "2018-06-05T11:46:20Z",
+    "location": {
+      "coordinates": {
+        "longitude": 10.733935,
+        "latitude": 59.967241
+      },
+      "name": "Her kommer navn"
+    }
+  }
+]

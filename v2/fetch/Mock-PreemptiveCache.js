@@ -15,6 +15,10 @@ class PreemptiveCache extends base implements Cache<string, *> {
         this.contents = contents;
     }
 
+    set(fetcherId : string, contents: *) {
+        this.contents[fetcherId] = contents;
+    }
+
     doFetch<V>(fetcherSpec: FetcherSpec<V>): Promise<V> {
         if (this.contents[fetcherSpec.id]) {
             return Promise.resolve(this.contents[fetcherSpec.id]);
