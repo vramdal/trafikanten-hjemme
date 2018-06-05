@@ -1,6 +1,7 @@
 // @flow
 import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
-import type {MessageProvider} from "./provider/MessageProvider";
+import type {MessageProvider, MessageProviderIcalAdapter} from "./provider/MessageProvider";
+import type {Location} from './Place';
 
 const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
 const GraphQLFetcher = require("./fetch/ValueFetcherAndFormatter.js").GraphQLFetcher;
@@ -9,7 +10,7 @@ const apiUrl = "https://api.entur.org/journeyplanner/2.0/index/graphql";
 // const telemarksvingenLatLong = [59.914240562735536,10.783734648356184];
 //noinspection JSUnusedLocalSymbols
 const fokushallenLatLong = [59.89906, 10.8105978];
-const jobbLatLong = [59.9151881,10.7521706];
+// const jobbLatLong = [59.9151881,10.7521706];
 const settings = require("./settings");
 const graphQlQuery = `
 # Welcome to GraphiQL
@@ -86,25 +87,6 @@ query ($dateTime: DateTime!, $from: Location!, $to: Location!)
 }`;
 
 const home = settings.get("home");
-
-const variables = {
-    //"dateTime": "2018-06-04T12:51:14.000+0100",
-    "dateTime": new Date().toISOString(),
-    "from": {
-        "name": "Telemarksvingen 8, Oslo",
-        "coordinates": {
-            "latitude": home.lat,
-            "longitude":home.long
-        }
-    },
-    "to": {
-        "coordinates": {
-            "latitude": jobbLatLong[0],
-            "longitude": jobbLatLong[1]
-        },
-        "name": "Fokushallen"
-    }
-};
 
 /**
  * DateTime format accepting ISO dates. Return values on format: yyyy-MM-dd'T'HH:mm:ssXXXX. Example: 2017-04-23T18:25:43+0100
@@ -212,30 +194,68 @@ type TripPattern = {
 type Trip = {
     dateTime : ?DateTimeStr,
     fromPlace: ?Place,
-    tripPatterns: [TripPattern]
+    toPlace: ?Place,
+    tripPatterns: [TripPattern],
+    messageEnums : [string],
+    messageStrings : [string]
 }
 
 type EnturTripResponseBodyData = {
     trip: Trip
 }
 
+type config = {
+    fetchIntervalSeconds?: number,
+    formatIntervalSeconds?: number,
+    graphQLFetcherFactory?: (apiUrl: string, headers: any, graphQLQuery: string, variables: any) => () => Promise<any>;
+}
+
+function graphQLFetcherFactory(apiUrl: string, headers, graphQLQuery: string, variables) {
+    return GraphQLFetcher(apiUrl, headers, graphQLQuery, () => variables);
+}
+
 class Entur implements MessageProvider {
 
     id : string;
     _valueFetcher : ValueFetcherAndFormatter<EnturTripResponseBodyData>;
-    
 
-    constructor(id : string, dataStore : PreemptiveCache) {
+    static factory;
+
+    //noinspection JSUnusedLocalSymbols
+    constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location, config? : config = {}) {
+        const variables = {
+            //"dateTime": "2018-06-04T12:51:14.000+0100",
+            "dateTime": new Date().toISOString(),
+            "from": {
+                "name": "Telemarksvingen 8, Oslo",
+                "coordinates": {
+                    "latitude": home.coordinates.latitude,
+                    "longitude":home.coordinates.longitude
+                }
+            },
+            "to": {
+                name: to.name,
+                coordinates: {
+                    latitude: to.coordinates.latitude,
+                    longitude: to.coordinates.longitude
+                }
+            } /*{
+                "coordinates": {
+                    "latitude": jobbLatLong[0],
+                    "longitude": jobbLatLong[1]
+                },
+                "name": "Fokushallen"*/
+        };
         this.id = id;
         let headers = {
             'ET-Client-Name': 'trafikanten-hjemme'
         };
         this._valueFetcher = new ValueFetcherAndFormatter(id,
             dataStore,
-            GraphQLFetcher(apiUrl, headers, graphQlQuery, () => variables),
-            30,
+            config.graphQLFetcherFactory ? config.graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variables) : graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variables),
+            config.fetchIntervalSeconds || 30,
             this.format.bind(this),
-            10,
+            config.formatIntervalSeconds || 10,
             [Object.assign({},
                 {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
                 {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]
@@ -268,8 +288,13 @@ class Entur implements MessageProvider {
         }
     }
 
+    //noinspection JSUnusedGlobalSymbols
     getMessage() : ?MessageType {
         return this._valueFetcher.getValue();
+    }
+
+    getMessageAsync(fresh : boolean = false) {
+        return this._valueFetcher.getMessageAsync(fresh);
     }
 
     format(enturTripResponseBodyData : EnturTripResponseBodyData) : Promise<MessageType> {
@@ -280,8 +305,23 @@ class Entur implements MessageProvider {
         let startLegs : Array<Leg> = tripPatterns
             .map((tripPattern : TripPattern) => tripPattern.legs
                 .filter((leg : Leg) => Entur.transportModeFilter(leg.mode) && leg.serviceJourney && leg.serviceJourney.journeyPattern)[0]);
-        if (startLegs.length === 0) {
-            throw new Error("Ingen avganger");
+        if (startLegs.length === 0 && enturTripResponseBodyData.trip.messageEnums.length > 0) {
+            return Promise.resolve([Object.assign({},
+                {start: 0, end: 127, text:  `${enturTripResponseBodyData.trip.messageStrings[0]} (${this.id}, ${enturTripResponseBodyData.trip.messageEnums[0]})`, lines: 2},
+                {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]);
+
+        } else if (startLegs.length === 0
+            && enturTripResponseBodyData.trip.fromPlace
+            && enturTripResponseBodyData.trip.fromPlace.name
+            && enturTripResponseBodyData.trip.toPlace
+            && enturTripResponseBodyData.trip.toPlace.name) {
+            return Promise.resolve([Object.assign({},
+                {start: 0, end: 127, text:  `Ingen avganger fra ${enturTripResponseBodyData.trip.fromPlace.name} til ${enturTripResponseBodyData.trip.toPlace.name} (${this.id})`, lines: 2},
+                {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]);
+        } else if (startLegs.length === 0) {
+            return Promise.resolve([Object.assign({},
+                {start: 0, end: 127, text:  `Ingen avganger (${this.id})`, lines: 2},
+                {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]);
         }
         startLegs.sort((leg1 : Leg, leg2 : Leg) => {
 
@@ -352,6 +392,14 @@ class Entur implements MessageProvider {
         }
     }
 
+    toString() {
+        return this.id;
+    }
+
+    shutdown() {
+        this._valueFetcher.shutdown();
+    }
+
 }
 
 const createFormatSpecifier = (x : number, end : number) : {start : number, end : number, lines : number}  => {
@@ -363,4 +411,25 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
+class EnturMessageProviderFactory implements MessageProviderIcalAdapter<Entur> {
+    dataStore: PreemptiveCache;
+    home: Location;
+
+    static displayName: string;
+    _config: config;
+
+    constructor(dataStore : PreemptiveCache, config : config = {}) {
+        this.dataStore = dataStore;
+        this._config = config;
+        this.home = settings.get("home");
+    }
+
+    //noinspection JSUnusedGlobalSymbols
+    createMessageProvider(id : string, options: {location : Location}) : Entur {
+        return new Entur(id, this.dataStore, this.home, options.location, this._config);
+    }
+}
+
 module.exports = Entur;
+module.exports.factory = EnturMessageProviderFactory;
+EnturMessageProviderFactory.displayName = "Entur";

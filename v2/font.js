@@ -157,6 +157,15 @@ function init() {
             "     ",
             "     ",
             "     ");
+    registerCharacter('_', 5,
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "XXXXX");
     registerCharacter('.', 5,
             "     ",
             "     ",

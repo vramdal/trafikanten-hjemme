@@ -1,0 +1,427 @@
+{
+  "trip": {
+    "fromPlace": {
+      "name": "Telemarksvingen 8, Oslo"
+    },
+    "toPlace": {
+      "name": "Her kommer navn"
+    },
+    "messageEnums": [],
+    "messageStrings": [],
+    "tripPatterns": [
+      {
+        "startTime": "2018-06-05T12:07:04+0200",
+        "duration": 2171,
+        "walkDistance": 680.9247692410679,
+        "legs": [
+          {
+            "expectedStartTime": "2018-06-05T12:07:04+0200",
+            "mode": "foot",
+            "distance": 347.83899999999994,
+            "fromPlace": {
+              "name": "Telemarksvingen 8, Oslo"
+            },
+            "toPlace": {
+              "name": "Ensjø"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:12:00+0200",
+            "mode": "metro",
+            "distance": 7003.7884122948835,
+            "fromPlace": {
+              "name": "Ensjø"
+            },
+            "toPlace": {
+              "name": "Smestad"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Østerås"
+                }
+              },
+              "line": {
+                "publicCode": "2"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:27:00+0200",
+            "mode": "foot",
+            "distance": 254.76399999999998,
+            "fromPlace": {
+              "name": "Smestad"
+            },
+            "toPlace": {
+              "name": "Smestad"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:36:00+0200",
+            "mode": "bus",
+            "distance": 3112.3803323907114,
+            "fromPlace": {
+              "name": "Smestad"
+            },
+            "toPlace": {
+              "name": "Lilleaker"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Lysaker"
+                }
+              },
+              "line": {
+                "publicCode": "23"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:42:00+0200",
+            "mode": "foot",
+            "distance": 78.04099999999998,
+            "fromPlace": {
+              "name": "Lilleaker"
+            },
+            "toPlace": {
+              "name": "Her kommer navn"
+            },
+            "serviceJourney": null
+          }
+        ]
+      },
+      {
+        "startTime": "2018-06-05T12:05:04+0200",
+        "duration": 2302,
+        "walkDistance": 597.0286923193454,
+        "legs": [
+          {
+            "expectedStartTime": "2018-06-05T12:05:04+0200",
+            "mode": "foot",
+            "distance": 347.83899999999994,
+            "fromPlace": {
+              "name": "Telemarksvingen 8, Oslo"
+            },
+            "toPlace": {
+              "name": "Ensjø"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:10:00+0200",
+            "mode": "metro",
+            "distance": 3233.365518794243,
+            "fromPlace": {
+              "name": "Ensjø"
+            },
+            "toPlace": {
+              "name": "Nationaltheatret"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Vestli via Majorstuen"
+                }
+              },
+              "line": {
+                "publicCode": "4"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:18:00+0200",
+            "mode": "foot",
+            "distance": 165.436,
+            "fromPlace": {
+              "name": "Nationaltheatret"
+            },
+            "toPlace": {
+              "name": "Nationaltheatret"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:24:00+0200",
+            "mode": "tram",
+            "distance": 6174.298215855166,
+            "fromPlace": {
+              "name": "Nationaltheatret"
+            },
+            "toPlace": {
+              "name": "Lilleaker"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Bekkestua"
+                }
+              },
+              "line": {
+                "publicCode": "13"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:42:00+0200",
+            "mode": "foot",
+            "distance": 83.43599999999999,
+            "fromPlace": {
+              "name": "Lilleaker"
+            },
+            "toPlace": {
+              "name": "Her kommer navn"
+            },
+            "serviceJourney": null
+          }
+        ]
+      },
+      {
+        "startTime": "2018-06-05T12:04:05+0200",
+        "duration": 2619,
+        "walkDistance": 407.89669231677755,
+        "legs": [
+          {
+            "expectedStartTime": "2018-06-05T12:04:05+0200",
+            "mode": "foot",
+            "distance": 347.83899999999994,
+            "fromPlace": {
+              "name": "Telemarksvingen 8, Oslo"
+            },
+            "toPlace": {
+              "name": "Ensjø"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:09:01+0200",
+            "mode": "metro",
+            "distance": 12790.877741517335,
+            "fromPlace": {
+              "name": "Ensjø"
+            },
+            "toPlace": {
+              "name": "Bekkestua"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Kolsås"
+                }
+              },
+              "line": {
+                "publicCode": "3"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:35:30+0200",
+            "mode": "foot",
+            "distance": 16.832,
+            "fromPlace": {
+              "name": "Bekkestua"
+            },
+            "toPlace": {
+              "name": "Bekkestua"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:40:00+0200",
+            "mode": "tram",
+            "distance": 2995.012028819648,
+            "fromPlace": {
+              "name": "Bekkestua"
+            },
+            "toPlace": {
+              "name": "Lilleaker"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Storo-Grefsen stasjon"
+                }
+              },
+              "line": {
+                "publicCode": "13"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:47:00+0200",
+            "mode": "foot",
+            "distance": 42.978,
+            "fromPlace": {
+              "name": "Lilleaker"
+            },
+            "toPlace": {
+              "name": "Her kommer navn"
+            },
+            "serviceJourney": null
+          }
+        ]
+      },
+      {
+        "startTime": "2018-06-05T12:01:04+0200",
+        "duration": 2086,
+        "walkDistance": 680.9247692410679,
+        "legs": [
+          {
+            "expectedStartTime": "2018-06-05T12:01:04+0200",
+            "mode": "foot",
+            "distance": 347.83899999999994,
+            "fromPlace": {
+              "name": "Telemarksvingen 8, Oslo"
+            },
+            "toPlace": {
+              "name": "Ensjø"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:06:00+0200",
+            "mode": "metro",
+            "distance": 7003.7884122948835,
+            "fromPlace": {
+              "name": "Ensjø"
+            },
+            "toPlace": {
+              "name": "Smestad"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Østerås"
+                }
+              },
+              "line": {
+                "publicCode": "2"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:21:00+0200",
+            "mode": "foot",
+            "distance": 254.76399999999998,
+            "fromPlace": {
+              "name": "Smestad"
+            },
+            "toPlace": {
+              "name": "Smestad"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:28:35+0200",
+            "mode": "bus",
+            "distance": 3112.3803323907114,
+            "fromPlace": {
+              "name": "Smestad"
+            },
+            "toPlace": {
+              "name": "Lilleaker"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Lysaker"
+                }
+              },
+              "line": {
+                "publicCode": "23"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:34:35+0200",
+            "mode": "foot",
+            "distance": 78.04099999999998,
+            "fromPlace": {
+              "name": "Lilleaker"
+            },
+            "toPlace": {
+              "name": "Her kommer navn"
+            },
+            "serviceJourney": null
+          }
+        ]
+      },
+      {
+        "startTime": "2018-06-05T12:00:45+0200",
+        "duration": 2570,
+        "walkDistance": 513.261,
+        "legs": [
+          {
+            "expectedStartTime": "2018-06-05T12:00:45+0200",
+            "mode": "foot",
+            "distance": 222.223,
+            "fromPlace": {
+              "name": "Telemarksvingen 8, Oslo"
+            },
+            "toPlace": {
+              "name": "Kampen park"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:03:53+0200",
+            "mode": "bus",
+            "distance": 2424.863304399708,
+            "fromPlace": {
+              "name": "Kampen park"
+            },
+            "toPlace": {
+              "name": "Jernbanetorget"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Vippetangen"
+                }
+              },
+              "line": {
+                "publicCode": "60"
+              }
+            }
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:16:53+0200",
+            "mode": "foot",
+            "distance": 291.038,
+            "fromPlace": {
+              "name": "Jernbanetorget"
+            },
+            "toPlace": {
+              "name": "Tollboden"
+            },
+            "serviceJourney": null
+          },
+          {
+            "expectedStartTime": "2018-06-05T12:24:00+0200",
+            "mode": "bus",
+            "distance": 7350.429993997835,
+            "fromPlace": {
+              "name": "Tollboden"
+            },
+            "toPlace": {
+              "name": "Lilleaker"
+            },
+            "serviceJourney": {
+              "journeyPattern": {
+                "destinationDisplay": {
+                  "frontText": "Voksen skog"
+                }
+              },
+              "line": {
+                "publicCode": "32"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
