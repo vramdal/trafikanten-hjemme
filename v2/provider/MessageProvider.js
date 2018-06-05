@@ -2,16 +2,19 @@
 import type {PlaylistProvider} from "./PlaylistProvider";
 import type {MessageType} from "../message/MessageType";
 
+// noinspection JSUnusedGlobalSymbols
 export interface MessageProvider {
 
-    getMessage() : MessageType;
+    getMessage() : MessageType,
+    getMessageAsync() : Promise<MessageType>;
+    shutdown() : void;
 
 }
 
-type ProviderUnion = MessageProvider | PlaylistProvider;
+export type ProviderUnion = MessageProvider | PlaylistProvider;
 
 export interface MessageProviderIcalAdapter<ProviderUnion> {
 
-    createMessageProvider(id : string, options: any) : ?ProviderUnion;
+    createMessageProvider(id : string, options: any) : ProviderUnion;
 
 }

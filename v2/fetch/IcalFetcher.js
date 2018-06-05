@@ -40,7 +40,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
                     endDate: o.endDate,
                     summary: o.item.summary,
                     locationName: o.item.location,
-                    id: o.item.uid,
+                    id: `${o.item.uid}-${o.recurrenceId.toString()}`,
                     lastUpdate: o.item.component.getFirstPropertyValue("dtstamp").toString(),
                     lastModified : o.item.component.getFirstPropertyValue("last-modified").toString()
                 }));

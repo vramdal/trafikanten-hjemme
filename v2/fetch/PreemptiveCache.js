@@ -3,7 +3,7 @@
 import type {ContentFetcher} from "./ContentFetcher";
 import type {Cache, CachedValueProvider} from "./Cache";
 
-type FetcherSpec<V> = {
+export type FetcherSpec<V> = {
     fetcher : ContentFetcher<V>,
     lastFetchedSecond : number,
     content : ?V,
@@ -14,6 +14,8 @@ type FetcherSpec<V> = {
     id : string,
     fetchIntervalSeconds : number
 }
+
+export type FetcherState =  "HAS_DATA" | "HAS_DATA_AND_ERROR" | "FAILED" | "NOT_RUN";
 
 //const ERROR_FETCHER_HAS_NOT_BEEN_RUN_YET : string = "Fetcher has not been run yet";
 const ERROR_NO_CONTENT : string  = "No content";
@@ -124,11 +126,12 @@ class PreemptiveCache implements Cache<string, *> {
             .catch(err => Promise.resolve(err));
     }
 
-    getFetcherState(fetcherId : string) : boolean {
+    getFetcherState(fetcherId : string) : FetcherState {
         let existingIndex = this._fetchers.findIndex(existing => existing.id === fetcherId);
         if (existingIndex === -1) {
             throw new Error("No fetcher with id " + fetcherId + " is registered");
         }
+        let fetcherSpec = this._fetchers[existingIndex];
         if (fetcherSpec.content && fetcherSpec.errorCount === 0) {
             return "HAS_DATA";
         } else if (fetcherSpec.content && fetcherSpec.errorCount > 0) {
@@ -162,7 +165,7 @@ class PreemptiveCache implements Cache<string, *> {
                 }
             };
             try {
-                fetcherSpec.fetcher().then(data => {
+                this.doFetch(fetcherSpec).then(data => {
                     console.log(`Fetched ${fetcherSpec.id}`);
                     fetcherSpec.content = data;
                     fetcherSpec.lastFetchedSecond = this._tick;
@@ -175,6 +178,11 @@ class PreemptiveCache implements Cache<string, *> {
             }
         });
         return fetcherSpec.isFetching;
+    }
+
+    // noinspection JSMethodCanBeStatic
+    doFetch<V>(fetcherSpec : FetcherSpec<V>) : Promise<V> {
+        return fetcherSpec.fetcher();
     }
 }
 

@@ -2,12 +2,12 @@
 
 import type {MessageType} from "../message/MessageType";
 import type {CachedValueProvider} from "./Cache";
+import type {FetcherState} from "./PreemptiveCache";
 
 const PreemptiveCache = require("./PreemptiveCache.js");
 const fetch = require("node-fetch");
 const xml2json = require("xml2json");
 const graphqlClient = require('graphql-client');
-const moment = require("moment");
 
 
 class ValueFetcherAndFormatter<R> {
@@ -21,6 +21,7 @@ class ValueFetcherAndFormatter<R> {
     _rawValueProvider : CachedValueProvider<R>;
     _formattedValueProvider : CachedValueProvider<MessageType>;
     _message : MessageType;
+    _formatterId : string;
 
     constructor(
         id : string,
@@ -43,9 +44,14 @@ class ValueFetcherAndFormatter<R> {
         ;
 
         this._rawValueProvider = this._dataStore.registerFetcher(this._fetcher, this._id + "-fetcher", this._fetchIntervalSeconds);
-        this._formattedValueProvider = dataStore.registerFetcher(this._format.bind(this), id + "-formatter", this._formatIntervalSeconds);
+        this._formatterId = id + "-formatter";
+        this._formattedValueProvider = dataStore.registerFetcher(this._format.bind(this), this._formatterId, this._formatIntervalSeconds);
 
         this._message = this._loadingMessage;
+    }
+    
+    getMessageAsync() {
+        return this._dataStore.getValue(this._formatterId);
     }
 
     _format() {
@@ -64,6 +70,15 @@ class ValueFetcherAndFormatter<R> {
 
     getValue() : MessageType {
         return this._message;
+    }
+
+    getState() : FetcherState {
+        return this._dataStore.getFetcherState(this._formatterId);
+    }
+
+    shutdown() {
+        this._dataStore.unregisterFetcher(this._id + "-fetcher");
+        this._dataStore.unregisterFetcher(this._id + "-formatter");
     }
 }
 

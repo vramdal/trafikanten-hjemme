@@ -6,18 +6,18 @@ memwatch.on('leak', (info) => {
 });
 
 const Display = require("./display/Display");
-const PlaylistDisplay = require("./PlaylistDisplay.js");
+// const PlaylistDisplay = require("./PlaylistDisplay.js");
 const Framer = require("./Framer.js");
-const ConsoleDisplay = require("./display/ConsoleDisplay.js");
+// const ConsoleDisplay = require("./display/ConsoleDisplay.js");
 const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 //const SimpleTypes = require("./SimpleTypes.js");
-const Trafikanten = require("./Trafikanten.js");
+// const Trafikanten = require("./Trafikanten.js");
 //const testdata = require("./testdata/ensjø-departures-1.json");
-const Yr = require("./Yr.js");
+// const Yr = require("./Yr.js");
 const YrProviderFactory = require("./Yr.js").factory;
 //const displayEventEmitter = require("./DisplayEventEmitter.js");
-const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
-const Entur = require("./Entur");
+// const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+// const Entur = require("./Entur");
 const EnturMessageProviderFactory = require("./Entur").factory;
 let MessageProviderFactoryRegistry = require("./MessageProviderFactoryRegistry");
 
@@ -50,29 +50,50 @@ let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarU
 
 fetchService.start().then(() => {
     "use strict";
+    setInterval(() =>
+        enturIcalProvider.prepareNext().then(changeset => {
+            console.log("changeset = ", changeset);
+            enturIcalProvider.executeNext(changeset);
+            console.log("messages", enturIcalProvider.getCurrentProviders().map(provider => {
+                if (typeof provider.getMessage === "function") {
+                    return provider.getMessage().map(part => part.text).join(" ");
+                } else if (typeof provider.getPlaylist === "function") {
+                    return provider.getPlaylist()
+                } else {
+                    return "Ingenting";
+                }
+            }));
+        }), 5000);
+/*
     let loop = function () {
         return Promise.all([
-            enturIcalProvider.getMessage(),
+            enturIcalProvider.getCurrentProviders().map(provider => {
+                if (typeof provider.getMessage === "function") {
+                    return provider.getMessage();
+                } else if (typeof provider.getPlaylist === "function") {
+                    return provider.getPlaylist()
+                }
+            }),
             // trafikanten1.getMessage(),
             // entur.getMessage(),
             // yr.getPlaylist()
-                /*,
-                Promise.resolve([{
-                    start: 127,
-                    end: 255,
-                    text: "           ▂ ▂ ▂ ▂ ▂ ▂                                                                             ▃ ▃ ▃ ▃ ▃ ▃▅ ▅ ▅ ▅ ▅ ▅█ █ █ █ █ ██ █ █ █ █ █",
-                    lines: 1,
-                    animation: {animationName: "NoAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"},
-                    messageId: "staticMessage"
-                }])*/
+            //     ,
+            //     Promise.resolve([{
+            //         start: 127,
+            //         end: 255,
+            //         text: "           ▂ ▂ ▂ ▂ ▂ ▂                                                                             ▃ ▃ ▃ ▃ ▃ ▃▅ ▅ ▅ ▅ ▅ ▅█ █ █ █ █ ██ █ █ █ █ █",
+            //         lines: 1,
+            //         animation: {animationName: "NoAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"},
+            //         messageId: "staticMessage"
+            //     }])
             ])
             .then(messageSpecs => {
-/*
+/!*
                 let tempMessageSpecs = [[Object.assign({},
                     { start: 0, end: 127, text: "aaa\nbbb", lines: 1},
                     { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"}})]];
 
-*/
+*!/
                 const playlists = messageSpecs.map(framer.parse.bind(framer));
                 let mergedPlaylist = [].concat.apply([], playlists);
                 display.playlist = new PlaylistDisplay(display.eventEmitter, mergedPlaylist);
@@ -82,6 +103,7 @@ fetchService.start().then(() => {
 
     display.eventEmitter.on(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED, loop);
     loop().then(() => display.play());
+ */
 
 });
 

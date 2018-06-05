@@ -90,6 +90,9 @@
     <option wsh="false" />
     <option yui="false" />
   </component>
+  <component name="JavaScriptLibraryMappings">
+    <includedPredefinedLibrary name="Node.js Core" />
+  </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="FLOW" />
   </component>

@@ -2,8 +2,11 @@
 
 import type {PlaylistType} from "../message/MessageType";
 
+// noinspection JSUnusedGlobalSymbols
 export interface PlaylistProvider {
 
-    getPlaylist() : PlaylistType
-    
+    getPlaylist() : PlaylistType,
+    getPlaylistAsync() : Promise<PlaylistType>;
+    shutdown() : void;
+
 }

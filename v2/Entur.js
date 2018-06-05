@@ -283,6 +283,10 @@ class Entur implements MessageProvider {
         return this._valueFetcher.getValue();
     }
 
+    getMessageAsync() {
+        return this._valueFetcher.getMessageAsync();
+    }
+
     format(enturTripResponseBodyData : EnturTripResponseBodyData) : Promise<MessageType> {
         let tripPatterns = enturTripResponseBodyData.trip.tripPatterns
             && enturTripResponseBodyData.trip.tripPatterns.filter(tripPattern =>
@@ -378,6 +382,14 @@ class Entur implements MessageProvider {
         }
     }
 
+    toString() {
+        return this.id;
+    }
+
+    shutdown() {
+        this._valueFetcher.shutdown();
+    }
+
 }
 
 const createFormatSpecifier = (x : number, end : number) : {start : number, end : number, lines : number}  => {
@@ -393,19 +405,19 @@ class EnturMessageProviderFactory implements MessageProviderIcalAdapter<Entur> {
     dataStore: PreemptiveCache;
     home: Location;
 
+    static displayName: string;
+
     constructor(dataStore : PreemptiveCache) {
         this.dataStore = dataStore;
         this.home = settings.get("home");
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options: {location : Location}) : ?Entur {
-        if (!options.location) {
-            return;
-        }
+    createMessageProvider(id : string, options: {location : Location}) : Entur {
         return new Entur(id, this.dataStore, this.home, options.location);
     }
 }
 
 module.exports = Entur;
 module.exports.factory = EnturMessageProviderFactory;
+EnturMessageProviderFactory.displayName = "Entur";
