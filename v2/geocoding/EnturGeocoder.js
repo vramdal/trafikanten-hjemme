@@ -38,7 +38,7 @@ class EnturGeocoder implements Geocoder {
                     } else {
                         let locations = json.features.slice(0, 1)
                             .map(feature => feature.geometry)
-                            .map((geometry : Location) => ({coordinates: {longitude: geometry.coordinates[0], latitude: geometry.coordinates[1]}, name: "Her kommer navn"}));
+                            .map((geometry : Location) => ({coordinates: {longitude: geometry.coordinates[0], latitude: geometry.coordinates[1]}, name: placeStr}));
                         return locations[0] || null;
                     }
                 });

@@ -42,8 +42,8 @@ query ($dateTime: DateTime!, $from: Location!, $to: Location!)
     walkSpeed: 1.3
     wheelchair: false
     arriveBy: false
-    modes: [transit, foot, bicycle]
-    allowBikeRental:true
+    modes: [transit, foot]
+    allowBikeRental:false
   )
 
 #### Requested fields
