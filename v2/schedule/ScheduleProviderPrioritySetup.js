@@ -3,16 +3,22 @@
 // const React = require("React");
 // const groupBy = require("lodash").groupBy;
 // const groupBy = require("lodash").groupBy;
+import type {MessageProviderIcalAdapter} from "../provider/MessageProvider";
+
 const zip = require("lodash").zip;
+const values = require("lodash").values;
 
 export type Slot = {
     colSpan : number,
     calendarUrl: ?string
 }
 
-type Calendar = {
+export type MessageProviderName = 'Entur' | 'Yr';
+
+export type Calendar = {
     url: string,
-    name : string
+    name : string,
+    messageProvider : MessageProviderName
 }
 
 class ScheduleProviderPrioritySetup {
@@ -20,13 +26,17 @@ class ScheduleProviderPrioritySetup {
     layout : Array<Array<Slot>>;
     calendars : {[url : string] : Calendar};
 
-    constructor(layout : Array<Array<Slot>>, calendars : {[url : string] : Calendar}) {
+    constructor(layout : Array<Array<Slot>>, calendars : {[string] : Calendar}) {
         this.layout = layout;
         this.calendars = calendars;
     }
 
     mapSlotToCalendar(slot : Slot) : ?Calendar {
         return slot.calendarUrl && this.calendars[slot.calendarUrl] || undefined;
+    }
+
+    getCalendars() : Array<Calendar> {
+        return values(this.calendars);
     }
 
     getPrioritizedLists() : Array<Array<Calendar>> {

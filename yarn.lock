@@ -1042,6 +1042,10 @@ once@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/once/-/once-1.1.1.tgz#9db574933ccb08c3a7614d154032c09ea6f339e7"
 
+ontime@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/ontime/-/ontime-0.0.5.tgz#193d623eea4eb72404e2f80bf838121a3739d84f"
+
 parseurl@~1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.2.tgz#fc289d4ed8993119460c156253262cdc8de65bf3"

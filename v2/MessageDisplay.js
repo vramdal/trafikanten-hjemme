@@ -61,9 +61,12 @@ class MessageDisplay {
             let frames = this._framesThatArePlaying.slice();
             let promises = frames.map(frame => frame.tick());
             let findMax = (acc, currentValue) => Math.max(acc, currentValue);
-            Promise.all(promises).then(() => {
+            Promise.all(promises).then((results) => {
+                if (results.length === 0) {
+                    console.warn("Message has no frames - nothing to display", this._message);
+                }
                 this._framesThatArePlaying = frames.filter(frame => !frame.animationComplete);
-                let animationRemaining = frames.map(frame => frame.animationRemaining).reduce(findMax);
+                let animationRemaining = frames.map(frame => frame.animationRemaining).reduce(findMax, 0);
                 ConsoleUtils.progressBar(1 - animationRemaining);
                 this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_UPDATED, frames);
                 resolve(this._framesThatArePlaying.length);

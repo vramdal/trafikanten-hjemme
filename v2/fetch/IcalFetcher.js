@@ -23,6 +23,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
         return () : Promise<Array<CalendarEvent>> => fetch(url, options)
             .then(res => res.text())
             .then(ics => {
+                console.log("ical fetched", url);
                 const day = moment();
                 const icalExpander = new IcalExpander({ics, maxIterations: 100});
                 const events = icalExpander.between(day.startOf("day").toDate(), day.endOf("day").add(1, "hour").toDate());

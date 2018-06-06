@@ -6,7 +6,7 @@ memwatch.on('leak', (info) => {
 });
 
 const Display = require("./display/Display");
-// const PlaylistDisplay = require("./PlaylistDisplay.js");
+const PlaylistDisplay = require("./PlaylistDisplay.js");
 const Framer = require("./Framer.js");
 // const ConsoleDisplay = require("./display/ConsoleDisplay.js");
 const WebsocketDisplay = require("./display/WebsocketDisplay.js");
@@ -16,7 +16,7 @@ const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 // const Yr = require("./Yr.js");
 const YrProviderFactory = require("./Yr.js").factory;
 //const displayEventEmitter = require("./DisplayEventEmitter.js");
-// const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
 // const Entur = require("./Entur");
 const EnturMessageProviderFactory = require("./Entur").factory;
 let MessageProviderFactoryRegistry = require("./MessageProviderFactoryRegistry");
@@ -24,7 +24,9 @@ let MessageProviderFactoryRegistry = require("./MessageProviderFactoryRegistry")
 const FetchService = require("./fetch/PreemptiveCache.js");
 let fetchService = new FetchService();
 const IcsScheduleProvider = require("./schedule/IcsScheduleProvider");
+const ScheduleProviderPrioritySetup = require("./schedule/ScheduleProviderPrioritySetup");
 const settings = require('./settings');
+const moment = require("moment");
 
 MessageProviderFactoryRegistry.register("entur", new EnturMessageProviderFactory(fetchService));
 MessageProviderFactoryRegistry.register("yr", new YrProviderFactory(fetchService));
@@ -41,7 +43,9 @@ let display : Display = new WebsocketDisplay();
 
 let calendarUrl = settings.get("calendarUrl");
 
-let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("entur"));
+// let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("entur"));
+
+let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
 
 // let yrIcalProvider = new IcsScheduleProvider("ics-2", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("yr"));
 
@@ -50,20 +54,17 @@ let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarU
 
 fetchService.start().then(() => {
     "use strict";
-    setInterval(() =>
-        enturIcalProvider.prepareNext().then(changeset => {
-            console.log("changeset = ", changeset);
-            enturIcalProvider.executeNext(changeset);
-            console.log("messages", enturIcalProvider.getCurrentProviders().map(provider => {
-                if (typeof provider.getMessage === "function") {
-                    return provider.getMessage().map(part => part.text).join(" ");
-                } else if (typeof provider.getPlaylist === "function") {
-                    return provider.getPlaylist()
-                } else {
-                    return "Ingenting";
-                }
-            }));
-        }), 5000);
+    const displayPrioritizer = new DisplayPrioritizer(new ScheduleProviderPrioritySetup([[{colSpan : 1, calendarUrl}]], {[calendarUrl] : {name: "Default-kalender", url: calendarUrl, messageProvider: "Entur"}}), fetchService);
+    displayPrioritizer.start();
+    let loop = function() {
+        const messageSpecs = displayPrioritizer.getPlaylist();
+        const playlists = messageSpecs.map(framer.parse.bind(framer));
+        let mergedPlaylist = [].concat.apply([], playlists);
+        display.playlist = new PlaylistDisplay(display.eventEmitter, mergedPlaylist);
+        return Promise.all([(resolve) => {window.setTimeout(resolve, 3000)}]);
+    };
+    display.eventEmitter.on(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED, loop);
+    loop().then(() => display.play()).catch(err => {console.error(err); display.play()});
 /*
     let loop = function () {
         return Promise.all([

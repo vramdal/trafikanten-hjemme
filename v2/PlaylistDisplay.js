@@ -36,6 +36,10 @@ class PlaylistDisplay {
                 }
             );
         });
+        if (this._messages.length === 0) { // Empty playlist
+            console.warn("Empty playlist");
+            return new Promise((resolve) => setTimeout(resolve, 1000));
+        }
         return promise; // A promise that be resolved when all messages have been played
     }
 

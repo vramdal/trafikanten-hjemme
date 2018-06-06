@@ -13,7 +13,7 @@ const keys = require("lodash").keys;
 const values = require("lodash").values;
 const keyBy = require("lodash").keyBy;
 const autoBind = require("auto-bind");
-const fetchIntervalSeconds = 60;
+const fetchIntervalSeconds = 20;
 
 export type LocationString = string;
 
@@ -29,7 +29,12 @@ export type DisplayEvent = {
 }
 
 export interface ScheduleProvider {
-    id : string
+    id : string,
+    name : ?string,
+    getEventsAt(when: moment) : Promise<Array<CalendarEvent>>,
+    prepareNext(when : moment) : Promise<DisplayEventChangeset>,
+    executeNext(changeset : DisplayEventChangeset) : void,
+    getCurrentProviders() : Array<ProviderUnion>
 }
 
 export type DisplayEventChangeset = {
@@ -48,10 +53,12 @@ class IcalScheduleProvider implements ScheduleProvider {
     _messageProviders : {[calendarEventId : string] : ProviderUnion};
     _calendarEventsById: {[calendarEventId : string] : CalendarEvent};
     _displayEventChangeset : DisplayEventChangeset;
+    name : ?string;
 
-    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : MessageProviderIcalAdapter<*> ) {
+    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : MessageProviderIcalAdapter<*>, name : string ) {
         autoBind(this);
         this.id = id;
+        this.name = name;
         this._messageProviderFactory = messageProviderFactory;
         this._fetcher = IcalFetcher(calendarUrl);
         this._valueProvider = dataStore.registerFetcher(this._fetcher, this.id+"-fetcher", fetchIntervalSeconds);
@@ -59,7 +66,14 @@ class IcalScheduleProvider implements ScheduleProvider {
         this._displayEventChangeset = {};
     }
 
-    prepareNext(deadline: moment): Promise<DisplayEventChangeset> {
+    getEventsAt(when: moment) : Promise<Array<CalendarEvent>> {
+        return this._valueProvider()
+            .then((calendarEvents : Array<CalendarEvent>) =>
+                calendarEvents.filter((calendarEvent : CalendarEvent) => moment(calendarEvent.startDate) <= when && moment(calendarEvent.endDate) >= when)
+            )
+    }
+
+    prepareNext(forWhen: moment): Promise<DisplayEventChangeset> {
         return this._valueProvider()
             .then((calendarEvents : Array<CalendarEvent>) => {
                 let added = calendarEvents
@@ -67,7 +81,7 @@ class IcalScheduleProvider implements ScheduleProvider {
                     .filter(calendarEvent => calendarEvent.location)
                     .map(this.mapToDisplayEvent)
                     .filter((displayEvent: DisplayEvent) => {
-                        return displayEvent.start.isBefore(deadline) && displayEvent.end.isAfter(deadline);
+                        return displayEvent.start.isBefore(forWhen) && displayEvent.end.isAfter(forWhen);
                     })
                     .map(this.displayEventToChangeItem)
                     .filter(displayEventChange => displayEventChange.messageProvider)
@@ -99,6 +113,16 @@ class IcalScheduleProvider implements ScheduleProvider {
             return provider.getMessageAsync(true);
         } else if (typeof provider.getPlaylistAsync === "function") {
             return provider.getPlaylistAsync(true);
+        } else {
+            throw new Error(`Not a provider: ${provider.toString()}`);
+        }
+    }
+
+    static getMessageOrPlaylist(provider : ProviderUnion) {
+        if (typeof provider.getMessage === "function") {
+            return provider.getMessage();
+        } else if (typeof provider.getPlaylist === "function") {
+            return provider.getPlaylist();
         } else {
             throw new Error(`Not a provider: ${provider.toString()}`);
         }
@@ -140,8 +164,6 @@ class IcalScheduleProvider implements ScheduleProvider {
         return values(this._messageProviders)
             .filter((messageProvider : ProviderUnion) => typeof messageProvider.isReady === "function" ? messageProvider.isReady() : true)
     }
-
-    // TODO Test
 
     mapToDisplayEvent(event: CalendarEvent) : DisplayEvent {
         return {

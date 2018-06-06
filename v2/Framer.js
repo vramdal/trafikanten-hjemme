@@ -44,10 +44,16 @@ class Framer {
     }
 
     createMessage(messageType : MessageType) {
-        return new Message(messageType.map(part => ({
-            frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType)), part.lines),
-            text: part.text
-        })));
+        try {
+            console.log("Creating message for ", JSON.stringify(messageType));
+            return new Message(messageType.map(part => ({
+                frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType)), part.lines),
+                text: part.text
+            })));
+        } catch (e) {
+            console.error("Error creating message for ", JSON.stringify(messageType), e);
+            throw e;
+        }
     }
 
 }
