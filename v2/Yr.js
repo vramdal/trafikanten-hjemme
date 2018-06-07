@@ -159,15 +159,16 @@ class Yr implements PlaylistProvider {
         let periodText = (period : number) : [string, number, Alignments, number] => {
             switch (parseInt(period)) {
                 case 0 : return ["natt", 25, "center", 22812];
-                case 1 : return ["morgen", 25, "center", 12192];
+                case 1 : return ["morg", 25, "center", 12192];
                 case 2 : return ["dag", 25, "center", 30829];
-                case 3 : return ["kveld", 25, "center", 12067];
+                case 3 : return ["kvld", 25, "center", 12067];
                 default : throw new Error("Unknown period: " + period);
             }
         };
 
         let symbol = (symbolNum : (number | string)) : string => {
             switch (parseInt(symbolNum, 10)) {
+                case 1 : return String.fromCharCode(30829);
                 case 4 : return '▓';
                 case 3 : return '▒';
                 case 2 : return '░';
@@ -183,7 +184,7 @@ class Yr implements PlaylistProvider {
         times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) =>
             {
                 const width = Math.round(periodTextAndPctWidth[1] * 128 / 100);
-                let el = [String.fromCharCode(periodTextAndPctWidth[3]), lastStop, lastStop + width, periodTextAndPctWidth[2]];
+                let el = [periodTextAndPctWidth[0], lastStop, lastStop + width, periodTextAndPctWidth[2]];
                 lastStop = lastStop + width;
                 elements.push(el);
             }
