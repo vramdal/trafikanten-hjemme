@@ -78,7 +78,7 @@ class IcalScheduleProvider implements ScheduleProvider {
             .then((calendarEvents : Array<CalendarEvent>) => {
                 let added = calendarEvents
                     .filter(calendarEvent => !this._messageProviders[calendarEvent.id])
-                    .filter(calendarEvent => calendarEvent.location)
+                    .filter(calendarEvent => calendarEvent.location || calendarEvent.locationString)
                     .map(this.mapToDisplayEvent)
                     .filter((displayEvent: DisplayEvent) => {
                         return displayEvent.start.isBefore(forWhen) && displayEvent.end.isAfter(forWhen);
@@ -170,7 +170,7 @@ class IcalScheduleProvider implements ScheduleProvider {
             start: moment(event.startDate),
             end: moment(event.endDate),
             messageProviderFactory: this._messageProviderFactory,
-            details: {location: event.location},
+            details: {location: event.location, locationString: event.locationString},
             internal: {
                 calendarEventId: event.id,
                 lastModified: moment(event.lastModified)

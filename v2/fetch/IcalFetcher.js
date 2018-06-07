@@ -32,6 +32,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
                     endDate: e.endDate,
                     summary: e.summary,
                     locationName: e.location,
+                    description: e.description,
                     id: e.uid,
                     lastUpdate: e.component.getFirstPropertyValue("dtstamp").toString(),
                     lastModified: e.component.getFirstPropertyValue("last-modified").toString()
@@ -39,6 +40,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
                 const mappedOccurrences = events.occurrences.map(o => ({
                     startDate: o.startDate,
                     endDate: o.endDate,
+                    description: o.item.description,
                     summary: o.item.summary,
                     locationName: o.item.location,
                     id: `${o.item.uid}-${o.recurrenceId.toString()}`,
@@ -47,8 +49,12 @@ const IcalFetcher = (url: string, options: ?{}) => {
                 }));
 
                 function extractLocationString(str : string) : ?string {
-                    // TODO
-                    return str.indexOf("/") !== -1 ? str : undefined;
+                    const match = /([^\s^\/]*\/[^\s^\/]*\/[^\s^\/]*\/[^\s^\/]*)/.exec(str);
+                    if (match) {
+                        return match[1];
+                    } else {
+                        return str;
+                    }
                 }
 
                 const allEvents : Array<*> = [].concat(mappedEvents, mappedOccurrences);
@@ -61,7 +67,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
                         endDate : new Date(event.endDate),
                         summary: event.summary,
                         location: undefined,
-                        locationString: extractLocationString(event.summary),
+                        locationString: extractLocationString(event.description),
                         id: event.id,
                         lastModified: event.lastModified,
                         location: locations[idx]

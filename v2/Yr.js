@@ -115,7 +115,7 @@ class Yr implements PlaylistProvider {
     _forecastFetcher : ValueFetcherAndFormatter<YrForecastResponse>;
     _precipitationFetcher: ValueFetcherAndFormatter<YrPrecipitationResponse>;
 
-    static factory;
+    static factory ;
 
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, place : string = defaultPlace) {
@@ -152,6 +152,11 @@ class Yr implements PlaylistProvider {
         playlist.playlistId = "yr-playlist-1";
         return playlist;
     }
+
+    getPlaylistAsync(fresh : boolean = false) {
+        return Promise.all([this._forecastFetcher.getMessageAsync(fresh), this._precipitationFetcher.getMessageAsync(fresh)]);
+    }
+
 
     formatForecast(yrForecast : YrForecastResponse) : Promise<MessageType> {
         const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
@@ -260,8 +265,8 @@ class YrProviderFactory implements MessageProviderIcalAdapter<Yr> {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options : {placeString : string}) {
-        return new Yr(id, this._dataStore, options.placeString);
+    createMessageProvider(id : string, options : {locationString : string}) {
+        return new Yr(id, this._dataStore, options.locationString);
     }
 }
 

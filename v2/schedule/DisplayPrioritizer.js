@@ -88,12 +88,21 @@ class DisplayPrioritizer {
         return this._playlist;
     }
 
-    createPlaylist(forWhen : moment) : Promise<PlaylistType> {
+    createPlaylist(forWhen : moment) : Promise<PlaylistType> { // TODO: Needs work
         let outerPromises = [];
         for (let scheduleProviderList : Array<ScheduleProvider> of this._prioritizedScheduleProviderLists) {
-            let promises = scheduleProviderList.map((scheduleProvider : ScheduleProvider) => scheduleProvider.getEventsAt(forWhen).then(events => ({scheduleProvider, hasEvent : events.length > 0})));
-            outerPromises.push(Promise.all(promises).then((scheduleProvidersWithStatus : Array<{scheduleProvider : ScheduleProvider, hasEvent: boolean}>) =>
-                scheduleProvidersWithStatus.filter(o => o.hasEvent).map(o => o.scheduleProvider)[0]));
+            let promises = scheduleProviderList
+                .map((scheduleProvider : ScheduleProvider) => scheduleProvider
+                    .getEventsAt(forWhen)
+                    .then(events => ({scheduleProvider, hasEvent : events.length > 0})));
+
+            outerPromises.push(
+                Promise.all(promises)
+                    .then((scheduleProvidersWithStatus : Array<{scheduleProvider : ScheduleProvider, hasEvent: boolean}>) => scheduleProvidersWithStatus
+                        .filter(o => o.hasEvent)
+                        .map(o => o.scheduleProvider)
+                        [0] // TODO <--
+                    )); //
         }
         return Promise.all(outerPromises)
             .then((scheduleProviders : Array<ScheduleProvider>) => flatten(scheduleProviders

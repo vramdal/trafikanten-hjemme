@@ -47,7 +47,11 @@ class EnturGeocoder implements Geocoder {
     }
 
     getCoordinates(str : string) {
-        return this.fetcher.getValue(str);
+        if (str) {
+            return this.fetcher.getValue(str);
+        } else {
+            return undefined;
+        }
     }
 }
 

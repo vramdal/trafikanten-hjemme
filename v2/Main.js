@@ -13,7 +13,7 @@ const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 //const SimpleTypes = require("./SimpleTypes.js");
 // const Trafikanten = require("./Trafikanten.js");
 //const testdata = require("./testdata/ensjø-departures-1.json");
-// const Yr = require("./Yr.js");
+const Yr = require("./Yr.js");
 const YrProviderFactory = require("./Yr.js").factory;
 //const displayEventEmitter = require("./DisplayEventEmitter.js");
 const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
@@ -27,9 +27,10 @@ const IcsScheduleProvider = require("./schedule/IcsScheduleProvider");
 const ScheduleProviderPrioritySetup = require("./schedule/ScheduleProviderPrioritySetup");
 const settings = require('./settings');
 const moment = require("moment");
+const flatten = require("lodash").flatten;
 
-MessageProviderFactoryRegistry.register("entur", new EnturMessageProviderFactory(fetchService));
-MessageProviderFactoryRegistry.register("yr", new YrProviderFactory(fetchService));
+// MessageProviderFactoryRegistry.register("entur", new EnturMessageProviderFactory(fetchService));
+// MessageProviderFactoryRegistry.register("yr", new YrProviderFactory(fetchService));
 
 
 let framer = new Framer();
@@ -41,7 +42,7 @@ let display : Display = new WebsocketDisplay();
 
 // let entur = new Entur("entur-1", fetchService);
 
-let calendarUrl = settings.get("calendarUrl");
+let calendarUrl = settings.get("calendars");
 
 // let enturIcalProvider = new IcsScheduleProvider("ics-1", fetchService, calendarUrl, MessageProviderFactoryRegistry.get("entur"));
 
@@ -54,13 +55,15 @@ let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
 
 fetchService.start().then(() => {
     "use strict";
-    const displayPrioritizer = new DisplayPrioritizer(new ScheduleProviderPrioritySetup([[{colSpan : 1, calendarUrl}]], {[calendarUrl] : {name: "Default-kalender", url: calendarUrl, messageProvider: "Entur"}}), fetchService);
+    let calendarMap = {};
+    settings.get("calendars").forEach(calendar => calendarMap[calendar.url] = {url: calendar.url, messageProvider: calendar.messageProvider, name: calendar.name});
+    let calendarLayout = settings.get("calendars").map(calendar => [{colSpan: 1, calendarUrl: calendar.url}]);
+    const displayPrioritizer = new DisplayPrioritizer(new ScheduleProviderPrioritySetup(calendarLayout, calendarMap), fetchService);
     displayPrioritizer.start();
     let loop = function() {
-        const messageSpecs = displayPrioritizer.getPlaylist();
-        const playlists = messageSpecs.map(framer.parse.bind(framer));
-        let mergedPlaylist = [].concat.apply([], playlists);
-        display.playlist = new PlaylistDisplay(display.eventEmitter, mergedPlaylist);
+        const messageSpecs = [].concat(displayPrioritizer.getPlaylist());
+        const messages = flatten(messageSpecs.map(framer.parse.bind(framer)));
+        display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
         return Promise.all([(resolve) => {window.setTimeout(resolve, 3000)}]);
     };
     display.eventEmitter.on(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED, loop);
