@@ -1,12 +1,12 @@
 #!/bin/sh
 #Should check for updates
-cd /home/pi/trafikanten-hjemme/app
+pushd ../app
 if [ -f pidfile ];
 then
 old_pid=`cat pidfile`
-sudo kill ${old_pid}
+kill ${old_pid}
 fi
-sudo node Main.js > Main.log &
+node_modules/flow-remove-types/flow-node --harmony --inspect ./Main.js
 some_pid=$!
 echo ${some_pid} > pidfile
 #wait ${some_pid}
