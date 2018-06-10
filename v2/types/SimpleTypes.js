@@ -1,5 +1,4 @@
 // @flow
-//export type EventTypes = $Keys<typeof EventTypeNames>;
 
 export type Char = string;
 

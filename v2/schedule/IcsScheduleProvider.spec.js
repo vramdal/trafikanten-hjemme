@@ -3,7 +3,7 @@ const expect = require("chai").expect;
 const IcsScheduleProvider = require("./IcsScheduleProvider");
 const PreemptiveCache = require("../fetch/Mock-PreemptiveCache");
 const moment = require("moment");
-const Entur = require("../Entur.js");
+const Entur = require("../provider/Entur.js");
 
 let setup = function (calendarEventsJsonFilename) {
     let calendarEventsJson = require(calendarEventsJsonFilename);

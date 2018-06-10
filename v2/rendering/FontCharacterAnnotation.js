@@ -1,7 +1,7 @@
 // @flow
 
-import type {BitmapAnnotation} from "../Bitmap";
-import type {Char} from "../SimpleTypes";
+import type {BitmapAnnotation} from "../bitmap/Bitmap";
+import type {Char} from "../types/SimpleTypes";
 
 class FontCharacterAnnotation implements BitmapAnnotation {
     start : number;

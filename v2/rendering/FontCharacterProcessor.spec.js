@@ -2,8 +2,8 @@
 const expect = require("chai").expect;
 
 const FontCharacterProcessor = require("./FontCharacterProcessor.js");
-const font = require("../font");
-const bitmapTo8Lines = require('../BitmapUtil').bitmapTo8Lines;
+const font = require("./font");
+const bitmapTo8Lines = require('../bitmap/BitmapUtil').bitmapTo8Lines;
 
 describe('FontCharacterProcessor', () => {
 

@@ -1,13 +1,13 @@
 // @flow
-const Ticker = require("./Ticker.js");
-const Frame = require("./Frame.js");
-import type {CountdownPromise} from "./Ticker";
-import type {AnnotatedBitmap} from "./Bitmap";
-import type {TextInFrame} from "./Message";
-const DisplayEventEmitter = require("./DisplayEventEmitter.js");
-const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+const Ticker = require("../timing/Ticker.js");
+const Frame = require("../bitmap/Frame.js");
+import type {CountdownPromise} from "../timing/Ticker";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap";
+import type {TextInFrame} from "../types/Message";
+const DisplayEventEmitter = require("../display/DisplayEventEmitter.js");
+const EventTypeNames = require("../types/SimpleTypes.js").EventTypeNames;
 const ConsoleUtils = require("./ConsoleUtils.js");
-const Message = require("./Message.js");
+const Message = require("../types/Message.js");
 const Rastrifier = require("./Rastrifier.js");
 
 class MessageDisplay {

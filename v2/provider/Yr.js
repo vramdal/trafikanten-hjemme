@@ -1,15 +1,15 @@
 // @flow
 
-import type {PlaylistProvider} from "./provider/PlaylistProvider";
-import type {MessageProviderIcalAdapter} from "./provider/MessageProvider";
+import type {PlaylistProvider} from "./PlaylistProvider";
+import type {MessageProviderIcalAdapter} from "./MessageProvider";
 
 const Trafikanten = require("./Trafikanten.js");
-const NoAnimation = require("./animations/NoAnimation.js");
-const PreemptiveCache = require("./fetch/PreemptiveCache.js");
-const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
-const XmlFetcher = require("./fetch/ValueFetcherAndFormatter.js").XmlFetcher;
-import type {MessageType, PlaylistType} from "./message/MessageType";
-import type {Alignments} from "./animations/Types";
+const NoAnimation = require("../animations/NoAnimation.js");
+const PreemptiveCache = require("../fetch/PreemptiveCache.js");
+const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
+const XmlFetcher = require("../fetch/ValueFetcherAndFormatter.js").XmlFetcher;
+import type {MessageType, PlaylistType} from "../message/MessageType";
+import type {Alignments} from "../animations/Types";
 
 // const url = "http://www.yr.no/sted/Norge/Telemark/Bamble/Bamble/varsel_nu.xml";
 // const url = "http://www.yr.no/sted/Norge/Nordland/Bodø/Bodø/varsel_nu.xml";

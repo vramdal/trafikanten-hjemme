@@ -1,7 +1,7 @@
 // @flow
 
-import type {AnnotatedBitmap} from "../Bitmap";
-import type {FontCharSpec} from "../font";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap";
+import type {FontCharSpec} from "./font";
 
 export interface CharacterProcessor {
 

@@ -1,7 +1,7 @@
 // @flow
 
-import type {Byte} from "../SimpleTypes";
-import type {AnnotatedBitmap} from "../Bitmap.js";
+import type {Byte} from "../types/SimpleTypes";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap.js";
 
 export interface Animation {
 

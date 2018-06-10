@@ -7,8 +7,8 @@ import type {PlaylistType} from "../message/MessageType";
 
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const ScheduleProviderPrioritySetup = require("./ScheduleProviderPrioritySetup.js");
-const Yr = require("../Yr");
-const Entur = require("../Entur");
+const Yr = require("../provider/Yr");
+const Entur = require("../provider/Entur");
 const IcalScheduleProvider = require("./IcsScheduleProvider");
 const moment = require("moment");
 const mapValues = require("lodash").mapValues;

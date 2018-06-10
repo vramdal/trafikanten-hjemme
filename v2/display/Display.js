@@ -1,13 +1,13 @@
 // @flow
 
-const Playlist = require("../PlaylistDisplay.js");
+const Playlist = require("../rendering/PlaylistDisplay.js");
 
-const DisplayEventEmitter = require("../DisplayEventEmitter.js");
-import type {Layout} from "../Frame";
-import type {Bitmap} from "../Bitmap";
+const DisplayEventEmitter = require("./DisplayEventEmitter.js");
+import type {Layout} from "../bitmap/Frame";
+import type {Bitmap} from "../bitmap/Bitmap";
 import type {DisplayInterface} from './DisplayInterface';
-const Collage = require("../Collage.js");
-const EventTypeNames = require("../SimpleTypes.js").EventTypeNames;
+const Collage = require("../bitmap/Collage.js");
+const EventTypeNames = require("../types/SimpleTypes.js").EventTypeNames;
 
 class Display implements DisplayInterface {
 

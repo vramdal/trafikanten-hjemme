@@ -2,8 +2,8 @@
 
 const LinebreakAnnotation = require("./LinebreakAnnotation.js");
 
-import type {Char} from "../SimpleTypes";
-import type {AnnotatedBitmap} from "../Bitmap";
+import type {Char} from "../types/SimpleTypes";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap";
 import type {CharacterProcessor} from "./CharacterProcessor";
 
 type SoftLinebreakAtPosition = {chStart : number, chEnd: number, xStart : number, xEnd: number};

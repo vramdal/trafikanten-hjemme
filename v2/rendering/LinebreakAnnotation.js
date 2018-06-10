@@ -1,6 +1,6 @@
 // @flow
 
-import type {BitmapAnnotation} from "../Bitmap";
+import type {BitmapAnnotation} from "../bitmap/Bitmap";
 
 type LinebreakType = "Soft" | "Hard";
 

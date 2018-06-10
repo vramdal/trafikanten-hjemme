@@ -1,6 +1,6 @@
 // @flow
 
-import type {Location} from "../Place";
+import type {Location} from "../types/Place";
 
 const moment = require("moment");
 const IcalExpander = require("ical-expander");

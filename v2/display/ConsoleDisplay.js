@@ -1,7 +1,7 @@
 // @flow
 
 const Display = require("./Display.js");
-const BitmapUtil = require("../BitmapUtil.js");
+const BitmapUtil = require("../bitmap/BitmapUtil.js");
 
 import type {DisplayInterface} from "./DisplayInterface";
 

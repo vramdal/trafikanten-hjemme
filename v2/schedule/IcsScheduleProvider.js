@@ -1,7 +1,7 @@
 // @flow
 import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {CalendarEvent} from "../fetch/IcalFetcher";
-import type {Location} from "../Place";
+import type {Location} from "../types/Place";
 import type {CachedValueProvider} from "../fetch/Cache";
 import type {PlaylistType} from "../message/MessageType";
 

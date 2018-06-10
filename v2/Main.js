@@ -6,10 +6,10 @@ memwatch.on('leak', (info) => {
 });
 
 const Display = require("./display/Display");
-const PlaylistDisplay = require("./PlaylistDisplay.js");
-const Framer = require("./Framer.js");
+const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
+const Framer = require("./rendering/Framer.js");
 const WebsocketDisplay = require("./display/WebsocketDisplay.js");
-const EventTypeNames = require("./SimpleTypes.js").EventTypeNames;
+const EventTypeNames = require("./types/SimpleTypes.js").EventTypeNames;
 
 const FetchService = require("./fetch/PreemptiveCache.js");
 let fetchService = new FetchService();

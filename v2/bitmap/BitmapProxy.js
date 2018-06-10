@@ -1,7 +1,7 @@
 // @flow
 
 import type {Bitmap} from "./Bitmap";
-import type {Byte} from "./SimpleTypes";
+import type {Byte} from "../types/SimpleTypes";
 
 function BitmapProxy(source: Bitmap, width: number, getIdxTranslatedFunc : (idx : number) => Byte) : Bitmap {
     return new Proxy(new Uint8Array(source.buffer, source.byteOffset, source.length), {

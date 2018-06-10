@@ -1,8 +1,8 @@
 // @flow
 
 import type {Animation} from "./Animation";
-import type {Byte} from "../SimpleTypes";
-import type {AnnotatedBitmap} from "../Bitmap";
+import type {Byte} from "../types/SimpleTypes";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap";
 import type {Alignments} from "./Types";
 
 const TextLayout = require("./TextLayout.js");

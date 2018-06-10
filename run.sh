@@ -6,7 +6,7 @@ then
 old_pid=`cat pidfile`
 sudo kill ${old_pid}
 fi
-sudo node app.js > app.log &
+sudo node Main.js > Main.log &
 some_pid=$!
 echo ${some_pid} > pidfile
 #wait ${some_pid}

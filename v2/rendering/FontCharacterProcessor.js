@@ -1,11 +1,11 @@
 // @flow
 
 import type {CharacterProcessor} from "./CharacterProcessor";
-import type {FontCharSpec, FontMap} from "../font";
-import type {AnnotatedBitmap} from "../Bitmap";
+import type {FontCharSpec, FontMap} from "./font";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap";
 
 const FontCharacterAnnotation = require("./FontCharacterAnnotation.js");
-const Font = require("../font.js");
+const Font = require("./font.js");
 
 type GlyphAtPosition = {glyph: FontCharSpec, x: number};
 

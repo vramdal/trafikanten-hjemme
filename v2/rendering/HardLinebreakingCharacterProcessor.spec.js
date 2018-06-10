@@ -1,7 +1,7 @@
 // @flow
 const expect = require("chai").expect;
 const HardLinebreakingCharacterProcessor = require("./HardLinebreakingCharacterProcessor.js");
-import type {AnnotatedBitmap} from "../Bitmap";
+import type {AnnotatedBitmap} from "../bitmap/Bitmap";
 
 describe('HardLinebreakingCharacterProcessor', () => {
 

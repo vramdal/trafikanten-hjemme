@@ -1,16 +1,15 @@
 // @flow
 
-const SimpleTypes = require("./SimpleTypes.js");
-import type {Animation} from "./animations/Animation";
-import type {AnimationType, MessageType, PlaylistType} from "./message/MessageType";
+import type {Animation} from "../animations/Animation";
+import type {AnimationType, MessageType, PlaylistType} from "../message/MessageType";
 //import type {TextInFrame} from "./Message";
 
-const NoAnimation = require("./animations/NoAnimation.js");
-const Message = require("./Message.js");
-const Scrolling = require("./animations/Scrolling.js");
-const Frame = require("./Frame.js");
-const PagingAnimation = require("./animations/Paging.js");
-const VerticalScrollingAnimation = require("./animations/VerticalScrolling.js");
+const NoAnimation = require("../animations/NoAnimation.js");
+const Message = require("../types/Message.js");
+const Scrolling = require("../animations/Scrolling.js");
+const Frame = require("../bitmap/Frame.js");
+const PagingAnimation = require("../animations/Paging.js");
+const VerticalScrollingAnimation = require("../animations/VerticalScrolling.js");
 
 let animationFactory = (animationSpec : AnimationType) : Animation => {
     "use strict";

@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 
 const Framer = require("./Framer.js");
-const NoAnimation = require("./animations/NoAnimation.js");
+const NoAnimation = require("../animations/NoAnimation.js");
 
 
 describe('Framer', () => {

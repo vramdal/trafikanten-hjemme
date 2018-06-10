@@ -2,7 +2,7 @@
 const fetch = require("node-fetch");
 const settings = require("../settings");
 import type {Geocoder} from "./index";
-import type {Location} from "../Place";
+import type {Location} from "../types/Place";
 
 const CachedFetcher = require("../fetch/Cache.js").CachedFetcher;
 

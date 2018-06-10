@@ -3,7 +3,7 @@ const bitmapTo8Lines = require('./BitmapUtil').bitmapTo8Lines;
 const getHexFingerprint = require('./BitmapUtil').getHexFingerprint;
 const Frame = require("./Frame.js");
 const printRuler = require('./BitmapUtil').printRuler;
-const NoAnimation = require("./animations/NoAnimation.js");
+const NoAnimation = require("../animations/NoAnimation.js");
 
 describe('Frame', () => { // TODO: Write tests for non-scrolling frame also
 

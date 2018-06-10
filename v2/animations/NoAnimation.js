@@ -1,7 +1,7 @@
 // @flow
 
 import type {Animation} from "./Animation";
-import type {Bitmap} from "../Bitmap";
+import type {Bitmap} from "../bitmap/Bitmap";
 import type {Alignments} from "./Types";
 
 // type AlignmentFunc = (frameWidth : number, contentPixelLength : number) => number;

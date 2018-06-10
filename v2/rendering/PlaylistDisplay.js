@@ -1,10 +1,8 @@
 // @flow
 
 const MessageDisplay = require("./MessageDisplay");
-const Message = require("./Message.js");
-const Frame = require("./Frame.js");
-const Display = require("./display/Display.js");
-const DisplayEventEmitter = require("./DisplayEventEmitter.js");
+const Message = require("../types/Message.js");
+const DisplayEventEmitter = require("../display/DisplayEventEmitter.js");
 
 class PlaylistDisplay {
 

@@ -1,9 +1,8 @@
 // @flow
 
-import type {Layout} from "./Frame";
-const Frame = require("./Frame.js");
-const NoAnimation = require("./animations/NoAnimation.js");
-//const Scrolling = require("./animations/Scrolling.js");
+import type {Layout} from "../bitmap/Frame";
+const Frame = require("../bitmap/Frame.js");
+const NoAnimation = require("../animations/NoAnimation.js");
 
 //noinspection JSUnusedLocalSymbols
 function defaultLayout() {

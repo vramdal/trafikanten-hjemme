@@ -4,13 +4,13 @@ const LinebreakAnnotation = require("../rendering/LinebreakAnnotation.js");
 const FontCharacterAnnotation = require("../rendering/FontCharacterAnnotation.js");
 const Alignment = require("./Alignment.js");
 
-const MultilineBitmap = require("../Bitmap.js").MultilineBitmap;
+const MultilineBitmap = require("../bitmap/Bitmap.js").MultilineBitmap;
 
-import type {AnnotatedBitmap, BitmapAnnotation, Bitmap} from "../Bitmap";
+import type {AnnotatedBitmap, BitmapAnnotation, Bitmap} from "../bitmap/Bitmap";
 
 import type {Alignments} from "./Types.js";
 
-import type {Char} from "../SimpleTypes";
+import type {Char} from "../types/SimpleTypes";
 
 class TextLayout {
 

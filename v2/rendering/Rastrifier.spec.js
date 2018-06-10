@@ -2,8 +2,8 @@ let expect = require("chai").expect;
 
 let Rastrifier = require('./Rastrifier');
 
-const bitmapTo8Lines = require('./BitmapUtil').bitmapTo8Lines;
-const printRuler = require('./BitmapUtil').printRuler;
+const bitmapTo8Lines = require('../bitmap/BitmapUtil').bitmapTo8Lines;
+const printRuler = require('../bitmap/BitmapUtil').printRuler;
 
 describe('Rastrifier', () => {
 

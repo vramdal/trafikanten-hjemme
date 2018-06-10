@@ -2,12 +2,11 @@
 import type {FontCharSpec} from "./font";
 
 const font = require("./font");
-const FontCharacterProcessor = require("./rendering/FontCharacterProcessor.js");
-const SoftLinebreakingCharacterProcessor = require("./rendering/SoftLinebreakingCharacterProcessor.js");
-const HardLinebreakingCharacterProcessor = require("./rendering/HardLinebreakingCharacterProcessor.js");
-const SimpleTypes = require("./SimpleTypes.js");
-import type {AnnotatedBitmap} from './Bitmap';
-import type {CharacterProcessor} from "./rendering/CharacterProcessor";
+const FontCharacterProcessor = require("./FontCharacterProcessor.js");
+const SoftLinebreakingCharacterProcessor = require("./SoftLinebreakingCharacterProcessor.js");
+const HardLinebreakingCharacterProcessor = require("./HardLinebreakingCharacterProcessor.js");
+import type {AnnotatedBitmap} from '../bitmap/Bitmap';
+import type {CharacterProcessor} from "./CharacterProcessor";
 
 function parseString(text : string, characterProcessors : Array<CharacterProcessor>) : Array<?FontCharSpec> {
     let glyphs : Array<?FontCharSpec> = [];

@@ -1,8 +1,8 @@
 // @flow
 
 import type {Animation} from "./Animation";
-import type {Bitmap} from "../Bitmap";
-import type {Byte} from "../SimpleTypes";
+import type {Bitmap} from "../bitmap/Bitmap";
+import type {Byte} from "../types/SimpleTypes";
 
 class Scrolling implements Animation {
 

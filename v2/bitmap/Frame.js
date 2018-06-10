@@ -1,7 +1,7 @@
 // @flow
 
 import type {AnnotatedBitmap, Bitmap} from "./Bitmap";
-import type {Animation} from "./animations/Animation";
+import type {Animation} from "../animations/Animation";
 
 const BitmapProxy = require("./BitmapProxy.js");
 /**

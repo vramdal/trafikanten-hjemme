@@ -1,17 +1,17 @@
 // @flow
-import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
-import type {MessageProvider, MessageProviderIcalAdapter} from "./provider/MessageProvider";
-import type {Location} from './Place';
+import type {MessageType, AnimationType, MessagePartType} from "../message/MessageType";
+import type {MessageProvider, MessageProviderIcalAdapter} from "./MessageProvider";
+import type {Location} from '../types/Place';
 
-const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
-const GraphQLFetcher = require("./fetch/ValueFetcherAndFormatter.js").GraphQLFetcher;
-const PreemptiveCache = require("./fetch/PreemptiveCache.js");
+const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
+const GraphQLFetcher = require("../fetch/ValueFetcherAndFormatter.js").GraphQLFetcher;
+const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const apiUrl = "https://api.entur.org/journeyplanner/2.0/index/graphql";
 // const telemarksvingenLatLong = [59.914240562735536,10.783734648356184];
 //noinspection JSUnusedLocalSymbols
 const fokushallenLatLong = [59.89906, 10.8105978];
 // const jobbLatLong = [59.9151881,10.7521706];
-const settings = require("./settings");
+const settings = require("../settings/index");
 const graphQlQuery = `
 # Welcome to GraphiQL
 ##################

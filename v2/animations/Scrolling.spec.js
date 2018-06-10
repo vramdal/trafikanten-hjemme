@@ -1,11 +1,10 @@
 const expect = require("chai").expect;
-const bitmapTo8Lines = require('../BitmapUtil').bitmapTo8Lines;
-const numToPaddedHex = require('../BitmapUtil').numToPaddedHex;
-const getHexFingerprint = require('../BitmapUtil').getHexFingerprint;
-const Frame = require("../Frame.js");
-const printRuler = require('../BitmapUtil').printRuler;
+const bitmapTo8Lines = require('../bitmap/BitmapUtil').bitmapTo8Lines;
+const numToPaddedHex = require('../bitmap/BitmapUtil').numToPaddedHex;
+const getHexFingerprint = require('../bitmap/BitmapUtil').getHexFingerprint;
+const printRuler = require('../bitmap/BitmapUtil').printRuler;
 const Scrolling = require("../animations/Scrolling.js");
-const BitmapProxy = require("../BitmapProxy.js");
+const BitmapProxy = require("../bitmap/BitmapProxy.js");
 
 
 const FRAME_WIDTH = 128;

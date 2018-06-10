@@ -1,8 +1,5 @@
 const expect = require("chai").expect;
 const LinebreakingCharacterProcessor = require("./SoftLinebreakingCharacterProcessor.js");
-const Rastrifier = require("../Rastrifier.js");
-const FontCharacterProcessor = require("./FontCharacterProcessor.js");
-const font = require("../font");
 
 describe('SoftLinebreakingCharacterProcessor', () => {
 
