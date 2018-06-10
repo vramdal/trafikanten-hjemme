@@ -1,5 +1,5 @@
 # trafikanten-hjemme
 
-[![Photo](trafikanten-hjemme-liten.png)
+![Photo](trafikanten-hjemme-liten.png)
 
-[![Build Status](https://travis-ci.org/vramdal/trafikanten-hjemme.svg?branch=master)](https://travis-ci.org/vramdal/trafikanten-hjemme)
+[![Build Status](https://travis-ci.org/vramdal/trafikanten-hjemme.svg?branch=dev)](https://travis-ci.org/vramdal/trafikanten-hjemme)

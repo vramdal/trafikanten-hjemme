@@ -41,7 +41,7 @@ describe('IcsScheduleProvider.spec.js', () => {
                 .catch(err => console.error(err));
 
         });
-    });
+    }).timeout(5000);
     it('should remove messages from events that are no longer there', (done) => {
         let {calendarEventsJson, dataStore, icsScheduleProvider} = setup('../testdata/ical-with-expires-event.json');
         dataStore._runFetchers().then(() => {
@@ -57,5 +57,5 @@ describe('IcsScheduleProvider.spec.js', () => {
                 });
             });
         });
-    });
+    }).timeout(5000);
 });

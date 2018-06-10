@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node v2/**/*.spec.js",
-    "v2start": "node_modules/flow-remove-types/flow-node --harmony ./v2/Main.js"
+    "test": "node_modules/mocha/bin/mocha node_modules/flow-remove-types/flow-node **/*.spec.js",
+    "v2start": "node_modules/flow-remove-types/flow-node --harmony ./Main.js"
   },
   "dependencies": {
     "async": "~0.9.0",

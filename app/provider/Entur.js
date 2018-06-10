@@ -86,7 +86,7 @@ query ($dateTime: DateTime!, $from: Location!, $to: Location!)
   }
 }`;
 
-const home = settings.get("home");
+const home = settings.get("home") || {coordinates: {latitude : 0, longitude: 0}};
 
 /**
  * DateTime format accepting ISO dates. Return values on format: yyyy-MM-dd'T'HH:mm:ssXXXX. Example: 2017-04-23T18:25:43+0100
