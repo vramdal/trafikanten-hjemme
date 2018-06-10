@@ -4,7 +4,7 @@ export type CountdownPromise = Promise<number>;
 
 class Ticker {
     _interval: number;
-    _timer: ?number;
+    _timer: ?IntervalID;
     _func: () => CountdownPromise;
     _promise: Promise<any>;
     _resolver: () => void;

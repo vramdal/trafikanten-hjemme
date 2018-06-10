@@ -1,3 +1,4 @@
+## TODO - rewrite away from Node-red
 #!/bin/sh
 echo "Saving files from writable area"
 if [ -d /etc_rw/usernodes_w ];

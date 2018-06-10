@@ -1,5 +1,5 @@
 #!/bin/sh
-cd /home/pi/trafikanten-hjemme
+cd /home/pi/trafikanten-hjemme/app
 if [ -f pidfile ];
 then
 old_pid=`cat pidfile`
