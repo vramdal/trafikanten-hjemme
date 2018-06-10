@@ -1,0 +1,24 @@
+{
+  "calendars": [
+    {
+      "name": "Entur",
+      "url": "https://calendar.google.com/calendar/ical/....../....../basic.ics",
+      "messageProvider": "Entur"
+    },
+    {
+      "name": "Weather",
+      "url": "https://calendar.google.com/calendar/ical/....../....../basic.ics",
+      "messageProvider": "Yr"
+    }
+  ],
+
+  "googleMapsApiKey": "......",
+  "home": {
+    "coordinates": {
+      "latitude": 123.45,
+      "longitude": 678.90
+    },
+    "name": "Home, sweet home"
+  }
+}
+

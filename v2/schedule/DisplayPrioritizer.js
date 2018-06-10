@@ -1,9 +1,8 @@
 // @flow
 
-import type {DisplayEvent, ScheduleProvider} from "./IcsScheduleProvider";
+import type {DisplayEventChangeset, ScheduleProvider} from "./IcsScheduleProvider";
 import type {Calendar, MessageProviderName} from "./ScheduleProviderPrioritySetup";
-import type {MessageProviderIcalAdapter, ProviderUnion} from "../provider/MessageProvider";
-import type {DisplayEventChangeset} from "./IcsScheduleProvider";
+import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {PlaylistType} from "../message/MessageType";
 
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
@@ -28,13 +27,14 @@ class DisplayPrioritizer {
     constructor(scheduleProviderPrioritySetup : ScheduleProviderPrioritySetup, dataStore : PreemptiveCache) {
         this._dataStore = dataStore;
         this._playlist = [[Object.assign({},
-            { start: 0, end: 127, text: "aaa\nbbb", lines: 1},
+            { start: 0, end: 127, text: `Loading data for ${scheduleProviderPrioritySetup.getCalendars().length} calendars`, lines: 1},
             { animation: {animationName : "VerticalScrollingAnimation", holdOnLine: 50, holdOnLastLine: 100, alignment: "center"}})]];
+        this._playlist = [];
         this._scheduleProviderPrioritySetup = scheduleProviderPrioritySetup;
         const prioritizedCalendarSetup = this._scheduleProviderPrioritySetup.getPrioritizedLists();
         this._scheduleProviders = {};
         this._scheduleProviderPrioritySetup.getCalendars().forEach((calendar : Calendar) => {
-            let messageProviderFactory : MessageProviderIcalAdapter<*> = this.createMessageProviderFactory(calendar.messageProvider);
+            let messageProviderFactory : AdapterUnion = this.createMessageProviderFactory(calendar.messageProvider);
             if (!this._scheduleProviders[calendar.url]) {
                 this._scheduleProviders[calendar.url] = new IcalScheduleProvider(`schedule-provider-${calendar.url}`, dataStore, calendar.url, messageProviderFactory, calendar.name);
             }
@@ -53,7 +53,7 @@ class DisplayPrioritizer {
         })
     }
     // noinspection JSMethodCanBeStatic
-    createMessageProviderFactory(messageProviderName : MessageProviderName) : MessageProviderIcalAdapter<*> {
+    createMessageProviderFactory(messageProviderName : MessageProviderName) : AdapterUnion {
         switch (messageProviderName) {
             case 'Entur' : return new Entur.factory(this._dataStore);
             case 'Yr' : return new Yr.factory(this._dataStore);
@@ -88,40 +88,43 @@ class DisplayPrioritizer {
         return this._playlist;
     }
 
-    createPlaylist(forWhen : moment) : Promise<PlaylistType> { // TODO: Needs work
-        let outerPromises = [];
-        for (let scheduleProviderList : Array<ScheduleProvider> of this._prioritizedScheduleProviderLists) {
-            let promises = scheduleProviderList
-                .map((scheduleProvider : ScheduleProvider) => scheduleProvider
-                    .getEventsAt(forWhen)
-                    .then(events => ({scheduleProvider, hasEvent : events.length > 0})));
-
-            outerPromises.push(
-                Promise.all(promises)
-                    .then((scheduleProvidersWithStatus : Array<{scheduleProvider : ScheduleProvider, hasEvent: boolean}>) => scheduleProvidersWithStatus
-                        .filter(o => o.hasEvent)
-                        .map(o => o.scheduleProvider)
-                        [0] // TODO <--
-                    )); //
-        }
-        return Promise.all(outerPromises)
-            .then((scheduleProviders : Array<ScheduleProvider>) => flatten(scheduleProviders
-                .filter(Boolean)
-                .map((scheduleProvider : ScheduleProvider) => scheduleProvider.getCurrentProviders())
-                .map((providerUnions : Array<ProviderUnion>) => providerUnions
-                    .map((providerUnion : ProviderUnion) => DisplayPrioritizer.getMessageArray(providerUnion)))));
-
-
+    createPlaylist(when : moment) : Promise<Array<PlaylistType>> {
+        let columns : Array<Column> = this._prioritizedScheduleProviderLists.map(list => new Column(list));
+        return Promise.all(columns.map(column => column.getPlaylistAsync(when)))
+            .then((arrayOfAsyncPlaylists : Array<PlaylistType>) => flatten(arrayOfAsyncPlaylists))
+            .catch(err => {
+                console.error(err);
+                return [];
+            });
     }
 
-    static getMessageArray(provider : ProviderUnion) : PlaylistType {
-        if (typeof provider.getMessage === "function") {
-            return provider.getMessage();
-        } else if (typeof provider.getPlaylist === "function") {
-            return flatten(provider.getPlaylist());
-        } else {
-            throw new Error(`Not a provider: ${provider.toString()}`);
-        }
+}
+
+class Column {
+    _prioritizedScheduleProviders: Array<ScheduleProvider>;
+
+
+    constructor(prioritizedScheduleProviders : Array<ScheduleProvider>) {
+        this._prioritizedScheduleProviders = prioritizedScheduleProviders;
+    }
+
+    getPlaylist(providerUnions : ?Array<ProviderUnion>) {
+        return providerUnions && providerUnions
+            && Promise.all(providerUnions
+                .map((providerUnion => IcalScheduleProvider.getPlaylistAsync(providerUnion, true)))
+            ).then((playlists: Array<PlaylistType>) => flatten(playlists))
+    }
+
+    getPlaylistAsync(moment : moment) : Promise<PlaylistType> {
+        const promises = this._prioritizedScheduleProviders
+            .map((scheduleProvider: ScheduleProvider) => scheduleProvider.hasEventAt(moment));
+        return Promise.all(promises)
+            .then((values: Array<boolean>) => values
+                .map((b: boolean, idx: number) => b ? this._prioritizedScheduleProviders[idx] : null)
+                .filter(Boolean)
+                [0] || null)
+            .then((scheduleProvider: ?ScheduleProvider) => scheduleProvider && scheduleProvider.getProviders() || null)
+            .then(this.getPlaylist)
     }
 
 }

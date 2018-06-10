@@ -3,10 +3,7 @@
 import type {PlaylistProvider} from "./provider/PlaylistProvider";
 import type {MessageProviderIcalAdapter} from "./provider/MessageProvider";
 
-const fetch = require("node-fetch");
-const xml2json = require("xml2json");
 const Trafikanten = require("./Trafikanten.js");
-const Scrolling = require("./animations/Scrolling.js");
 const NoAnimation = require("./animations/NoAnimation.js");
 const PreemptiveCache = require("./fetch/PreemptiveCache.js");
 const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
@@ -115,7 +112,7 @@ class Yr implements PlaylistProvider {
     _forecastFetcher : ValueFetcherAndFormatter<YrForecastResponse>;
     _precipitationFetcher: ValueFetcherAndFormatter<YrPrecipitationResponse>;
 
-    static factory ;
+    static factory : Class<MessageProviderIcalAdapter<PlaylistProvider>> ;
 
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, place : string = defaultPlace) {
@@ -138,6 +135,8 @@ class Yr implements PlaylistProvider {
 
         )
     }
+
+    shutdown() {}
 
     //noinspection JSUnusedGlobalSymbols
     getPlaylist() : PlaylistType {
@@ -256,7 +255,7 @@ class Yr implements PlaylistProvider {
 
 }
 
-class YrProviderFactory implements MessageProviderIcalAdapter<Yr> {
+class YrProviderFactory implements MessageProviderIcalAdapter<PlaylistProvider> {
     _dataStore: PreemptiveCache;
 
 
@@ -265,7 +264,7 @@ class YrProviderFactory implements MessageProviderIcalAdapter<Yr> {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options : {locationString : string}) {
+    createMessageProvider(id : string, options : {locationString : string}) : Yr {
         return new Yr(id, this._dataStore, options.locationString);
     }
 }

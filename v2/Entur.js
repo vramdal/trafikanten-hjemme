@@ -219,7 +219,7 @@ class Entur implements MessageProvider {
     id : string;
     _valueFetcher : ValueFetcherAndFormatter<EnturTripResponseBodyData>;
 
-    static factory;
+    static factory : Class<MessageProviderIcalAdapter<MessageProvider>>;
 
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location, config? : config = {}) {
@@ -411,7 +411,7 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
-class EnturMessageProviderFactory implements MessageProviderIcalAdapter<Entur> {
+class EnturMessageProviderFactory implements MessageProviderIcalAdapter<MessageProvider> {
     dataStore: PreemptiveCache;
     home: Location;
 

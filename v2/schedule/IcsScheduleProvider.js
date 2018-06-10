@@ -1,9 +1,9 @@
 // @flow
-// import type {CachedValueProvider} from "../fetch/Cache";
-import type {MessageProviderIcalAdapter, ProviderUnion} from "../provider/MessageProvider";
+import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {CalendarEvent} from "../fetch/IcalFetcher";
 import type {Location} from "../Place";
 import type {CachedValueProvider} from "../fetch/Cache";
+import type {PlaylistType} from "../message/MessageType";
 
 const IcalFetcher = require("../fetch/IcalFetcher");
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
@@ -20,7 +20,7 @@ export type LocationString = string;
 export type DisplayEvent = {
     start: moment,
     end: moment,
-    messageProviderFactory: MessageProviderIcalAdapter<*>,
+    messageProviderFactory: AdapterUnion,
     details: (Location | LocationString),
     internal: {
         calendarEventId : string,
@@ -32,9 +32,11 @@ export interface ScheduleProvider {
     id : string,
     name : ?string,
     getEventsAt(when: moment) : Promise<Array<CalendarEvent>>,
+    hasEventAt(when: moment) : Promise<boolean>,
     prepareNext(when : moment) : Promise<DisplayEventChangeset>,
     executeNext(changeset : DisplayEventChangeset) : void,
-    getCurrentProviders() : Array<ProviderUnion>
+    getCurrentProviders() : Array<ProviderUnion>,
+    getProviders() : Array<ProviderUnion>,
 }
 
 export type DisplayEventChangeset = {
@@ -49,13 +51,13 @@ class IcalScheduleProvider implements ScheduleProvider {
     _valueProvider : CachedValueProvider<Array<CalendarEvent>>;
 
     _fetcher : () => Promise<IcalExpander>;
-    _messageProviderFactory: MessageProviderIcalAdapter<*>;
+    _messageProviderFactory: AdapterUnion;
     _messageProviders : {[calendarEventId : string] : ProviderUnion};
     _calendarEventsById: {[calendarEventId : string] : CalendarEvent};
     _displayEventChangeset : DisplayEventChangeset;
     name : ?string;
 
-    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : MessageProviderIcalAdapter<*>, name : string ) {
+    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : AdapterUnion, name : string ) {
         autoBind(this);
         this.id = id;
         this.name = name;
@@ -69,8 +71,17 @@ class IcalScheduleProvider implements ScheduleProvider {
     getEventsAt(when: moment) : Promise<Array<CalendarEvent>> {
         return this._valueProvider()
             .then((calendarEvents : Array<CalendarEvent>) =>
-                calendarEvents.filter((calendarEvent : CalendarEvent) => moment(calendarEvent.startDate) <= when && moment(calendarEvent.endDate) >= when)
+                calendarEvents.filter((calendarEvent : CalendarEvent) => {
+                    const start = moment(calendarEvent.startDate.getTime());
+                    const end = moment(calendarEvent.endDate.getTime());
+                    return start.isBefore(when) && end.isAfter(when);
+                })
             )
+    }
+
+    hasEventAt(when: moment) : Promise<boolean> {
+        return this.getEventsAt(when)
+            .then(events => events.length > 0);
     }
 
     prepareNext(forWhen: moment): Promise<DisplayEventChangeset> {
@@ -118,14 +129,15 @@ class IcalScheduleProvider implements ScheduleProvider {
         }
     }
 
-    static getMessageOrPlaylist(provider : ProviderUnion) {
-        if (typeof provider.getMessage === "function") {
-            return provider.getMessage();
-        } else if (typeof provider.getPlaylist === "function") {
-            return provider.getPlaylist();
+    static getPlaylistAsync(provider : ProviderUnion, fresh : boolean) : Promise<PlaylistType> {
+        if (typeof provider.getMessageAsync === "function") {
+            return provider.getMessageAsync(fresh).then(message => [message]);
+        } else if (typeof provider.getPlaylistAsync === "function") {
+            return provider.getPlaylistAsync(fresh);
         } else {
             throw new Error(`Not a provider: ${provider.toString()}`);
         }
+
     }
 
     displayEventToChangeItem(displayEvent : DisplayEvent) : { calendarEventId: string, displayEvent: DisplayEvent, messageProvider : ProviderUnion } {
@@ -163,6 +175,10 @@ class IcalScheduleProvider implements ScheduleProvider {
     getCurrentProviders() : Array<ProviderUnion> {
         return values(this._messageProviders)
             .filter((messageProvider : ProviderUnion) => typeof messageProvider.isReady === "function" ? messageProvider.isReady() : true)
+    }
+
+    getProviders() : Array<ProviderUnion> {
+        return values(this._messageProviders);
     }
 
     mapToDisplayEvent(event: CalendarEvent) : DisplayEvent {
