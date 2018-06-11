@@ -100,8 +100,10 @@ class PreemptiveCache implements Cache<string, *> {
             id
         }: any) : FetcherSpec<*>);
         if (existingIndex !== -1) {
+            console.log('Re-registering fetcher ' + id);
             this._fetchers[existingIndex] = fetcherSpec;
         } else {
+            console.log('Registering fetcher ' + id);
             this._fetchers.push(fetcherSpec);
             if (this.isStarted) {
                 this._runFetcher(fetcherSpec);
@@ -111,6 +113,7 @@ class PreemptiveCache implements Cache<string, *> {
     }
 
     unregisterFetcher(id : string) {
+        console.log("Unregistering fetcher " + id);
         let existingIndex = this._fetchers.findIndex(existing => existing.id === id);
         if (existingIndex !== -1) {
             this._fetchers.splice(existingIndex, 1);

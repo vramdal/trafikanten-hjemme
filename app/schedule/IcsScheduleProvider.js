@@ -167,7 +167,6 @@ class IcalScheduleProvider implements ScheduleProvider {
             changeset.updated.forEach((updated : {displayEvent : DisplayEvent, messageProvider : ProviderUnion}) => {
                 let obsolete = this._messageProviders[updated.displayEvent.internal.calendarEventId];
                 this._messageProviders[updated.displayEvent.internal.calendarEventId] = updated.messageProvider;
-                obsolete.shutdown();
             });
         }
     }

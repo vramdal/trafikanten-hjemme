@@ -25,7 +25,7 @@ const IcalFetcher = (url: string, options: ?{}) => {
             .then(ics => {
                 const day = moment();
                 const icalExpander = new IcalExpander({ics, maxIterations: 100});
-                const events = icalExpander.between(day.startOf("day").subtract(2, "hour").toDate(), day.endOf("day").add(2, "hour").toDate());
+                const events = icalExpander.between(day.add(-10, "day").toDate(), day.add(10, "day").toDate());
                 const mappedEvents = events.events.map(e => ({
                     startDate: e.startDate,
                     endDate: e.endDate,
