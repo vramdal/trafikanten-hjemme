@@ -28,7 +28,7 @@ export type FetchError = {
 
 class PreemptiveCache implements Cache<string, *> {
 
-    _timer : number;
+    _timer : ?IntervalID;
     _fetchers : Array<FetcherSpec<*>>;
     _tick : number;
     _tickFrequence : number;
@@ -36,7 +36,7 @@ class PreemptiveCache implements Cache<string, *> {
     constructor() {
         this._fetchers = [];
         this._tick = 0;
-        this._timer = 0;
+        this._timer = null;
         this._tickFrequence = 1000;
     }
 
@@ -49,8 +49,8 @@ class PreemptiveCache implements Cache<string, *> {
 
     stop() {
         this._tick = 0;
-        clearInterval(this._timer);
-        this._timer = 0;
+        this._timer && clearInterval(this._timer);
+        this._timer = null;
     }
 
     getValue<V>(fetcherId : string, fresh : boolean = false) : Promise<V> {
@@ -85,7 +85,7 @@ class PreemptiveCache implements Cache<string, *> {
     }
 
     get isStarted() : boolean {
-        return this._timer !== 0;
+        return this._timer !== null;
     }
 
     registerFetcher<V>(fetcher : ContentFetcher<V>, id : string, fetchIntervalSeconds : number, maxErrorCount : number = 3) : CachedValueProvider<V> {
