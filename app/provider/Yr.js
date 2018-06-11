@@ -121,7 +121,7 @@ class Yr implements PlaylistProvider {
         this._forecastFetcher = new ValueFetcherAndFormatter(
             `${this._id}-forecast`,
             dataStore,
-            XmlFetcher("http://www.yr.no/sted/" + defaultPlace + "/varsel.xml"),
+            XmlFetcher("http://www.yr.no/sted/" + place + "/varsel.xml"),
             120,
             this.formatForecast.bind(this)
         );
@@ -129,7 +129,7 @@ class Yr implements PlaylistProvider {
         this._precipitationFetcher = new ValueFetcherAndFormatter(
             `${this._id}-precipitation`,
             dataStore,
-            XmlFetcher("http://www.yr.no/sted/" + defaultPlace + "/varsel_nu.xml"),
+            XmlFetcher("http://www.yr.no/sted/" + place + "/varsel_nu.xml"),
             120,
             this.formatPrecipitation.bind(this)
 
