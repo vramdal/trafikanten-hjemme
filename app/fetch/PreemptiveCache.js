@@ -58,6 +58,9 @@ class PreemptiveCache implements Cache<string, *> {
             return this.getContent(fetcherId);
         } else {
             const existing = this.findFetcher(fetcherId);
+            if (!existing) {
+                throw new Error("Unknown fetcher id: " + fetcherId);
+            }
             return this._runFetcher(existing);
         }
     }

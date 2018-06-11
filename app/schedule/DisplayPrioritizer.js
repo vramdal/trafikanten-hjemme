@@ -91,7 +91,7 @@ class DisplayPrioritizer {
     createPlaylist(when : moment) : Promise<Array<PlaylistType>> {
         let columns : Array<Column> = this._prioritizedScheduleProviderLists.map(list => new Column(list));
         return Promise.all(columns.map(column => column.getPlaylistAsync(when)))
-            .then((arrayOfAsyncPlaylists : Array<PlaylistType>) => flatten(arrayOfAsyncPlaylists))
+            .then((arrayOfAsyncPlaylists : Array<PlaylistType>) => flatten(arrayOfAsyncPlaylists).filter((playlist : PlaylistType) => playlist !== null))
             .catch(err => {
                 console.error(err);
                 return [];
