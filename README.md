@@ -5,6 +5,16 @@
 [![Build Status](https://travis-ci.org/vramdal/trafikanten-hjemme.svg?branch=dev)](https://travis-ci.org/vramdal/trafikanten-hjemme)
 
 ## Installation
+### Create Google Calendars
+Create a calendar in Google Calendars. Call it "Public transport" or similar. 
+Set up the display schedule as calendar events. Give each event a location.
+
+Create another calendar, call it "Weather". Set up one or more events. Do not use the Location field, instead, in the 
+description field, enter a location string on the form used by Yr.no URLs, for example `Norway/Oslo/Oslo/Kikutstua/`. 
+
+For each of the two calendars, copy the _private_ ICS URL and copy them into the ...
+
+### Configuration file
 Create a configuration file `.trafikanten-hjemme` in your home directory, with the following JSON structure:
 
 ```
@@ -12,17 +22,16 @@ Create a configuration file `.trafikanten-hjemme` in your home directory, with t
   "calendars": [
     {
       "name": "Entur",
-      "url": "https://calendar.google.com/calendar/ical/....../....../basic.ics",
+      "url": "YOUR-PUBLIC_TRANSPORT-ICS-URL-HERE",
       "messageProvider": "Entur"
     },
     {
       "name": "Weather",
-      "url": "https://calendar.google.com/calendar/ical/....../....../basic.ics",
+      "url": "YOUR-WEATHER-ICS-URL-HERE",
       "messageProvider": "Yr"
     }
   ],
 
-  "googleMapsApiKey": "......",
   "home": {
     "coordinates": {
       "latitude": 123.45,
@@ -34,6 +43,7 @@ Create a configuration file `.trafikanten-hjemme` in your home directory, with t
 
 ```
 
+Make sure you enter the coordinates for your home.
 
 ## Starting the application
 ```
