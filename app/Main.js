@@ -10,6 +10,7 @@ const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
 const Framer = require("./rendering/Framer.js");
 const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 const EventTypeNames = require("./types/SimpleTypes.js").EventTypeNames;
+const createHttpUiServer = require("./http-ui/ExpressServer").createHttpUiServer;
 
 const FetchService = require("./fetch/PreemptiveCache.js");
 let fetchService = new FetchService();
@@ -18,10 +19,9 @@ const settings = require('./settings');
 const flatten = require("lodash").flatten;
 
 let framer = new Framer();
-
-let display : Display = new WebsocketDisplay();
-
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
+let uiServer = createHttpUiServer(6060);
+let display : Display = new WebsocketDisplay(6061);
 
 fetchService.start().then(() => {
     "use strict";
@@ -39,5 +39,4 @@ fetchService.start().then(() => {
     };
     display.eventEmitter.on(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED, loop);
     loop().then(() => display.play()).catch(err => {console.error(err); display.play()});
-
 });
