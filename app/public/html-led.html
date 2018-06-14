@@ -65,7 +65,7 @@
             });
 
             let openWebsocket = () => {
-                websocket = new WebSocket("ws://localhost:6061", "bitmapUpdated");
+                websocket = new WebSocket("ws://" + window.location.hostname + ":6061", "bitmapUpdated");
                 websocket.binaryType = "arraybuffer";
                 websocket.onmessage = (event) => {
                     if (event.data instanceof ArrayBuffer) {
