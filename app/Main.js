@@ -20,7 +20,7 @@ const flatten = require("lodash").flatten;
 
 let framer = new Framer();
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
-let uiServer = createHttpUiServer(6060);
+let uiServer = createHttpUiServer(6060, process.env.NODE_ENV === 'development');
 let display : Display = new WebsocketDisplay(6061);
 
 fetchService.start().then(() => {
