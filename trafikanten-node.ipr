@@ -263,6 +263,19 @@
       <method />
     </configuration>
   </component>
+  <component name="PublishConfigData" serverName="trafikanten-2.local">
+    <serverData>
+      <paths name="trafikanten-2.local">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/git/trafikanten-hjemme" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/git/trafikanten-hjemme/app" local="$PROJECT_DIR$/app" web="/app" />
+            <mapping deploy="/git/trafikanten-hjemme/frontend" local="$PROJECT_DIR$/frontend" web="/frontend" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
@@ -279,5 +292,17 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+  </component>
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0be55c38-f7ed-400a-a632-ca206790d8b8" name="trafikanten-2.local" url="http://trafikanten-2.local">
+        <fileTransfer host="trafikanten-2.local" port="22" rootFolder="/home/pi" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
   </component>
 </project>
