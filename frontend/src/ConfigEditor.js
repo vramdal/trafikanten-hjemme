@@ -3,7 +3,7 @@ import {string, arrayOf, shape, oneOf, func} from 'prop-types';
 // import fetch from 'fetch-hoc';
 import './ConfigEditor.css';
 import autoBind from 'auto-bind';
-import {remove, without} from 'lodash';
+import {remove} from 'lodash';
 import objectPath from 'object-path';
 
 class ConfigEditor extends Component
@@ -24,6 +24,7 @@ class ConfigEditor extends Component
             .then(configuration => this.setState({configuration}));
     }
 
+    // noinspection JSMethodCanBeStatic
     getEndpointUrl() {
         return `http://${window.location.hostname}:6060/config.json`;
     }
@@ -66,7 +67,8 @@ class ConfigEditor extends Component
             .catch(err => console.error(err));
     }
 
-    onReset() {
+    onReset(evt) {
+        evt.preventDefault();
         this.fetchConfig();
     }
 
@@ -81,7 +83,6 @@ class ConfigEditor extends Component
     }
 
     render() {
-        console.log("this.state = ", this.state);
         if (!this.state.configuration) {
             return <div>Loading ...</div>;
         }
@@ -98,7 +99,7 @@ class ConfigEditor extends Component
                 {this.state.configuration.calendars.map((calendar, idx) => (
                     <CalendarComponent name={"calendars." + idx + "."}
                         calendar={calendar}
-                        key={calendar.url}
+                        key={`calendar-${idx}`}
                         onFieldChange={this.onFieldChange}
                         deleteButtonClicked={this.deleteButtonClicked}/>
                     )
