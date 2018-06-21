@@ -174,6 +174,7 @@ class Yr implements PlaylistProvider {
             switch (parseInt(symbolNum, 10)) {
                 case 1 : return String.fromCharCode(30829);
                 case 4 : return '▓';
+                case 5 : return '▒' + String.fromCharCode(62246);
                 case 3 : return '▒';
                 case 2 : return '░';
                 case 9 : return '▓' + String.fromCharCode(62247);
