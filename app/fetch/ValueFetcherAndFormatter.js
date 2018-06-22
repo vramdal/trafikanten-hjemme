@@ -96,13 +96,15 @@ const XmlFetcher = (url : string, options : ?{}) =>
 
 const GraphQLFetcher = (url : string, headers: ?{}, graphQLQuery : string, variableFactory : () => {}) => {
     const client = graphqlClient({url: url, headers: headers});
-    let variables = variableFactory();
-    return () => client.query(graphQLQuery, variables, (req, res) => {
-        if (res.status === 401) {
-            throw new Error("Noe feil");
-        }
-    }).then(body => body.data)
-        .catch(err => console.error("Error executing GraphQL query", err, "query", graphQLQuery, "variables", JSON.stringify(variables)));
+    return () => {
+        let variables = variableFactory();
+        return client.query(graphQLQuery, variables, (req, res) => {
+            if (res.status === 401) {
+                throw new Error("Noe feil");
+            }
+        }).then(body => body.data)
+            .catch(err => console.error("Error executing GraphQL query", err, "query", graphQLQuery, "variables", JSON.stringify(variables)));
+    };
 };
 
 // https://github.com/mifi/ical-expander0

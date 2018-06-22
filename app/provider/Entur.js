@@ -207,11 +207,11 @@ type EnturTripResponseBodyData = {
 type config = {
     fetchIntervalSeconds?: number,
     formatIntervalSeconds?: number,
-    graphQLFetcherFactory?: (apiUrl: string, headers: any, graphQLQuery: string, variables: any) => () => Promise<any>;
+    graphQLFetcherFactory?: (apiUrl: string, headers: any, graphQLQuery: string, variableFactory: () => any) => () => Promise<any>;
 }
 
-function graphQLFetcherFactory(apiUrl: string, headers, graphQLQuery: string, variables) {
-    return GraphQLFetcher(apiUrl, headers, graphQLQuery, () => variables);
+function graphQLFetcherFactory(apiUrl: string, headers, graphQLQuery: string, variableFactory) {
+    return GraphQLFetcher(apiUrl, headers, graphQLQuery, variableFactory);
 }
 
 class Entur implements MessageProvider {
@@ -223,7 +223,7 @@ class Entur implements MessageProvider {
 
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location, config? : config = {}) {
-        const variables = {
+        const variableFactory = () => ({
             //"dateTime": "2018-06-04T12:51:14.000+0100",
             "dateTime": new Date().toISOString(),
             "from": {
@@ -245,14 +245,14 @@ class Entur implements MessageProvider {
                     "longitude": jobbLatLong[1]
                 },
                 "name": "Fokushallen"*/
-        };
+        });
         this.id = id;
         let headers = {
             'ET-Client-Name': 'trafikanten-hjemme'
         };
         this._valueFetcher = new ValueFetcherAndFormatter(id,
             dataStore,
-            config.graphQLFetcherFactory ? config.graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variables) : graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variables),
+            config.graphQLFetcherFactory ? config.graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variableFactory) : graphQLFetcherFactory(apiUrl, headers, graphQlQuery, variableFactory),
             config.fetchIntervalSeconds || 30,
             this.format.bind(this),
             config.formatIntervalSeconds || 10,
