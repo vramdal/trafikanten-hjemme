@@ -1,0 +1,14 @@
+fieldset {
+    display: flex;
+    text-align: left;
+}
+
+fieldset input, fieldset select {
+    display: block;
+    width: 100%;
+}
+
+button {
+    display: block;
+    width: 100%;
+}

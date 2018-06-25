@@ -1,35 +1,26 @@
 // @flow
 
 const WebSocket = require("ws");
-const express = require('express');
-const http = require('http');
-const url = require('url');
 
 const Display = require("./Display.js");
 
 import type {DisplayInterface} from "./DisplayInterface";
+import type {ExpressServer} from "../http-ui/ExpressServer";
 
 class WebsocketDisplay extends Display implements DisplayInterface {
 
     _webSocketServer: Object;
-    _app: Object;
-    _expressServer: Object;
 
-    constructor() {
+    constructor(port : number = 6061) {
         super();
-        this._app = express();
 
-        this._app.use(express.static('public'));
-        this._expressServer = http.createServer(this._app);
-        this._webSocketServer = new WebSocket.Server({ server: this._expressServer });
+        this._webSocketServer = new WebSocket.Server({port: port });
         this._webSocketServer.on('connection', (ws) => {
             ws.on('message', (message) => {
                 console.log("Received message: ", message);
             });
         });
-        this._expressServer.listen(6060, () => {
-            console.log("Express server listening on %d", this._expressServer.address().port);
-        });
+
     }
 
     output() {
