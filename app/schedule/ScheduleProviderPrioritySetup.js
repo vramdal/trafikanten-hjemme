@@ -3,7 +3,6 @@
 // const React = require("React");
 // const groupBy = require("lodash").groupBy;
 // const groupBy = require("lodash").groupBy;
-import type {MessageProviderIcalAdapter} from "../provider/MessageProvider";
 
 const zip = require("lodash").zip;
 const values = require("lodash").values;
@@ -13,7 +12,7 @@ export type Slot = {
     calendarUrl: ?string
 }
 
-export type MessageProviderName = 'Entur' | 'Yr';
+export type MessageProviderName = 'Entur' | 'Yr' | 'Bysykkel';
 
 export type Calendar = {
     url: string,

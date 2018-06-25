@@ -16,12 +16,13 @@ const autoBind = require("auto-bind");
 const fetchIntervalSeconds = 20;
 
 export type LocationString = string;
+export type IdAndDescriptionString = string;
 
 export type DisplayEvent = {
     start: moment,
     end: moment,
     messageProviderFactory: AdapterUnion,
-    details: (Location | LocationString),
+    details: (Location | LocationString | IdAndDescriptionString),
     internal: {
         calendarEventId : string,
         lastModified: moment
@@ -185,7 +186,7 @@ class IcalScheduleProvider implements ScheduleProvider {
             start: moment(event.startDate),
             end: moment(event.endDate),
             messageProviderFactory: this._messageProviderFactory,
-            details: {location: event.location, locationString: event.locationString},
+            details: {location: event.location, locationString: event.locationString, idAndDescriptionString: event.locationString},
             internal: {
                 calendarEventId: event.id,
                 lastModified: moment(event.lastModified)

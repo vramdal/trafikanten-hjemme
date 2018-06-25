@@ -1233,7 +1233,7 @@ function init() {
         "  XXX  ",
         "       "
     );
-    registerCharacter('🚲', 11, // Bicycle
+    registerCharacter(22900, 11, // Bicycle
         "           ",
         "           ",
         "   X XXXX  ",
@@ -1243,7 +1243,7 @@ function init() {
         "X  X   X  X",
         " XX     XX ");
 
-    registerCharacter('🔒', 9, // Padlock
+    registerCharacter(22901, 9, // Padlock
         "  XXXXX  ",
         " XX   XX ",
         " X     X ",
