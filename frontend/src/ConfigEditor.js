@@ -144,7 +144,7 @@ const CalendarComponent = ({
         <button type="button" className="deleteCalendarButton" data-url={calendar.url} onClick={deleteButtonClicked}>Delete</button>
     </fieldset>;
 
-const MESSAGEPROVIDERS = ["Entur", "Yr"];
+const MESSAGEPROVIDERS = ["Entur", "Yr", "Bysykkel"];
 
 const calendarProps = {
     name: string.isRequired,

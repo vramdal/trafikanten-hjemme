@@ -1233,6 +1233,26 @@ function init() {
         "  XXX  ",
         "       "
     );
+    registerCharacter(22900, 11, // Bicycle
+        "           ",
+        "           ",
+        "   X XXXX  ",
+        "   X   X   ",
+        " XX X X XX ",
+        "X  X X X  X",
+        "X  X   X  X",
+        " XX     XX ");
+
+    registerCharacter(22901, 9, // Padlock
+        "  XXXXX  ",
+        " XX   XX ",
+        " X     X ",
+        "X       X",
+        "XXXXXXXXX",
+        "XXXXXXXXX",
+        "XXXXXXXXX",
+        "XXXXXXXXX"
+    );
 
     let requiredWidth = 0;
     let positions : {[string | number] : number} = {};

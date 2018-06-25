@@ -6,6 +6,7 @@ import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {PlaylistType} from "../message/MessageType";
 
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
+const Bysykkel = require("../provider/Bysykkel");
 const ScheduleProviderPrioritySetup = require("./ScheduleProviderPrioritySetup.js");
 const Yr = require("../provider/Yr");
 const Entur = require("../provider/Entur");
@@ -57,6 +58,7 @@ class DisplayPrioritizer {
         switch (messageProviderName) {
             case 'Entur' : return new Entur.factory(this._dataStore);
             case 'Yr' : return new Yr.factory(this._dataStore);
+            case 'Bysykkel' : return new Bysykkel.factory(this._dataStore);
             default : throw new Error("Invalid message provider name: " + messageProviderName);
         }
     }
