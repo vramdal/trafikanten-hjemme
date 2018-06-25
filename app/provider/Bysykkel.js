@@ -146,12 +146,10 @@ class Bysykkel implements MessageProvider {
 class BysykkelProviderFactory implements MessageProviderIcalAdapter<MessageProvider> {
     _dataStore: PreemptiveCache;
     _apiKey : string;
-    _displayEventTitle: boolean;
 
-    constructor(dataStore : PreemptiveCache, config: {}, displayEventTitle: boolean) {
+    constructor(dataStore : PreemptiveCache) {
         this._dataStore = dataStore;
-        this._displayEventTitle = displayEventTitle;
-        this._apiKey = settings.get("oslobysykkel").apiKey;
+        this._apiKey = settings.get("bysykkel").apiKey;
     }
 
     //noinspection JSUnusedGlobalSymbols
