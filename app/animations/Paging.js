@@ -15,7 +15,7 @@ class PagingAnimation implements Animation {
     _frameWidth : number;
 
 
-    constructor(ticksPerPage: number) {
+    constructor(ticksPerPage: number = 50) {
         this._ticksPerPage = ticksPerPage;
     }
 
