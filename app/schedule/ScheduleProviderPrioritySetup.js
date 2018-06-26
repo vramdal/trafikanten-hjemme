@@ -17,7 +17,8 @@ export type MessageProviderName = 'Entur' | 'Yr' | 'Bysykkel';
 export type Calendar = {
     url: string,
     name : string,
-    messageProvider : MessageProviderName
+    messageProvider : MessageProviderName,
+    displayEventTitle? : boolean
 }
 
 class ScheduleProviderPrioritySetup {

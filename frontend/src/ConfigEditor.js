@@ -74,7 +74,7 @@ class ConfigEditor extends Component
 
     onFieldChange(evt) {
         const path = evt.target.name;
-        const value = evt.target.value;
+        const value = evt.target.type === 'checkbox' ? evt.target.checked : evt.target.value;
         const target = {...this.state.configuration};
         objectPath.set(target, path, value);
         const model = objectPath(this.state);
@@ -140,6 +140,9 @@ const CalendarComponent = ({
                     <option key={mpn} value={mpn}>{mpn}</option>
                 ))}
             </select>
+        </p>
+        <p>
+            <label><input type="checkbox" name={`${name}displayEventTitle`} checked={calendar.displayEventTitle} onChange={onFieldChange}/> Display event titles</label>
         </p>
         <button type="button" className="deleteCalendarButton" data-url={calendar.url} onClick={deleteButtonClicked}>Delete</button>
     </fieldset>;

@@ -221,8 +221,11 @@ class Entur implements MessageProvider {
 
     static factory : Class<MessageProviderIcalAdapter<MessageProvider>>;
 
+    title : ?string;
+
     //noinspection JSUnusedLocalSymbols
-    constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location, config? : config = {}) {
+    constructor(id : string, dataStore : PreemptiveCache, from: Location, to : Location, config? : config = {}, title : ?string) {
+        this.title = title;
         const variableFactory = () => ({
             //"dateTime": "2018-06-04T12:51:14.000+0100",
             "dateTime": new Date().toISOString(),
@@ -417,16 +420,18 @@ class EnturMessageProviderFactory implements MessageProviderIcalAdapter<MessageP
 
     static displayName: string;
     _config: config;
+    _displayEventTitle : boolean;
 
-    constructor(dataStore : PreemptiveCache, config : config = {}) {
+    constructor(dataStore : PreemptiveCache, config : config = {}, displayEventTitle: boolean) {
         this.dataStore = dataStore;
         this._config = config;
+        this._displayEventTitle = displayEventTitle;
         this.home = settings.get("home");
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options: {location : Location}) : Entur {
-        return new Entur(id, this.dataStore, this.home, options.location, this._config);
+    createMessageProvider(id : string, options: {location : Location, title: string}, title: ?string) : Entur {
+        return new Entur(id, this.dataStore, this.home, options.location, this._config, title);
     }
 }
 

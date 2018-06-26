@@ -8,7 +8,8 @@ export interface MessageProvider {
     getMessage() : MessageType,
     getMessageAsync(fresh : boolean) : Promise<MessageType>;
     shutdown() : void;
-    isReady? : () => boolean
+    isReady? : () => boolean;
+    title? : ?string;
 
 }
 
@@ -17,7 +18,7 @@ export type AdapterUnion = MessageProviderIcalAdapter<MessageProvider> | Message
 
 export interface MessageProviderIcalAdapter<ProviderUnion> {
     constructor(arg1 : any, arg2: any, ...rest : Array<any>) : void;
-    createMessageProvider(id : string, options: any) : ProviderUnion;
+    createMessageProvider(id : string, options: any, title? : string) : ProviderUnion;
     displayName? : string;
 }
 
