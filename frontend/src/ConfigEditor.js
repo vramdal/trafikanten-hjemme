@@ -135,7 +135,7 @@ const CalendarComponent = ({
         </p>
         <p>
             <label>Message provider</label><br/>
-            <select name={`${name}messageProvider`} defaultValue={calendar.messageProviderName} onChange={onFieldChange}>
+            <select name={`${name}messageProvider`} value={calendar.messageProvider} onChange={onFieldChange}>
                 {MESSAGEPROVIDERS.map(mpn => (
                     <option key={mpn} value={mpn}>{mpn}</option>
                 ))}
