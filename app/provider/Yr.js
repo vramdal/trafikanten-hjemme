@@ -241,14 +241,14 @@ class Yr implements PlaylistProvider {
             {},
             {text: "Nedbør neste 90 min"},
             Trafikanten.createFormatSpecifier(0, 128),
-            {animation: {animationName: "NoAnimation", timeoutTicks: 100, alignment: "center"}}
+            {animation: {animationName: "NoAnimation", timeoutTicks: noPrecipitation ? 75 : 200, alignment: "center"}}
         );
 
         let part2 = Object.assign(
             {},
             {text: (noPrecipitation ? "Ingen" : graph)},
             Trafikanten.createFormatSpecifier(128, 255),
-            {animation: {animationName: "NoAnimation", timeoutTicks: 200, alignment: "center"}}
+            {animation: {animationName: "NoAnimation", timeoutTicks: noPrecipitation ? 75 : 200, alignment: "center"}}
         );
 
         return Promise.resolve([part1, part2]);
