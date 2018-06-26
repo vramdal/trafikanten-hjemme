@@ -111,12 +111,14 @@ class Yr implements PlaylistProvider {
 
     _forecastFetcher : ValueFetcherAndFormatter<YrForecastResponse>;
     _precipitationFetcher: ValueFetcherAndFormatter<YrPrecipitationResponse>;
+    title : ?string;
 
     static factory : Class<MessageProviderIcalAdapter<PlaylistProvider>> ;
 
     //noinspection JSUnusedLocalSymbols
-    constructor(id : string, dataStore : PreemptiveCache, place : string = defaultPlace) {
+    constructor(id : string, dataStore : PreemptiveCache, place : string = defaultPlace, title : ?string) {
         this._id = id;
+        this.title = title;
 
         this._forecastFetcher = new ValueFetcherAndFormatter(
             `${this._id}-forecast`,
@@ -267,8 +269,8 @@ class YrProviderFactory implements MessageProviderIcalAdapter<PlaylistProvider> 
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options : {locationString : string}) : Yr {
-        return new Yr(id, this._dataStore, options.locationString);
+    createMessageProvider(id : string, options : {locationString : string}, title : ?string) : Yr {
+        return new Yr(id, this._dataStore, options.locationString, this._displayEventTitle && title || null);
     }
 }
 

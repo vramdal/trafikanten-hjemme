@@ -155,7 +155,8 @@ class IcalScheduleProvider implements ScheduleProvider {
             displayEvent: displayEvent,
             messageProvider: displayEvent.messageProviderFactory.createMessageProvider(
                 `${typeof displayEvent.messageProviderFactory.displayName === "string" ? displayEvent.messageProviderFactory.displayName : displayEvent.messageProviderFactory.constructor.name}-${displayEvent.internal.calendarEventId}-${this.id}`,
-                displayEvent.details
+                displayEvent.details,
+                displayEvent.title
             )
         };
     }

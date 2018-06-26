@@ -102,6 +102,7 @@ class DisplayPrioritizer {
 
 }
 
+
 class Column {
     _prioritizedScheduleProviders: Array<ScheduleProvider>;
 
@@ -110,10 +111,25 @@ class Column {
         this._prioritizedScheduleProviders = prioritizedScheduleProviders;
     }
 
+    static insertHeaderMessage(provider : ProviderUnion, playlist : PlaylistType) : PlaylistType {
+        if (provider.title) {
+            const headerMessagePart = {
+                text: provider.title,
+                start: 0, end: 128, lines: 1,
+                animation: {animationName : "NoAnimation", timeoutTicks: 50, alignment: "center"}
+            };
+            playlist.unshift([headerMessagePart]);
+            return playlist;
+        } else {
+            return playlist;
+        }
+    }
+
     getPlaylist(providerUnions : ?Array<ProviderUnion>) {
         return providerUnions && providerUnions
             && Promise.all(providerUnions
-                .map((providerUnion => IcalScheduleProvider.getPlaylistAsync(providerUnion, true)))
+                .map((providerUnion => IcalScheduleProvider.getPlaylistAsync(providerUnion, true)
+                    .then(playlist => Column.insertHeaderMessage(providerUnion, playlist))))
             ).then((playlists: Array<PlaylistType>) => flatten(playlists))
     }
 
