@@ -8,6 +8,12 @@ fieldset input, fieldset select {
     width: 100%;
 }
 
+fieldset input[type='checkbox'] {
+    width: inherit;
+    display: inline;
+    vertical-align: bottom;
+}
+
 button {
     display: block;
     width: 100%;

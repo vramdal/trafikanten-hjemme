@@ -35,7 +35,7 @@ class DisplayPrioritizer {
         const prioritizedCalendarSetup = this._scheduleProviderPrioritySetup.getPrioritizedLists();
         this._scheduleProviders = {};
         this._scheduleProviderPrioritySetup.getCalendars().forEach((calendar : Calendar) => {
-            let messageProviderFactory : AdapterUnion = this.createMessageProviderFactory(calendar.messageProvider);
+            let messageProviderFactory : AdapterUnion = this.createMessageProviderFactory(calendar.messageProvider, calendar.displayEventTitle || false);
             if (!this._scheduleProviders[calendar.url]) {
                 this._scheduleProviders[calendar.url] = new IcalScheduleProvider(`schedule-provider-${calendar.url}`, dataStore, calendar.url, messageProviderFactory, calendar.name);
             }
@@ -54,11 +54,11 @@ class DisplayPrioritizer {
         })
     }
     // noinspection JSMethodCanBeStatic
-    createMessageProviderFactory(messageProviderName : MessageProviderName) : AdapterUnion {
+    createMessageProviderFactory(messageProviderName : MessageProviderName, displayEventTitle: boolean) : AdapterUnion {
         switch (messageProviderName) {
-            case 'Entur' : return new Entur.factory(this._dataStore);
-            case 'Yr' : return new Yr.factory(this._dataStore);
-            case 'Bysykkel' : return new Bysykkel.factory(this._dataStore);
+            case 'Entur' : return new Entur.factory(this._dataStore, undefined, displayEventTitle);
+            case 'Yr' : return new Yr.factory(this._dataStore, undefined, displayEventTitle);
+            case 'Bysykkel' : return new Bysykkel.factory(this._dataStore, undefined, displayEventTitle);
             default : throw new Error("Invalid message provider name: " + messageProviderName);
         }
     }
@@ -102,6 +102,7 @@ class DisplayPrioritizer {
 
 }
 
+
 class Column {
     _prioritizedScheduleProviders: Array<ScheduleProvider>;
 
@@ -110,10 +111,25 @@ class Column {
         this._prioritizedScheduleProviders = prioritizedScheduleProviders;
     }
 
+    static insertHeaderMessage(provider : ProviderUnion, playlist : PlaylistType) : PlaylistType {
+        if (provider.title) {
+            const headerMessagePart = {
+                text: provider.title,
+                start: 0, end: 128, lines: 1,
+                animation: {animationName : "NoAnimation", timeoutTicks: 50, alignment: "center"}
+            };
+            playlist.unshift([headerMessagePart]);
+            return playlist;
+        } else {
+            return playlist;
+        }
+    }
+
     getPlaylist(providerUnions : ?Array<ProviderUnion>) {
         return providerUnions && providerUnions
             && Promise.all(providerUnions
-                .map((providerUnion => IcalScheduleProvider.getPlaylistAsync(providerUnion, true)))
+                .map((providerUnion => IcalScheduleProvider.getPlaylistAsync(providerUnion, true)
+                    .then(playlist => Column.insertHeaderMessage(providerUnion, playlist))))
             ).then((playlists: Array<PlaylistType>) => flatten(playlists))
     }
 
