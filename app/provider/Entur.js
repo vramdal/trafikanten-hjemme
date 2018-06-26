@@ -417,15 +417,17 @@ class EnturMessageProviderFactory implements MessageProviderIcalAdapter<MessageP
 
     static displayName: string;
     _config: config;
+    _displayEventTitle : boolean;
 
-    constructor(dataStore : PreemptiveCache, config : config = {}) {
+    constructor(dataStore : PreemptiveCache, config : config = {}, displayEventTitle: boolean) {
         this.dataStore = dataStore;
         this._config = config;
+        this._displayEventTitle = displayEventTitle;
         this.home = settings.get("home");
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options: {location : Location}) : Entur {
+    createMessageProvider(id : string, options: {location : Location, title: string}) : Entur {
         return new Entur(id, this.dataStore, this.home, options.location, this._config);
     }
 }

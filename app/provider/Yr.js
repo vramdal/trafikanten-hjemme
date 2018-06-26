@@ -258,10 +258,12 @@ class Yr implements PlaylistProvider {
 
 class YrProviderFactory implements MessageProviderIcalAdapter<PlaylistProvider> {
     _dataStore: PreemptiveCache;
+    _displayEventTitle: boolean;
 
 
-    constructor(dataStore : PreemptiveCache) {
+    constructor(dataStore : PreemptiveCache, config: {}, displayEventTitle: boolean) {
         this._dataStore = dataStore;
+        this._displayEventTitle = displayEventTitle;
     }
 
     //noinspection JSUnusedGlobalSymbols

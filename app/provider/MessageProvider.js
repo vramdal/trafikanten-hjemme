@@ -8,7 +8,8 @@ export interface MessageProvider {
     getMessage() : MessageType,
     getMessageAsync(fresh : boolean) : Promise<MessageType>;
     shutdown() : void;
-    isReady? : () => boolean
+    isReady? : () => boolean;
+    title? : string;
 
 }
 

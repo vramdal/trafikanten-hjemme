@@ -35,7 +35,7 @@ class DisplayPrioritizer {
         const prioritizedCalendarSetup = this._scheduleProviderPrioritySetup.getPrioritizedLists();
         this._scheduleProviders = {};
         this._scheduleProviderPrioritySetup.getCalendars().forEach((calendar : Calendar) => {
-            let messageProviderFactory : AdapterUnion = this.createMessageProviderFactory(calendar.messageProvider);
+            let messageProviderFactory : AdapterUnion = this.createMessageProviderFactory(calendar.messageProvider, calendar.displayEventTitle || false);
             if (!this._scheduleProviders[calendar.url]) {
                 this._scheduleProviders[calendar.url] = new IcalScheduleProvider(`schedule-provider-${calendar.url}`, dataStore, calendar.url, messageProviderFactory, calendar.name);
             }
@@ -54,11 +54,11 @@ class DisplayPrioritizer {
         })
     }
     // noinspection JSMethodCanBeStatic
-    createMessageProviderFactory(messageProviderName : MessageProviderName) : AdapterUnion {
+    createMessageProviderFactory(messageProviderName : MessageProviderName, displayEventTitle: boolean) : AdapterUnion {
         switch (messageProviderName) {
-            case 'Entur' : return new Entur.factory(this._dataStore);
-            case 'Yr' : return new Yr.factory(this._dataStore);
-            case 'Bysykkel' : return new Bysykkel.factory(this._dataStore);
+            case 'Entur' : return new Entur.factory(this._dataStore, undefined, displayEventTitle);
+            case 'Yr' : return new Yr.factory(this._dataStore, undefined, displayEventTitle);
+            case 'Bysykkel' : return new Bysykkel.factory(this._dataStore, undefined, displayEventTitle);
             default : throw new Error("Invalid message provider name: " + messageProviderName);
         }
     }
