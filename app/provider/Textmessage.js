@@ -15,11 +15,13 @@ class Textmessage implements MessageProvider {
     static factory : Class<MessageProviderIcalAdapter<MessageProvider>>;
     _message: string;
     _formatter : ValueFetcherAndFormatter<string>;
+    title : ?string;
 
-    constructor(id: string, dataStore: PreemptiveCache, message : string) {
+    constructor(id: string, dataStore: PreemptiveCache, message : string, title : ?string) {
         this._id = id;
         this._message = message;
         this._formatter = new ValueFetcherAndFormatter(`${id}-fetcher`, dataStore, () => Promise.resolve(this._message), 600, this.format.bind(this), 600, null);
+        this.title = title;
     }
 
     format() : Promise<MessageType> {
@@ -56,8 +58,8 @@ class TextmessageProviderFactory implements MessageProviderIcalAdapter<MessagePr
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options : {textmessageString: string}) : Textmessage {
-        return new Textmessage(id, this._dataStore, options.textmessageString);
+    createMessageProvider(id : string, options : {textmessageString: string}, title : ?string) : Textmessage {
+        return new Textmessage(id, this._dataStore, options.textmessageString, title);
     }
 }
 
