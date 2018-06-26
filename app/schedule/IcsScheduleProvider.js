@@ -17,13 +17,14 @@ const fetchIntervalSeconds = 20;
 
 export type LocationString = string;
 export type IdAndDescriptionString = string;
+export type TextmessageString = string;
 
 export type DisplayEvent = {
     start: moment,
     end: moment,
     messageProviderFactory: AdapterUnion,
     title: string,
-    details: (Location | LocationString | IdAndDescriptionString),
+    details: (Location | LocationString | IdAndDescriptionString | TextmessageString),
     internal: {
         calendarEventId : string,
         lastModified: moment
@@ -196,7 +197,7 @@ class IcalScheduleProvider implements ScheduleProvider {
             end: moment(event.endDate),
             title: event.summary,
             messageProviderFactory: this._messageProviderFactory,
-            details: {location: event.location, locationString: event.locationString, idAndDescriptionString: event.locationString},
+            details: {location: event.location, locationString: event.locationString, idAndDescriptionString: event.locationString, textmessageString : event.locationString},
             internal: {
                 calendarEventId: event.id,
                 lastModified: moment(event.lastModified)

@@ -10,6 +10,7 @@ const Bysykkel = require("../provider/Bysykkel");
 const ScheduleProviderPrioritySetup = require("./ScheduleProviderPrioritySetup.js");
 const Yr = require("../provider/Yr");
 const Entur = require("../provider/Entur");
+const Textmessage = require("../provider/Textmessage");
 const IcalScheduleProvider = require("./IcsScheduleProvider");
 const moment = require("moment");
 const mapValues = require("lodash").mapValues;
@@ -59,6 +60,7 @@ class DisplayPrioritizer {
             case 'Entur' : return new Entur.factory(this._dataStore, undefined, displayEventTitle);
             case 'Yr' : return new Yr.factory(this._dataStore, undefined, displayEventTitle);
             case 'Bysykkel' : return new Bysykkel.factory(this._dataStore, undefined, displayEventTitle);
+            case 'Textmessage' : return new Textmessage.factory(this._dataStore, undefined, displayEventTitle);
             default : throw new Error("Invalid message provider name: " + messageProviderName);
         }
     }

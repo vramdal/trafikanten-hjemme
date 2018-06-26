@@ -12,7 +12,7 @@ export type Slot = {
     calendarUrl: ?string
 }
 
-export type MessageProviderName = 'Entur' | 'Yr' | 'Bysykkel';
+export type MessageProviderName = 'Entur' | 'Yr' | 'Bysykkel' | 'Textmessage';
 
 export type Calendar = {
     url: string,
