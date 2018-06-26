@@ -341,7 +341,7 @@ class Entur implements MessageProvider {
             createFormatSpecifier(100, 127),
             {animation: {animationName : "NoAnimation", timeoutTicks: 5, alignment: "right"}}
         );
-        let formatted = startLegs.slice(1).slice(0, 5).map(this.formatLeg.bind(this));
+        let formatted = startLegs.slice(1).slice(0, 3).map(this.formatLeg.bind(this));
         let secondLine : MessagePartType = Object.assign(
             {},
             {text: formatted.join("  -  ")},
