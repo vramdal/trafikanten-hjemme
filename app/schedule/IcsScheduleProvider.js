@@ -22,6 +22,7 @@ export type DisplayEvent = {
     start: moment,
     end: moment,
     messageProviderFactory: AdapterUnion,
+    title: string,
     details: (Location | LocationString | IdAndDescriptionString),
     internal: {
         calendarEventId : string,
@@ -38,6 +39,7 @@ export interface ScheduleProvider {
     executeNext(changeset : DisplayEventChangeset) : void,
     getCurrentProviders() : Array<ProviderUnion>,
     getProviders() : Array<ProviderUnion>,
+    isDisplayEventTitle() : boolean,
 }
 
 export type DisplayEventChangeset = {
@@ -57,8 +59,9 @@ class IcalScheduleProvider implements ScheduleProvider {
     _calendarEventsById: {[calendarEventId : string] : CalendarEvent};
     _displayEventChangeset : DisplayEventChangeset;
     name : ?string;
+    _isDisplayEventTitle: boolean;
 
-    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : AdapterUnion, name : string ) {
+    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : AdapterUnion, name : string, displayEventTitle? : boolean ) {
         autoBind(this);
         this.id = id;
         this.name = name;
@@ -67,6 +70,11 @@ class IcalScheduleProvider implements ScheduleProvider {
         this._valueProvider = dataStore.registerFetcher(this._fetcher, this.id+"-fetcher", fetchIntervalSeconds);
         this._messageProviders = {};
         this._displayEventChangeset = {};
+        this._isDisplayEventTitle = displayEventTitle || false;
+    }
+
+    isDisplayEventTitle() : boolean {
+        return this._isDisplayEventTitle;
     }
 
     getEventsAt(when: moment) : Promise<Array<CalendarEvent>> {
@@ -185,6 +193,7 @@ class IcalScheduleProvider implements ScheduleProvider {
         return {
             start: moment(event.startDate),
             end: moment(event.endDate),
+            title: event.summary,
             messageProviderFactory: this._messageProviderFactory,
             details: {location: event.location, locationString: event.locationString, idAndDescriptionString: event.locationString},
             internal: {
