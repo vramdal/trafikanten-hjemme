@@ -85,7 +85,7 @@ class Bysykkel implements MessageProvider {
 
     format(availabilityResponse : AvailabilityResponseType) : Promise<MessageType> {
         let bikesBitmap = (numBikes : number) => {
-            let str = `${numBikes} `;
+            let str = `${numBikes ? numBikes : "Ingen"} `;
             for (let i = 0; i < numBikes && i < 8; i++) {
                 str += String.fromCharCode(22900);
             }
@@ -93,7 +93,7 @@ class Bysykkel implements MessageProvider {
                 str += " +";
             }
             if (numBikes === 0) {
-                str += "Ingen " + String.fromCharCode(22900);
+                str += String.fromCharCode(22900);
             }
             return str;
         };
