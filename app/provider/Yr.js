@@ -42,6 +42,15 @@ type YrPrecipitationForecastType = {
 
 export type YrPrecipitationResponse = YrResponseType<YrPrecipitationForecastType>;
 
+type YrResponseError = {
+    error: {
+        info : {
+            message : string
+        }
+    },
+    status: "ERROR"
+}
+
 
 type YrResponseType<T> = {
     weatherdata: {
@@ -53,8 +62,9 @@ type YrResponseType<T> = {
             nextupdate: string
         },
         forecast: T ;
-    }
-}
+    },
+    status: "SUCCESS"
+} | YrResponseError
 
 type TabTime = {
     from : string,
@@ -117,7 +127,7 @@ class Yr implements PlaylistProvider {
 
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, place : string = defaultPlace, title : ?string) {
-        this._id = id;
+        this._id = `Yr:${place}`;
         this.title = title;
 
         this._forecastFetcher = new ValueFetcherAndFormatter(
@@ -160,6 +170,9 @@ class Yr implements PlaylistProvider {
 
 
     formatForecast(yrForecast : YrForecastResponse) : Promise<MessageType> {
+        if (yrForecast.status === "ERROR") {
+            throw new Error(yrForecast.error.info.message);
+        }
         const times : Array<TabTime> = yrForecast.weatherdata.forecast.tabular.time.filter((time, idx) => idx < 4);
         //let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
         let periodText = (period : number) : [string, number, Alignments, number] => {
@@ -219,6 +232,9 @@ class Yr implements PlaylistProvider {
 
 
     formatPrecipitation(yrPrecipitation: YrPrecipitationResponse) : Promise<MessageType> {
+        if (yrPrecipitation.status === "ERROR") {
+            throw new Error(yrPrecipitation.error.info.message);
+        }
         const barWidth = 6; //Math.floor(128 / yrPrecipitation.weatherdata.forecast.time.length / 2);
         let noPrecipitation = true;
 

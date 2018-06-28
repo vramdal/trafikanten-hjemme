@@ -90,9 +90,22 @@ const JsonFetcher = (url : string, options : ?{}) =>
 
 const XmlFetcher = (url : string, options : ?{}) =>
     () => fetch(url, options)
+        .then(res => {
+            if (res.status !== 200) {
+                return Promise.reject(res);
+            } else {
+                return res;
+            }
+        })
         .then(res => res.text())
         .then(body => Promise.resolve(xml2json.toJson(body)))
-        .then(json => JSON.parse(json));
+        .then(json => JSON.parse(json))
+        .then(json => Object.assign({}, json, {status: "OK"}))
+        .catch(res => res.text()
+            .then(body => Promise.resolve(xml2json.toJson(body)))
+            .then(json => JSON.parse(json))
+            .then(json => Object.assign({}, json, {status: "ERROR"}))
+        );
 
 const GraphQLFetcher = (url : string, headers: ?{}, graphQLQuery : string, variableFactory : () => {}) => {
     const client = graphqlClient({url: url, headers: headers});
