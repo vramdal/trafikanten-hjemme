@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
-import {string, arrayOf, shape, oneOf, func} from 'prop-types';
+import {string, arrayOf, shape, oneOf, func, element} from 'prop-types';
 // import fetch from 'fetch-hoc';
 import './ConfigEditor.css';
 import autoBind from 'auto-bind';
 import {remove} from 'lodash';
 import objectPath from 'object-path';
 
-class ConfigEditor extends Component
-{
+class ConfigEditor extends Component {
     constructor(props) {
         super(props);
         autoBind(this);
@@ -104,6 +103,11 @@ class ConfigEditor extends Component
                         deleteButtonClicked={this.deleteButtonClicked}/>
                     )
                 )}
+                <fieldset>
+                    <legend>Oslo bysykkel</legend>
+                    <label>API key</label>
+                    <input type="text"/>
+                </fieldset>
                 <button type="button" onClick={this.addButtonClicked}>Add calendar</button>
                 <div className="form-buttons">
                     <button type="reset">Reset</button>
@@ -113,6 +117,19 @@ class ConfigEditor extends Component
         );
     }
 }
+
+/*function connectToState(InputComponent, state, path, onFieldChange) {
+    let model = objectPath(state);
+    return <InputComponent onChange={onFieldChange} name={path} value={model.get(path)}/>
+
+}
+
+ConnectedInput.propTypes = {
+    path: string,
+    state : object,
+    onFieldChange : func,
+    children: element.isRequired,
+};*/
 
 export default ConfigEditor;
 

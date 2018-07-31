@@ -115,6 +115,15 @@ type ForecastType = {
 
 export type YrForecastResponse = YrResponseType<ForecastType>;
 
+const createFormatSpecifier = (x : number, end : number) : {start : number, end : number, lines : number}  => {
+    return {
+        start: x,
+        end: end,
+        lines: 1
+    }
+
+};
+
 class Yr implements PlaylistProvider {
 
     _id : string;
@@ -258,14 +267,14 @@ class Yr implements PlaylistProvider {
         let part1 = Object.assign(
             {},
             {text: "Nedbør neste 90 min"},
-            Trafikanten.createFormatSpecifier(0, 128),
+            createFormatSpecifier(0, 128),
             {animation: {animationName: "NoAnimation", timeoutTicks: noPrecipitation ? 75 : 200, alignment: "center"}}
         );
 
         let part2 = Object.assign(
             {},
             {text: (noPrecipitation ? "Ingen" : graph)},
-            Trafikanten.createFormatSpecifier(128, 255),
+            createFormatSpecifier(128, 255),
             {animation: {animationName: "NoAnimation", timeoutTicks: noPrecipitation ? 75 : 200, alignment: "center"}}
         );
 

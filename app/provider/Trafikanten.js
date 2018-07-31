@@ -34,6 +34,12 @@ const createFormatSpecifier = (x : number, end : number) : {start : number, end 
 
 };
 
+function getLoadingMessage(id : string) {
+    return [Object.assign({},
+        {start: 0, end: 127, text: "Loading data for " + id, lines: 2},
+        {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})];
+}
+
 class Trafikanten implements MessageProvider {
 
     id : string;
@@ -51,9 +57,7 @@ class Trafikanten implements MessageProvider {
                 30,
                 this.format.bind(this),
                 10,
-                [Object.assign({},
-                    {start: 0, end: 127, text: "Loading data for " + this.id, lines: 2},
-                    {animation: {animationName: "VerticalScrollingAnimation", holdOnLine: 50}})]
+                getLoadingMessage(id)
             );
     }
 
@@ -137,5 +141,3 @@ class Trafikanten implements MessageProvider {
     }
 
 }
-
-module.exports = Trafikanten;

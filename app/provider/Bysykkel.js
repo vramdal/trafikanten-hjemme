@@ -151,7 +151,7 @@ class BysykkelProviderFactory implements MessageProviderIcalAdapter<MessageProvi
     constructor(dataStore : PreemptiveCache, config: {}, displayEventTitle: boolean) {
         this._dataStore = dataStore;
         this._displayEventTitle = displayEventTitle;
-        this._apiKey = settings.get("bysykkel").apiKey;
+        this._apiKey = settings.get("oslobysykkel").apiKey;
     }
 
     //noinspection JSUnusedGlobalSymbols
