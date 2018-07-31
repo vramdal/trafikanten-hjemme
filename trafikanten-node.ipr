@@ -265,7 +265,7 @@
       <method />
     </configuration>
   </component>
-  <component name="PublishConfigData" serverName="trafikanten-2.local">
+  <component name="PublishConfigData" autoUpload="Always" serverName="trafikanten-2.local" compareModeInSync="TEXT" showNewOnTargetInSync="false">
     <serverData>
       <paths name="trafikanten-2.local">
         <serverdata>
@@ -277,6 +277,7 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">

@@ -8,7 +8,6 @@ memwatch.on('leak', (info) => {
 const Display = require("./display/Display");
 const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
 const Framer = require("./rendering/Framer.js");
-const WebsocketDisplay = require("./display/WebsocketDisplay.js");
 const EventTypeNames = require("./types/SimpleTypes.js").EventTypeNames;
 const createHttpUiServer = require("./http-ui/ExpressServer").createHttpUiServer;
 
@@ -21,7 +20,17 @@ const flatten = require("lodash").flatten;
 let framer = new Framer();
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
 let uiServer = createHttpUiServer(6060, process.env.NODE_ENV === 'development');
-let display : Display = new WebsocketDisplay(6061);
+// let display : Display = new GPIODisplay();
+let display;
+if (process.argv[2] === "ws") {
+    console.log('Outputting to WebSocket display');
+    display = new (require("./display/WebsocketDisplay.js"))(6061);
+} else {
+    console.log('Outputting to GPIO display');
+    display = new (require("./display/GPIOPiDisplay.js"));
+}
+// const display = require("./display/GPIOPiDisplay.js");
+// let display : Display = new WebsocketDisplay(6061);
 
 fetchService.start().then(() => {
     "use strict";

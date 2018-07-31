@@ -44,7 +44,7 @@
   },
   "optionalDependencies": {
     "ofe": "0.1.x",
-    "pi-led": "~/git/pi-led"
+    "pi-led": "../pi-led"
   },
   "bundledDependencies": [
     "async",

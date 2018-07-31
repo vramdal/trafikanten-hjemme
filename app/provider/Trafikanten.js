@@ -45,6 +45,8 @@ class Trafikanten implements MessageProvider {
     id : string;
     _valueFetcher : ValueFetcherAndFormatter<GetDeparturesResponse>;
 
+    static getLoadingMessage : (id : string) => MessageType;
+
     static createFormatSpecifier(x : number, end : number) : {start : number, end : number, lines : number} {
         return createFormatSpecifier.apply(this, arguments);
     }
@@ -141,3 +143,6 @@ class Trafikanten implements MessageProvider {
     }
 
 }
+
+module.exports = Trafikanten;
+module.exports.getLoadingMessage = getLoadingMessage;
