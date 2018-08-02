@@ -725,6 +725,10 @@ mockery@~1.4.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/mockery/-/mockery-1.4.1.tgz#e8cff1f19049aa94aad0bb0ba13af256f11b1dbe"
 
+moment-round@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/moment-round/-/moment-round-1.0.1.tgz#5baf2b752e85d0f6a227c0a16f6fbe107c2a2d39"
+
 moment@^2.22.1:
   version "2.22.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.1.tgz#529a2e9bf973f259c9643d237fda84de3a26e8ad"

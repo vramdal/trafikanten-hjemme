@@ -9,8 +9,9 @@ const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js")
 const XmlFetcher = require("../fetch/ValueFetcherAndFormatter.js").XmlFetcher;
 import type {MessageType, PlaylistType} from "../message/MessageType";
 import type {Alignments} from "../animations/Types";
-import {LatLong} from "../types/Place";
-import moment from "moment";
+import type {LatLong} from "../types/Place";
+const moment = require("moment");
+require("moment-round");
 
 //const defaultPlace = "Norge/Oslo/Oslo/Kampen";
 
@@ -56,58 +57,63 @@ type MetResponseType<T> = {
     status: "SUCCESS"
 } | MetResponseError
 
+type LocationType = {
+    altitude: number,
+    latitude: number,
+    longitude: number,
+    precipitation?: {
+        value: number,
+        unit: string,
+        minvalue: number,
+        maxvalue: number,
+    },
+    symbol?: {
+        number: number,
+        id: string,
+    },
+    temperature?: {
+        unit: string,
+        value: number
+    },
+    windDirection?: {
+        deg: number,
+        name: string
+    },
+    windSpeed?: {
+        mps: number,
+        name: string,
+        beaufort: number
+    },
+    pressure?: {
+        unit: string,
+        value: number
+    }
+}
+
 type TimeType = {
     datatype: "forecast",
     from: string,
     to: string,
-    location: {
-        altitude: number,
-        latitude: number,
-        longitude: number,
-        precipitation?: {
-            value: number,
-            unit: string,
-            minvalue: number,
-            maxvalue: number,
-        },
-        symbol?: {
-            number: number,
-            id: string,
-        },
-        temperature?: {
-            unit: string,
-            value: number
-        },
-        windDirection?: {
-            deg: number,
-            name: string
-        },
-        windSpeed?: {
-            mps: number,
-            name: string,
-            beaufort: number
-        },
-        pressure?: {
-            unit: string,
-            value: number
-        }
-    }
+    location: LocationType
 }
 
-type AggregatedTimeType = {
-    from: string,
-    to: string,
-    precipitation: {
-        value: number,
-        unit: string,
-        minvalue: number,
-        maxvalue: number
-    },
-    symbol: {
+type PeriodType = 'NIGHT' | 'MORNING' | 'DAY' | 'EVENING' | 'NOW'
+
+
+type ParsedTimeType = {
+    from: moment,
+    to: moment,
+    location: LocationType
+}
+
+type CoercedTimeType = {
+    time: moment,
+    period : PeriodType,
+    symbol?: {
         number: number,
         id: string
     },
-    temperature: {
+    temperature?: {
         unit: string,
         value: number
     }
@@ -154,16 +160,16 @@ class Met implements PlaylistProvider {
             this.formatForecast.bind(this)
         );
 
-/*
-        this._precipitationFetcher = new ValueFetcherAndFormatter(
-            `${this._id}-precipitation`,
-            dataStore,
-            XmlFetcher("http://www.yr.no/sted/" + place + "/varsel_nu.xml", {headers: {"User-Agent": USER_AGENT}}),
-            120,
-            this.formatPrecipitation.bind(this)
+        /*
+                this._precipitationFetcher = new ValueFetcherAndFormatter(
+                    `${this._id}-precipitation`,
+                    dataStore,
+                    XmlFetcher("http://www.yr.no/sted/" + place + "/varsel_nu.xml", {headers: {"User-Agent": USER_AGENT}}),
+                    120,
+                    this.formatPrecipitation.bind(this)
 
-        )
-*/
+                )
+        */
     }
 
     shutdown() {}
@@ -180,20 +186,19 @@ class Met implements PlaylistProvider {
     }
 
 
-    formatForecast(yrForecast : MetForecastResponse) : Promise<MessageType> {
-        if (yrForecast.status === "ERROR") {
-            throw new Error(yrForecast.error.info.message);
+    formatForecast(metForecast : MetForecastResponse) : Promise<MessageType> {
+        if (metForecast.status === "ERROR") {
+            throw new Error(metForecast.error.info.message);
         }
-        const times : Array<TimeType> = yrForecast.weatherdata.product.filter((time, idx) => time.from === time.to);
-        const aggregatedForecast = aggregate(times);
-        // TODO: Finn verdier for kl 0600, 1200, 1800 og 2400
+        const times : Array<TimeType> = metForecast.weatherdata.product.filter((time, idx) => time.from === time.to);
+        const aggregatedForecast : Array<CoercedTimeType> = aggregate(times);
         //let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
-        let periodText = (period : number) : [string, number, Alignments, number] => {
-            switch (parseInt(period)) {
-                case 0 : return ["natt", 25, "center", 22812];
-                case 1 : return ["morg", 25, "center", 12192];
-                case 2 : return ["dag", 25, "center", 30829];
-                case 3 : return ["kvld", 25, "center", 12067];
+        let periodText = (period : PeriodType) : [string, number, Alignments, number] => {
+            switch (period) {
+                case 'EVENING' : return ["natt", 25, "center", 22812];
+                case 'NIGHT' : return ["morg", 25, "center", 12192];
+                case 'MORNING' : return ["dag", 25, "center", 30829];
+                case 'DAY' : return ["kvld", 25, "center", 12067];
                 default : throw new Error("Unknown period: " + period);
             }
         };
@@ -214,8 +219,8 @@ class Met implements PlaylistProvider {
         };
         let lastStop = 0;
         let elements = [];
-        times.map(time => time.period).map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) =>
-            {
+        aggregatedForecast.map((time : CoercedTimeType) => time.period)
+            .map(periodText).forEach((periodTextAndPctWidth : [string, number, Alignments, number]) => {
                 const width = Math.round(periodTextAndPctWidth[1] * 128 / 100);
                 let el = [periodTextAndPctWidth[0], lastStop, lastStop + width, periodTextAndPctWidth[2]];
                 lastStop = lastStop + width;
@@ -232,12 +237,23 @@ class Met implements PlaylistProvider {
                 }
             )
         );
-        let row2 = times.map((time, idx) => ( {
-            text : `${time.temperature.value}°\n${symbol(time.symbol.numberEx)}\n${time.temperature.value}°\n${symbol(time.symbol.numberEx)}`,
-            start : row1[idx].start + 128,
-            end : row1[idx].end + 128,
-            animation: {animationName: "VerticalScrollingAnimation",  holdOnLine : 50, holdOnLastLine : 50, alignment: "center", scrollIn : false, scrollOut: false}
-        } ));
+        let row2 = aggregatedForecast.map((time, idx) => {
+            const temperatureTxt = time.temperature && time.temperature.value || '';
+            const symbolTxt = time.symbol && symbol(time.symbol.id) || '';
+            return ({
+                text: `${temperatureTxt}°\n${symbol(symbolTxt)}\n${temperatureTxt}°\n${symbolTxt}`,
+                start: row1[idx].start + 128,
+                end: row1[idx].end + 128,
+                animation: {
+                    animationName: "VerticalScrollingAnimation",
+                    holdOnLine: 50,
+                    holdOnLastLine: 50,
+                    alignment: "center",
+                    scrollIn: false,
+                    scrollOut: false
+                }
+            });
+        });
 
 
         return Promise.resolve(row1.concat(row2));
@@ -252,20 +268,20 @@ class Met implements PlaylistProvider {
         let noPrecipitation = true;
 
         const graph = yrPrecipitation.weatherdata.forecast.time && yrPrecipitation.weatherdata.forecast.time
-                .map(precipitationTime => parseFloat(precipitationTime.precipitation.value))
-                .map(value => {
-                    if (value > 0) {
-                        noPrecipitation = false;
-                    }
-                    return value;
-                })
-                .map(value => Math.ceil(Math.min(value / 1, 1) * 8))
-                .map(value => {
-                    return value;
-                })
-                .map(eights => eights === 0 ? 8202 : 9600 + eights)
-                .map(charCode => new Array(barWidth).fill(String.fromCharCode(charCode)).join(String.fromCharCode(8202)))
-                .join("")
+            .map(precipitationTime => parseFloat(precipitationTime.precipitation.value))
+            .map(value => {
+                if (value > 0) {
+                    noPrecipitation = false;
+                }
+                return value;
+            })
+            .map(value => Math.ceil(Math.min(value / 1, 1) * 8))
+            .map(value => {
+                return value;
+            })
+            .map(eights => eights === 0 ? 8202 : 9600 + eights)
+            .map(charCode => new Array(barWidth).fill(String.fromCharCode(charCode)).join(String.fromCharCode(8202)))
+            .join("")
             || "Nå-varsel utilgjengelig";
 
         let part1 = Object.assign(
@@ -303,13 +319,39 @@ class MetProviderFactory implements MessageProviderIcalAdapter<PlaylistProvider>
     }
 }
 
-const aggregate = (times : Array<TimeType>) : AggregatedTimeType => {
-    let thisHour = moment().set('minute', 0).set('second', 0).set('millisecond', 0);
-    // Installer https://github.com/WebDevTmas/moment-round/blob/master/package.json
-    while (thisHour.get('hour') % 6 !== 0 ) {
-        thisHour = thisHour.add(1, 'hour');
-    }
-    const targetTimes = [moment(), moment().hours(0), moment().hours(6)]
+const aggregate = (times : Array<TimeType>) : Array<CoercedTimeType> => {
+    let rows : Array<ParsedTimeType> = times.map(time => Object.assign({}, time, {to: moment(time.to), from: moment(time.from)}));
+    let now = moment("2018-08-01T14:30:00Z").round(1, 'hours');
+    let next = now.clone().add(3, 'hour').ceil(6, 'hours');
+    const targetTimes = [now, next, next.clone().add(6, 'hour'), next.clone().add(12, 'hour')];
+    return targetTimes.map(targetTime => {
+        const selectedRows : Array<ParsedTimeType> = rows.filter(time => targetTime.isBetween(time.from, time.to, null, "[]"));
+        const coerceRows = (rows : Array<ParsedTimeType>) : CoercedTimeType => {
+            let temperature = undefined;
+            let symbol = undefined;
+            let period = undefined;
+            switch (targetTime.round(6, 'hours').hours()) {
+                case 0 : period = 'NIGHT'; break;
+                case 6 : period = 'MORNING'; break;
+                case 12: period = 'DAY'; break;
+                case 18: period = 'EVENING'; break;
+                default: throw new Error("Unknown period for " + targetTime);
+            }
+            for (let i = 0; i < rows.length && (temperature === undefined || symbol === undefined) ; i++) {
+                let selectedTime = rows[i];
+                temperature = temperature || selectedTime.location.temperature;
+                symbol = symbol || selectedTime.location.symbol;
+            }
+            return {
+                time: targetTime,
+                temperature,
+                symbol,
+                period
+            };
+        };
+        return coerceRows(selectedRows);
+        }
+    );
 };
 
 module.exports = Met;
