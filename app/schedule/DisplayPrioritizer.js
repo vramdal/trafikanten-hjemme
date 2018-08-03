@@ -6,6 +6,7 @@ import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {PlaylistType} from "../message/MessageType";
 
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
+const Met = require("../provider/Met");
 const Bysykkel = require("../provider/Bysykkel");
 const ScheduleProviderPrioritySetup = require("./ScheduleProviderPrioritySetup.js");
 const Yr = require("../provider/Yr");
@@ -59,6 +60,7 @@ class DisplayPrioritizer {
         switch (messageProviderName) {
             case 'Entur' : return new Entur.factory(this._dataStore, undefined, displayEventTitle);
             case 'Yr' : return new Yr.factory(this._dataStore, undefined, displayEventTitle);
+            case 'Met': return new Met.factory(this._dataStore, undefined, displayEventTitle);
             case 'Bysykkel' : return new Bysykkel.factory(this._dataStore, undefined, displayEventTitle);
             case 'Textmessage' : return new Textmessage.factory(this._dataStore, undefined, displayEventTitle);
             default : throw new Error("Invalid message provider name: " + messageProviderName);
@@ -117,8 +119,8 @@ class Column {
         if (provider.title) {
             const headerMessagePart = {
                 text: provider.title,
-                start: 0, end: 128, lines: 1,
-                animation: {animationName : "NoAnimation", timeoutTicks: 50, alignment: "center"}
+                start: 0, end: 128, lines: 2,
+                animation: {animationName : "PagingAnimation", timeoutTicks: 50, alignment: "center"}
             };
             playlist.unshift([headerMessagePart]);
             return playlist;

@@ -9,33 +9,30 @@ const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js")
 const XmlFetcher = require("../fetch/ValueFetcherAndFormatter.js").XmlFetcher;
 import type {MessageType, PlaylistType} from "../message/MessageType";
 import type {Alignments} from "../animations/Types";
-import type {LatLong} from "../types/Place";
+import type {LatLong, Location} from "../types/Place";
 const moment = require("moment");
 require("moment-round");
 
 //const defaultPlace = "Norge/Oslo/Oslo/Kampen";
 
-type LinkType = {
-    text: string,
-    url: string
-}
-
 type PrecipitationType = {
+    value: number,
     unit: string,
-    value: string
+    minvalue: number,
+    maxvalue: number,
+
 }
 
 type PrecipitationTimeType = {
     from: dateStringType,
     to: dateStringType,
-    precipitation: PrecipitationType
+    location: LocationType & {precipitation: PrecipitationType},
 }
 
 type dateStringType = string;
 
-type MetPrecipitationForecastType = {
-    time: Array<PrecipitationTimeType>
-}
+type MetPrecipitationForecastType = PrecipitationTimeType
+
 
 export type MetPrecipitationResponse = MetResponseType<MetPrecipitationForecastType>;
 
@@ -52,8 +49,10 @@ type MetResponseError = {
 type MetResponseType<T> = {
     weatherdata: {
         meta: any,
-        product: T ;
-    },
+        product: {
+            class: "pointData",
+            time: Array<T>
+        }},
     status: "SUCCESS"
 } | MetResponseError
 
@@ -61,12 +60,6 @@ type LocationType = {
     altitude: number,
     latitude: number,
     longitude: number,
-    precipitation?: {
-        value: number,
-        unit: string,
-        minvalue: number,
-        maxvalue: number,
-    },
     symbol?: {
         number: number,
         id: string,
@@ -94,7 +87,7 @@ type TimeType = {
     datatype: "forecast",
     from: string,
     to: string,
-    location: LocationType
+    location: LocationType & {precipitation? : PrecipitationType}
 }
 
 type PeriodType = 'NIGHT' | 'MORNING' | 'DAY' | 'EVENING' | 'NOW'
@@ -120,9 +113,9 @@ type CoercedTimeType = {
 }
 
 
-type ForecastType = Array<TimeType>
+type ForecastTimeType = TimeType;
 
-export type MetForecastResponse = MetResponseType<ForecastType>;
+export type MetForecastResponse = MetResponseType<ForecastTimeType>;
 
 const createFormatSpecifier = (x : number, end : number) : {start : number, end : number, lines : number}  => {
     return {
@@ -150,7 +143,7 @@ class Met implements PlaylistProvider {
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, location : LatLong, title : ?string) {
         this._id = `Met:${title || location}`;
-        this.title = title ? title + " fra met.no" : "Værvarsel fra met.no";
+        this.title = title ? title +  "\nfra met.no" : "Værvarsel\nfra met.no";
 
         this._forecastFetcher = new ValueFetcherAndFormatter(
             `${this._id}-forecast`,
@@ -160,29 +153,26 @@ class Met implements PlaylistProvider {
             this.formatForecast.bind(this)
         );
 
-        /*
-                this._precipitationFetcher = new ValueFetcherAndFormatter(
-                    `${this._id}-precipitation`,
-                    dataStore,
-                    XmlFetcher("http://www.yr.no/sted/" + place + "/varsel_nu.xml", {headers: {"User-Agent": USER_AGENT}}),
-                    120,
-                    this.formatPrecipitation.bind(this)
-
-                )
-        */
+        this._precipitationFetcher = new ValueFetcherAndFormatter(
+            `${this._id}-precipitation`,
+            dataStore,
+            XmlFetcher(`https://api.met.no/weatherapi/nowcast/0.9/?lat=${location.latitude}&lon=${location.longitude}`, {headers: {"User-Agent": USER_AGENT}}),
+            120,
+            this.formatPrecipitation.bind(this)
+        )
     }
 
     shutdown() {}
 
     //noinspection JSUnusedGlobalSymbols
     getPlaylist() : PlaylistType {
-        let playlist : PlaylistType = [this._forecastFetcher.getValue()/*, this._precipitationFetcher.getValue()*/];
-        playlist.playlistId = "yr-playlist-1";
+        let playlist : PlaylistType = [this._forecastFetcher.getValue(), this._precipitationFetcher.getValue()];
+        playlist.playlistId = "met-playlist-1";
         return playlist;
     }
 
     getPlaylistAsync(fresh : boolean = false) {
-        return Promise.all([this._forecastFetcher.getMessageAsync(fresh)/*, this._precipitationFetcher.getMessageAsync(fresh)*/]);
+        return Promise.all([this._forecastFetcher.getMessageAsync(fresh), this._precipitationFetcher.getMessageAsync(fresh)]);
     }
 
 
@@ -190,31 +180,31 @@ class Met implements PlaylistProvider {
         if (metForecast.status === "ERROR") {
             throw new Error(metForecast.error.info.message);
         }
-        const times : Array<TimeType> = metForecast.weatherdata.product.filter((time, idx) => time.from === time.to);
-        const aggregatedForecast : Array<CoercedTimeType> = aggregate(times);
+        const times : Array<TimeType> = metForecast.weatherdata.product.time;
+        const aggregatedForecast : Array<CoercedTimeType> = aggregate(times, moment());
         //let timestampRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
         let periodText = (period : PeriodType) : [string, number, Alignments, number] => {
             switch (period) {
-                case 'EVENING' : return ["natt", 25, "center", 22812];
-                case 'NIGHT' : return ["morg", 25, "center", 12192];
-                case 'MORNING' : return ["dag", 25, "center", 30829];
-                case 'DAY' : return ["kvld", 25, "center", 12067];
+                case 'EVENING' : return ["kveld", 25, "center", 22812];
+                case 'NIGHT' : return ["natt", 25, "center", 12192];
+                case 'MORNING' : return ["morg", 25, "center", 30829];
+                case 'DAY' : return ["dag", 25, "center", 12067];
                 default : throw new Error("Unknown period: " + period);
             }
         };
 
-        let symbol = (symbolNum : (number | string)) : string => {
-            switch (parseInt(symbolNum, 10)) {
+        let symbol = (symbolName : string, symbolNumber : number) : string => {
+            switch (parseInt(symbolNumber, 10)) {
                 case 1 : return String.fromCharCode(30829);
+                case 2 : return '░';
+                case 3 : return '▒';
                 case 4 : return '▓';
                 case 5 : return '▒' + String.fromCharCode(62246);
-                case 3 : return '▒';
-                case 2 : return '░';
                 case 9 : return '▓' + String.fromCharCode(62247);
                 case 10 : return '▓' + String.fromCharCode(62248);
                 case 46 : return '▓' + String.fromCharCode(62246);
                 case 40 : return '▒' + String.fromCharCode(62246);
-                default : return symbolNum + "";
+                default : return symbolName;
             }
         };
         let lastStop = 0;
@@ -238,10 +228,10 @@ class Met implements PlaylistProvider {
             )
         );
         let row2 = aggregatedForecast.map((time, idx) => {
-            const temperatureTxt = time.temperature && time.temperature.value || '';
-            const symbolTxt = time.symbol && symbol(time.symbol.id) || '';
+            const temperatureTxt = time.temperature && Math.round(time.temperature.value) || '';
+            const symbolTxt = time.symbol && symbol(time.symbol.id, time.symbol.number) || '?';
             return ({
-                text: `${temperatureTxt}°\n${symbol(symbolTxt)}\n${temperatureTxt}°\n${symbolTxt}`,
+                text: `${temperatureTxt}°\n${symbolTxt}\n${temperatureTxt}°\n${symbolTxt}`,
                 start: row1[idx].start + 128,
                 end: row1[idx].end + 128,
                 animation: {
@@ -260,15 +250,15 @@ class Met implements PlaylistProvider {
     }
 
 
-    formatPrecipitation(yrPrecipitation: MetPrecipitationResponse) : Promise<MessageType> {
-        if (yrPrecipitation.status === "ERROR") {
-            throw new Error(yrPrecipitation.error.info.message);
+    formatPrecipitation(metPrecipitation: MetPrecipitationResponse) : Promise<MessageType> {
+        if (metPrecipitation.status === "ERROR") {
+            throw new Error(metPrecipitation.error.info.message);
         }
         const barWidth = 6; //Math.floor(128 / yrPrecipitation.weatherdata.forecast.time.length / 2);
         let noPrecipitation = true;
 
-        const graph = yrPrecipitation.weatherdata.forecast.time && yrPrecipitation.weatherdata.forecast.time
-            .map(precipitationTime => parseFloat(precipitationTime.precipitation.value))
+        const graph = metPrecipitation.weatherdata.product.time && metPrecipitation.weatherdata.product.time
+            .map(precipitationTime => parseFloat(precipitationTime.location.precipitation.value))
             .map(value => {
                 if (value > 0) {
                     noPrecipitation = false;
@@ -314,16 +304,16 @@ class MetProviderFactory implements MessageProviderIcalAdapter<PlaylistProvider>
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options : {locationString : string}, title : ?string) : Met {
-        return new Met(id, this._dataStore, options.locationString, this._displayEventTitle && title || null);
+    createMessageProvider(id : string, options : {location: Location}, title : ?string) : Met {
+        return new Met(id, this._dataStore, options.location.coordinates, this._displayEventTitle && title || null);
     }
 }
 
-const aggregate = (times : Array<TimeType>) : Array<CoercedTimeType> => {
+const aggregate = (times : Array<TimeType>, now : moment): Array<CoercedTimeType> => {
     let rows : Array<ParsedTimeType> = times.map(time => Object.assign({}, time, {to: moment(time.to), from: moment(time.from)}));
-    let now = moment("2018-08-01T14:30:00Z").round(1, 'hours');
-    let next = now.clone().add(3, 'hour').ceil(6, 'hours');
-    const targetTimes = [now, next, next.clone().add(6, 'hour'), next.clone().add(12, 'hour')];
+    let thisHour = now.round(1, 'hours');
+    let next = thisHour.clone().add(3, 'hour').ceil(6, 'hours');
+    const targetTimes = [thisHour, next, next.clone().add(6, 'hour'), next.clone().add(12, 'hour')];
     return targetTimes.map(targetTime => {
         const selectedRows : Array<ParsedTimeType> = rows.filter(time => targetTime.isBetween(time.from, time.to, null, "[]"));
         const coerceRows = (rows : Array<ParsedTimeType>) : CoercedTimeType => {
@@ -340,7 +330,7 @@ const aggregate = (times : Array<TimeType>) : Array<CoercedTimeType> => {
             for (let i = 0; i < rows.length && (temperature === undefined || symbol === undefined) ; i++) {
                 let selectedTime = rows[i];
                 temperature = temperature || selectedTime.location.temperature;
-                symbol = symbol || selectedTime.location.symbol;
+                symbol = symbol || selectedTime.location.symbol && {id: selectedTime.location.symbol.id, number: parseInt(selectedTime.location.symbol.number) };
             }
             return {
                 time: targetTime,

@@ -49,6 +49,15 @@ function init() {
             "     ",
             "  X  ",
             "     ");
+    registerCharacter('?', 5,
+            " XXX ",
+            "X   X",
+            "    X",
+            "    X",
+            "   X ",
+            "  X  ",
+            "     ",
+            "  X  ");
     registerCharacter('"', 5,
             "     ",
             "XX XX",

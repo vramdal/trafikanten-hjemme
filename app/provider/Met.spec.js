@@ -14,9 +14,13 @@ describe('Met', () => {
         it('should aggregate met.no forecast xml', (done) => {
             Promise.resolve(xml2json.toJson(testdata))
                 .then(json => JSON.parse(json))
+                .then(json => {
+                    console.log("json", JSON.stringify(json, undefined, 3));
+                    return json;
+                })
                 .then(json => Object.assign({}, json, {status: "OK"}))
                 .then(json => {
-                    const aggregated = met._testing.aggregate(json.weatherdata.product.time);
+                    const aggregated = met._testing.aggregate(json.weatherdata.product.time, moment("2018-08-01T14:30:00Z"));
                     expect(aggregated).to.be.a('array');
                     expect(aggregated).to.have.lengthOf(4);
                     function testPeriod(period, timeStr, periodName, temperatureObj, symbolObj) {
