@@ -1,3 +1,5 @@
+let moment = require("moment");
+
 let expect = require("chai").expect;
 
 let met = require("./Met.js");
@@ -15,7 +17,34 @@ describe('Met', () => {
                 .then(json => Object.assign({}, json, {status: "OK"}))
                 .then(json => {
                     const aggregated = met._testing.aggregate(json.weatherdata.product.time);
-                    console.log("aggregated", aggregated);
+                    expect(aggregated).to.be.a('array');
+                    expect(aggregated).to.have.lengthOf(4);
+                    function testPeriod(period, timeStr, periodName, temperatureObj, symbolObj) {
+                        expect(period).to.have.property('period', periodName);
+                        expect(period).to.have.property('time');
+                        expect(period.time.isSame(moment(timeStr))).to.equal(true);
+                        expect(period).to.have.property('temperature');
+                        expect(period.temperature).to.deep.equal(temperatureObj);
+                        expect(period).to.have.property('symbol');
+                        expect(period.symbol).to.deep.equal(symbolObj);
+                    }
+
+                    testPeriod(aggregated[0], "2018-08-01T18:00:00.000", 'EVENING', {id: 'TTT', unit: 'celsius', value: '23.3'}, {
+                        id: 'LightCloud',
+                        number: '2'
+                    });
+                    testPeriod(aggregated[1], '2018-08-02T00:00:00.000', 'NIGHT', {id: 'TTT', unit: 'celsius', value: '17.4'}, {
+                        id: 'Sun',
+                        number: '1'
+                    });
+                    testPeriod(aggregated[2], "2018-08-02T06:00:00.000", 'MORNING', {id: 'TTT', unit: 'celsius', value: '14.5'}, {
+                        id: 'PartlyCloud',
+                        number: '3'
+                    });
+                    testPeriod(aggregated[3], "2018-08-02T12:00:00.000", 'DAY', {id: 'TTT', unit: 'celsius', value: '20.1'}, {
+                        id: 'Cloud',
+                        number: '4'
+                    });
                     done();
                 });
         });
