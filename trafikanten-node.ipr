@@ -226,7 +226,9 @@
     </dictionary>
     <dictionary name="e502955">
       <words>
+        <w>datatype</w>
         <w>ical</w>
+        <w>weatherdata</w>
       </words>
     </dictionary>
   </component>

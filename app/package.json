@@ -21,6 +21,7 @@
     "lodash": "^4.17.10",
     "memwatch-next": "^0.3.0",
     "moment": "^2.22.1",
+    "moment-round": "^1.0.1",
     "node-cache": "^4.2.0",
     "node-fetch": "^1.7.2",
     "ontime": "^0.0.5",
