@@ -15,7 +15,7 @@ describe('Met', () => {
             Promise.resolve(xml2json.toJson(testdata))
                 .then(json => JSON.parse(json))
                 .then(json => {
-                    console.log("json", JSON.stringify(json, undefined, 3));
+                    //console.log("json", JSON.stringify(json, undefined, 3));
                     return json;
                 })
                 .then(json => Object.assign({}, json, {status: "OK"}))
@@ -35,19 +35,19 @@ describe('Met', () => {
 
                     testPeriod(aggregated[0], "2018-08-01T18:00:00.000", 'EVENING', {id: 'TTT', unit: 'celsius', value: '23.3'}, {
                         id: 'LightCloud',
-                        number: '2'
+                        number: 2
                     });
                     testPeriod(aggregated[1], '2018-08-02T00:00:00.000', 'NIGHT', {id: 'TTT', unit: 'celsius', value: '17.4'}, {
                         id: 'Sun',
-                        number: '1'
+                        number: 1
                     });
                     testPeriod(aggregated[2], "2018-08-02T06:00:00.000", 'MORNING', {id: 'TTT', unit: 'celsius', value: '14.5'}, {
                         id: 'PartlyCloud',
-                        number: '3'
+                        number: 3
                     });
                     testPeriod(aggregated[3], "2018-08-02T12:00:00.000", 'DAY', {id: 'TTT', unit: 'celsius', value: '20.1'}, {
                         id: 'Cloud',
-                        number: '4'
+                        number: 4
                     });
                     done();
                 });
