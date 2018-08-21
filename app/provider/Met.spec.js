@@ -32,20 +32,19 @@ describe('Met', () => {
                         expect(period).to.have.property('symbol');
                         expect(period.symbol).to.deep.equal(symbolObj);
                     }
-
-                    testPeriod(aggregated[0], "2018-08-01T18:00:00.000", 'EVENING', {id: 'TTT', unit: 'celsius', value: '23.3'}, {
+                    testPeriod(aggregated[0], "2018-08-01T16:00:00Z", 'EVENING', {id: 'TTT', unit: 'celsius', value: '23.3'}, {
                         id: 'LightCloud',
                         number: 2
                     });
-                    testPeriod(aggregated[1], '2018-08-02T00:00:00.000', 'NIGHT', {id: 'TTT', unit: 'celsius', value: '17.4'}, {
+                    testPeriod(aggregated[1], '2018-08-01T22:00:00Z', 'NIGHT', {id: 'TTT', unit: 'celsius', value: '17.4'}, {
                         id: 'Sun',
                         number: 1
                     });
-                    testPeriod(aggregated[2], "2018-08-02T06:00:00.000", 'MORNING', {id: 'TTT', unit: 'celsius', value: '14.5'}, {
+                    testPeriod(aggregated[2], "2018-08-02T04:00:00Z", 'MORNING', {id: 'TTT', unit: 'celsius', value: '14.5'}, {
                         id: 'PartlyCloud',
                         number: 3
                     });
-                    testPeriod(aggregated[3], "2018-08-02T12:00:00.000", 'DAY', {id: 'TTT', unit: 'celsius', value: '20.1'}, {
+                    testPeriod(aggregated[3], "2018-08-02T10:00:00Z", 'DAY', {id: 'TTT', unit: 'celsius', value: '20.1'}, {
                         id: 'Cloud',
                         number: 4
                     });
