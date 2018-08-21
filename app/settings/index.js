@@ -9,6 +9,7 @@ let homedir = process.env.HOME || process.env.USERPROFILE,
     filepath = path.join(homedir, FILENAME);
 
 module.exports.all = () => JSON.parse(fs.readFileSync(filepath, "UTF-8"));
+module.exports.timingFactor = 0.1;
 module.exports.setAll = (obj => {
     for (let key in obj) {
         if (!obj.hasOwnProperty(key)) {

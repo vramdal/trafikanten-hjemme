@@ -20,7 +20,6 @@ const flatten = require("lodash").flatten;
 let framer = new Framer();
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
 let uiServer = createHttpUiServer(6060, process.env.NODE_ENV === 'development');
-// let display : Display = new GPIODisplay();
 let display;
 if (process.argv[2] === "ws") {
     console.log('Outputting to WebSocket display');

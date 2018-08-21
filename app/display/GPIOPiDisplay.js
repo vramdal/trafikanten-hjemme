@@ -1,5 +1,6 @@
 // @flow
 import type {DisplayInterface} from "./DisplayInterface";
+import type {Bitmap} from "../bitmap/Bitmap";
 const Display = require("./Display.js");
 
 class GPIOPiDisplay extends Display implements DisplayInterface {
@@ -10,9 +11,17 @@ class GPIOPiDisplay extends Display implements DisplayInterface {
     constructor() {
         super();
         this.isOutputting = false;
-        this.ledDisplay = require("pi-led");
+        if (process.env.piLedAddon !== undefined) {
+            this.ledDisplay = require(process.env.piLedAddon);
+        } else {
+            console.warn("------------------------------------------------------------------------");
+            console.warn("piLedAddon environment parameter not set, GPIOPiDisplay will not operate");
+            console.warn("------------------------------------------------------------------------");
+        }
         console.log("this.ledDisplay = ", this.ledDisplay);
-        this.ledDisplay.Init(true);
+        if (this.ledDisplay) {
+            this.ledDisplay.Init(true, 50);
+        }
     }
 
 
@@ -24,7 +33,9 @@ class GPIOPiDisplay extends Display implements DisplayInterface {
                 } else {
                     this.isOutputting = true;
                     // if (Array.isArray(this.buffer)) {
+                    //console.log("Writing buffer ...");
                     this.ledDisplay.WriteBytes(Array.from(this.buffer), 0);
+                    //console.log("... complete");
                     // } else {
                     //     console.warn("Buffer is not an array of bytes, but " + typeof this.buffer);
                     // }
@@ -35,6 +46,11 @@ class GPIOPiDisplay extends Display implements DisplayInterface {
                 throw e;
             }
         }
+    }
+    
+    outputRaw(buffer : Bitmap) { // Kun for testing
+        this.ledDisplay.WriteBytes(Array.from(buffer), 0);
+
     }
 
 }
