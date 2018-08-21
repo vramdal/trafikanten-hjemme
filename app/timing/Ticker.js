@@ -1,7 +1,5 @@
 // @flow
 
-const timingFactor = require("../settings").timingFactor;
-
 export type CountdownPromise = Promise<number>;
 
 class Ticker {
@@ -11,10 +9,12 @@ class Ticker {
     _promise: Promise<any>;
     _resolver: () => void;
     _rejecter: (err: Error) => void;
+    _timingFactor : number;
 
-    constructor(interval: number, func: () => CountdownPromise) {
+    constructor(interval: number, func: () => CountdownPromise, timingFactor : number = 1) {
         this._interval = interval;
         this._func = func;
+        this._timingFactor = timingFactor;
     }
 
     countdown() : Promise<any> {
@@ -22,7 +22,7 @@ class Ticker {
             this._resolver = resolve;
             this._rejecter = reject;
         });
-        this._timer = setInterval(this.tick.bind(this), this._interval * timingFactor);
+        this._timer = setInterval(this.tick.bind(this), this._interval * this._timingFactor);
         return this._promise;
     }
 
