@@ -47,7 +47,7 @@ class GPIOPiDisplay extends Display implements DisplayInterface {
             }
         }
     }
-    
+
     outputRaw(buffer : Bitmap) { // Kun for testing
         this.ledDisplay.WriteBytes(Array.from(buffer), 0);
 
