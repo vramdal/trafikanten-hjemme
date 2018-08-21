@@ -43,8 +43,7 @@
     "test": ">=0.0.5"
   },
   "optionalDependencies": {
-    "ofe": "0.1.x",
-    "pi-led": "../pi-led"
+    "ofe": "0.5.1"
   },
   "bundledDependencies": [
     "async",
