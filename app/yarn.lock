@@ -696,7 +696,7 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-nan@^2.1.0, nan@^2.10.0, nan@^2.3.2:
+nan@^2.1.0, nan@^2.10.0, nan@^2.3.2, nan@^2.3.5:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
@@ -775,6 +775,12 @@ path-parse@^1.0.5:
 path-to-regexp@0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-0.1.7.tgz#df604178005f522f15eb4490e7247a1bfaa67f8c"
+
+pi-spi@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/pi-spi/-/pi-spi-1.0.2.tgz#10619ea2e7e1f8425b885abefb627c2739030dc6"
+  dependencies:
+    nan "^2.3.5"
 
 proxy-addr@~2.0.3:
   version "2.0.4"
