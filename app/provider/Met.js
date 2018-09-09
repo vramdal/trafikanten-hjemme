@@ -143,7 +143,7 @@ class Met implements PlaylistProvider {
     //noinspection JSUnusedLocalSymbols
     constructor(id : string, dataStore : PreemptiveCache, location : LatLong, title : ?string) {
         this._id = `Met:${title || location}`;
-        this.title = title ? title +  "\nfra met.no" : "Værvarsel\nfra met.no";
+        this.title = title; //? title +  "\nfra met.no" : "Værvarsel\nfra met.no";
 
         this._forecastFetcher = new ValueFetcherAndFormatter(
             `${this._id}-forecast`,
