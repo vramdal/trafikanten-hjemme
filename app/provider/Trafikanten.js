@@ -1,18 +1,16 @@
 // @flow
 
-const NoAnimation = require("./animations/NoAnimation.js");
-//const testdata1 = require("./testdata/ensjø-departures-1.json");
-//const testdata2 = require("./testdata/ensjø-departures-2.json");
-const PreemptiveCache = require("./fetch/PreemptiveCache.js");
-const ValueFetcherAndFormatter = require("./fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
-const JsonFetcher = require("./fetch/ValueFetcherAndFormatter.js").JsonFetcher;
+const NoAnimation = require("../animations/NoAnimation.js");
+const PreemptiveCache = require("../fetch/PreemptiveCache.js");
+const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
+const JsonFetcher = require("../fetch/ValueFetcherAndFormatter.js").JsonFetcher;
 
 type MonitoredCall = {
     ExpectedDepartureTime : string
 }
 
-import type {MessageType, AnimationType, MessagePartType} from "./message/MessageType";
-import type {MessageProvider} from "./provider/MessageProvider";
+import type {MessageType, AnimationType, MessagePartType} from "../message/MessageType";
+import type {MessageProvider} from "./MessageProvider";
 
 
 type MonitoredVehicleJourney = {
