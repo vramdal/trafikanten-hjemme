@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--suppress CssUnusedSymbol -->
+    <style type="text/css">
+        body {
+            background-color: #050505;
+        }
+        table {
+            border-collapse: collapse;
+            min-width: 400px;
+            table-layout: fixed;
+        }
+
+        td {
+            border: 1px solid black;
+            width: 10px;
+            height: 10px;
+            background-color: black;
+        }
+
+        td.on {
+            background-color: yellow;
+        }
+    </style>
+    <script type="text/javascript">
+        window.addEventListener('load', () => {
+
+            let rows = [];
+
+            let websocket;
+
+            window.setInterval(() => {
+                if (!websocket || websocket.readyState >= WebSocket.CLOSING) {
+                    openWebsocket()
+                }
+            }, 2000);
+
+            document.querySelectorAll("table tbody").forEach(tbody => {
+                for (let r = 0; r < 8; r++) {
+                    let row = document.createElement("tr");
+                    for (let c = 0; c < 128; c++) {
+                        let col = document.createElement("td");
+                        row.appendChild(col);
+                    }
+                    tbody.appendChild(row);
+                }
+            });
+
+            document.querySelectorAll("table tbody tr").forEach((tr, trIdx) => {
+                tr.querySelectorAll("td").forEach((td, tdIdx) => {
+                    const rowIdx = trIdx % 8;
+                    const colIdx = tdIdx + (Math.floor(trIdx / 8)) * 128;
+                    rows[rowIdx] = rows[rowIdx] || [];
+                    rows[rowIdx][colIdx] = td;
+//                    td.innerText = rowIdx + " " + colIdx;
+                });
+
+            });
+            console.log("rows = ", rows);
+
+            let paintLock;
+
+            document.querySelector("#connectButton").addEventListener("click", () => {
+                openWebsocket();
+            });
+
+            let openWebsocket = () => {
+                websocket = new WebSocket("ws://" + window.location.hostname + ":6061", "bitmapUpdated");
+                websocket.binaryType = "arraybuffer";
+                websocket.onmessage = (event) => {
+                    if (event.data instanceof ArrayBuffer) {
+                        let bitmap = new Uint8Array(event.data);
+                        if (!paintLock) {
+                            paintLock = setTimeout(() => {
+                                paint(bitmap);
+                                paintLock = undefined;
+
+                            }, 0);
+                        } else {
+                            console.warn("Skipped frame");
+                        }
+                    }
+                };
+
+                function handleWebsocketStatusChange(event) {
+                    let statusDomElement = document.querySelector("#websocket-status");
+                    let statusErrorElement = document.querySelector("#websocket-error");
+                    console.log("event = ", event);
+                    switch (event.type) {
+                        case "open" : statusErrorElement.innerText = ""; statusDomElement.innerText = "Open"; break;
+                        case "close" : statusDomElement.innerText = "Closed"; break;
+                        case "error" : statusErrorElement.innerText = "Error"; break;
+                        default : statusDomElement.innerText = "Unknown";
+                    }
+                }
+                websocket.onerror = handleWebsocketStatusChange;
+                websocket.onopen = handleWebsocketStatusChange;
+                websocket.onclose = handleWebsocketStatusChange;
+            };
+
+            function paint(bitmap) {
+                let ctx = document.querySelector("canvas").getContext('2d');
+                for (let x = 0; x < bitmap.length; x++) {
+                    const byte = bitmap[x];
+                    let mask = 0x80;
+                    let y = 0;
+                    while (y < 8) {
+                        let bit = byte & mask;
+                        ctx.fillStyle = bit ? 'yellow' : "black";
+                        //console.log('Filling x, y, with ', x, y, ctx.fillStyle);
+                        let section = Math.floor(x / 128);
+                        ctx.fillRect(x % 128  * 10 , y * 10 + section * 8 * 10 + Math.min(1, section) * 10, 10, 10);
+
+                        y = y + 1;
+                        mask = mask / 2;
+
+                    }
+                }
+
+
+                /*
+                 for (let x = 0; x < bitmap.length; x++) {
+                 const byte = bitmap[x];
+                 let mask = 0x80;
+                 let y = 0;
+                 while (y < 8) {
+                 let bit = byte & mask;
+                 rows[y][x].className = (bit ? "on" : "off");
+                 y = y + 1;
+                 mask = mask / 2;
+                 }
+                 }
+                 */
+
+            }
+        });
+    </script>
+</head>
+<body>
+
+<button type="button" id="connectButton" style="float: left; background-color: black; color: white; border: 1px solid black">Connect</button> - <span id="websocket-status">Not opened</span> <span id="websocket-error"></span>
+
+<canvas width="1270" height="170"></canvas>
+</body>
+</html>

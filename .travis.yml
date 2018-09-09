@@ -21,4 +21,5 @@ deploy:
     repo: vramdal/trafikanten-hjemme
     all_branches: true
     tags: true
+script: ./run_build.sh
 

@@ -1,0 +1,20 @@
+fieldset {
+    display: flex;
+    text-align: left;
+}
+
+fieldset input, fieldset select {
+    display: block;
+    width: 100%;
+}
+
+fieldset input[type='checkbox'] {
+    width: inherit;
+    display: inline;
+    vertical-align: bottom;
+}
+
+button {
+    display: block;
+    width: 100%;
+}

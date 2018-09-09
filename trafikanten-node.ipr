@@ -16,7 +16,6 @@
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
-  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
   <component name="IdProvider" IDEtalkID="496A3CEC1CDE5007561FC6A42C70D4A1" />
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
@@ -94,6 +93,9 @@
     <option worker="false" />
     <option wsh="false" />
     <option yui="false" />
+  </component>
+  <component name="JavaScriptLibraryMappings">
+    <includedPredefinedLibrary name="Node.js Core" />
   </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="FLOW" />
@@ -223,6 +225,14 @@
     <dictionary name="vramdal">
       <words>
         <w>linebreaker</w>
+        <w>ontime</w>
+      </words>
+    </dictionary>
+    <dictionary name="e502955">
+      <words>
+        <w>datatype</w>
+        <w>ical</w>
+        <w>weatherdata</w>
       </words>
     </dictionary>
   </component>
@@ -231,6 +241,8 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/frontend/frontend.iml" filepath="$PROJECT_DIR$/frontend/frontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/trafikanten-node.iml" filepath="$PROJECT_DIR$/trafikanten-node.iml" />
     </modules>
   </component>
@@ -257,6 +269,20 @@
       <method />
     </configuration>
   </component>
+  <component name="PublishConfigData" autoUpload="Always" serverName="trafikanten-2.local" compareModeInSync="TEXT" showNewOnTargetInSync="false">
+    <serverData>
+      <paths name="trafikanten-2.local">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/git/trafikanten-hjemme" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/git/trafikanten-hjemme/app" local="$PROJECT_DIR$/app" web="/app" />
+            <mapping deploy="/git/trafikanten-hjemme/frontend" local="$PROJECT_DIR$/frontend" web="/frontend" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
@@ -273,5 +299,17 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+  </component>
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0be55c38-f7ed-400a-a632-ca206790d8b8" name="trafikanten-2.local" url="http://trafikanten-2.local">
+        <fileTransfer host="trafikanten-2.local" port="22" rootFolder="/home/pi" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
   </component>
 </project>

@@ -1,0 +1,18 @@
+[
+  {
+    "startDate": "2018-06-06T00:00:00.000Z",
+    "endDate": "2018-06-07T00:00:00.000Z",
+    "summary": "Run 1",
+    "locationName": "Lilleaker, Oslo, Norge",
+    "id": "4oi7op2gq53323aluab2pbur88_R20180604@google.com",
+    "lastUpdate": "2018-06-05T07:47:10Z",
+    "lastModified": "2018-06-05T06:59:06Z",
+    "location": {
+      "coordinates": {
+        "longitude": 10.635967,
+        "latitude": 59.920861
+      },
+      "name": "Her kommer navn"
+    }
+  }
+]
