@@ -54,7 +54,7 @@ class TextmessageProviderFactory implements MessageProviderIcalAdapter<MessagePr
 
     constructor(dataStore : PreemptiveCache) {
         this._dataStore = dataStore;
-        this._apiKey = settings.get("bysykkel").apiKey;
+        this._apiKey = settings.get("oslobysykkel").apiKey;
     }
 
     //noinspection JSUnusedGlobalSymbols
