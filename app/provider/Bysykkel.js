@@ -3,7 +3,7 @@ const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js")
 
 
 const AVAILABILITY_URL = "https://oslobysykkel.no/api/v1/stations/availability";
-//const STATIONS_URL = "https://oslobysykkel.no/api/v1/stations";
+const STATIONS_URL = "https://oslobysykkel.no/api/v1/stations";
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const JsonFetcher = require("../fetch/ValueFetcherAndFormatter.js").JsonFetcher;
 const settings = require("../settings/index");
@@ -107,6 +107,7 @@ class Bysykkel implements MessageProvider {
             return str;
         };
 */
+
         let messages = availabilityResponse.stations
             && availabilityResponse.stations
                 .filter(station => station.id === this._stationId)
@@ -147,11 +148,28 @@ class BysykkelProviderFactory implements MessageProviderIcalAdapter<MessageProvi
     _dataStore: PreemptiveCache;
     _apiKey : string;
     _displayEventTitle: boolean;
+    _stationsListFetcher : ValueFetcherAndFormatter<StationsResponseType>;
 
     constructor(dataStore : PreemptiveCache, config: {}, displayEventTitle: boolean) {
         this._dataStore = dataStore;
         this._displayEventTitle = displayEventTitle;
         this._apiKey = settings.get("oslobysykkel").apiKey;
+        this._stationsListFetcher = new ValueFetcherAndFormatter<StationsResponseType>(
+            'bysykkel-stations-list-fetcher',
+            this._dataStore,
+            JsonFetcher(STATIONS_URL, {headers: {"Client-Identifier": this._apiKey}}),
+            60*60*24,
+            (response: StationsResponseType) => {
+                // TODO: Fetch all stations list, sort by distance from home, save ID of nearest station
+                let homeLocation : LatLongType = settings.home.coordinates;
+                let distanceFromHome : (station : StationType) => number = (station : StationType) => {
+                    return station.center.latitude * station.center.latitude
+                };
+
+
+            },
+            60*60*24
+            )
     }
 
     //noinspection JSUnusedGlobalSymbols
