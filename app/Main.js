@@ -5,7 +5,6 @@ memwatch.on('leak', (info) => {
     console.error('Memory leak detected:\n', info);
 });
 
-const Display = require("./display/Display");
 const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
 const Framer = require("./rendering/Framer.js");
 const EventTypeNames = require("./types/SimpleTypes.js").EventTypeNames;
@@ -17,20 +16,33 @@ const ScheduleProviderPrioritySetup = require("./schedule/ScheduleProviderPriori
 const settings = require('./settings');
 const flatten = require("lodash").flatten;
 
+const program = require('commander');
+const version = require('./package.json').version;
+
+program.version(version)
+    .option('-s, --websocket [port]', 'Output to websocket [port]. Defaults to 6061.', parseInt)
+    .option('-N, --nogpio', 'Do not output to GPIO display.')
+    .option('-p, --uiport [port]', 'Start admin UI on [port]. Defaults to 6060.', parseInt, 6060)
+    .option('-t, --timingfactor <factor>', 'Multiply timeouts by [factor]. Defaults to 1.0', parseFloat, 1.0)
+    .parse(process.argv)
+;
+
+const timingfactor = program.timingfactor;
+
 let framer = new Framer();
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
-let uiServer = createHttpUiServer(6060, process.env.NODE_ENV === 'development');
+const uiPort = program.uiport;
+console.log("Starting admin UI on port " + uiPort);
+let uiServer = createHttpUiServer(uiPort, process.env.NODE_ENV === 'development');
 let display;
-if (process.argv[2] === "ws") {
-    console.log('Outputting to WebSocket display');
-    display = new (require("./display/WebsocketDisplay.js"))(6061);
-} else {
+if (program.websocket) {
+    console.log('Outputting to WebSocket display on port ' + program.websocket);
+    display = new (require("./display/WebsocketDisplay.js"))(program.websocket);
+} if (!program.nogpio) {
     console.log('Outputting to GPIO display');
     display = new (require("./display/GPIOPiDisplay.js"));
 }
-// const display = require("./display/GPIOPiDisplay.js");
-// let display : Display = new WebsocketDisplay(6061);
-
+console.log("Timing factor", timingfactor);
 fetchService.start().then(() => {
     "use strict";
     let calendarMap = {};
@@ -42,7 +54,7 @@ fetchService.start().then(() => {
         const playlist = displayPrioritizer.getPlaylist();
         const messageSpecs = [].concat(playlist);
         const messages = flatten(messageSpecs.map(framer.parse.bind(framer)));
-        display.playlist = new PlaylistDisplay(display.eventEmitter, messages);
+        display.playlist = new PlaylistDisplay(display.eventEmitter, messages, timingfactor);
         return Promise.all([(resolve) => {window.setTimeout(resolve, 3000)}]);
     };
     display.eventEmitter.on(EventTypeNames.EVENT_PLAYLIST_EXHAUSTED, loop);

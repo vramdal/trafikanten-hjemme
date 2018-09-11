@@ -9,8 +9,6 @@ const EventTypeNames = require("../types/SimpleTypes.js").EventTypeNames;
 const ConsoleUtils = require("./ConsoleUtils.js");
 const Message = require("../types/Message.js");
 const Rastrifier = require("./Rastrifier.js");
-const timingFactor = require("../settings").timingFactor;
-
 
 class MessageDisplay {
 
@@ -21,7 +19,7 @@ class MessageDisplay {
     _message: Message;
     _prepared: boolean;
 
-    constructor(message : Message, display : DisplayEventEmitter) {
+    constructor(message : Message, display : DisplayEventEmitter, timingFactor : number) {
         this._message = message;
         this._displayEventEmitter = display;
         this._ticker = new Ticker(25, this.scrollFrames.bind(this), timingFactor);

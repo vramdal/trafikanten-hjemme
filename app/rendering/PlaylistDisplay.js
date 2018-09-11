@@ -10,11 +10,13 @@ class PlaylistDisplay {
     _playlistItemIdx: number ;
     _currentlyPlayingMessage : ?MessageDisplay;
     _displayEventEmitter: DisplayEventEmitter;
+    _timingFactor : number;
 
-    constructor(displayEventEmitter : DisplayEventEmitter, messages : Array<Message>) {
+    constructor(displayEventEmitter : DisplayEventEmitter, messages : Array<Message>, timingFactor : number = 1.0) {
         this._displayEventEmitter = displayEventEmitter;
         this._playlistItemIdx = 0;
         this._messages = messages.slice();
+        this._timingFactor = timingFactor;
     }
 
     play() : Promise<void> {
@@ -43,7 +45,7 @@ class PlaylistDisplay {
 
     //noinspection JSMethodCanBeStatic
     prepareMessage(message : Message) : MessageDisplay {
-        let messageDisplay = new MessageDisplay(message, this._displayEventEmitter);
+        let messageDisplay = new MessageDisplay(message, this._displayEventEmitter, this._timingFactor);
         messageDisplay.prepare();
         return messageDisplay;
 
