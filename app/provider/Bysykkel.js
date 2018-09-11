@@ -10,6 +10,7 @@ const settings = require("../settings/index");
 
 import type {MessageType} from "../message/MessageType";
 import type {MessageProviderIcalAdapter, MessageProvider} from "./MessageProvider";
+import type {Location, LatLong} from '../types/Place';
 
 type LatLongType = {
     latitude: number,
@@ -54,33 +55,63 @@ type StatusResponseType = {
     }
 }
 
+/*
 const defaultStationId = 358;
 const defaultStationName = "Kampen park øst";
+
+*/
+function distance(lat1, lon1, lat2, lon2) {
+    const p = 0.017453292519943295;    // Math.PI / 180
+    const c = Math.cos;
+    const a = 0.5 - c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) *
+        (1 - c((lon2 - lon1) * p)) / 2;
+
+    return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+}
+
+function latLongDistance(latLong1 : LatLong, latLong2 : LatLong) {
+    try {
+        return distance(latLong1.latitude, latLong1.longitude, latLong2.latitude, latLong2.longitude);
+    } catch (e) {
+        console.warn(e, latLong1, latLong2);
+        return Number.MAX_SAFE_INTEGER;
+    }
+}
 
 class Bysykkel implements MessageProvider {
 
     _id: string;
-    _statusFetcher: ValueFetcherAndFormatter<AvailabilityResponseType>;
+    _statusFetcherPromise: Promise<ValueFetcherAndFormatter<AvailabilityResponseType>>;
 
     static factory : Class<MessageProviderIcalAdapter<MessageProvider>>;
     _stationId: number;
     _stationname: string;
     _apiKey : string;
+    _stationsListPromise: Promise<Array<StationType>>;
+    _location: Location;
 
 
-    constructor(id: string, dataStore: PreemptiveCache, apiKey : string, stationId : number = defaultStationId, stationname: string = defaultStationName) {
+    constructor(id: string, dataStore: PreemptiveCache, apiKey : string, stationsListPromise : Promise<Array<StationType>>, location : Location) {
         this._id = id;
-        this._stationId = stationId;
-        this._stationname = stationname;
         this._apiKey = apiKey;
-        this._statusFetcher = new ValueFetcherAndFormatter(
-            `bysykkel-${this._stationId}-availability`,
-            dataStore,
-            JsonFetcher(AVAILABILITY_URL, {headers: {"Client-Identifier": apiKey}}),
-            30,
-            this.format.bind(this),
-            10
-        );
+        this._stationsListPromise = stationsListPromise;
+        this._location = location;
+        this._statusFetcherPromise = this._stationsListPromise.then((stationsList : Array<StationType>) => {
+            const nearestStation : StationType = stationsList
+                .sort((stationA : StationType, stationB : StationType) => latLongDistance(stationA.center, location.coordinates) - latLongDistance(stationB.center, location.coordinates))
+            [0];
+            this._stationId = nearestStation.id;
+            this._stationname = nearestStation.title;
+            return new ValueFetcherAndFormatter(
+                `bysykkel-${nearestStation.id}-availability`,
+                dataStore,
+                JsonFetcher(AVAILABILITY_URL, {headers: {"Client-Identifier": apiKey}}),
+                30,
+                this.format.bind(this),
+                10
+            );
+        });
     }
 
     format(availabilityResponse : AvailabilityResponseType) : Promise<MessageType> {
@@ -132,11 +163,11 @@ class Bysykkel implements MessageProvider {
     }
 
     getMessage() : ?MessageType {
-        return this._statusFetcher.getValue();
+        return this._statusFetcherPromise.then((statusFetcher : ValueFetcherAndFormatter<AvailabilityResponseType>) => statusFetcher.getValue());
     }
 
     getMessageAsync(fresh : boolean) : Promise<MessageType> {
-        return this._statusFetcher.getMessageAsync(fresh);
+        return this._statusFetcherPromise.then((statusFetcher: ValueFetcherAndFormatter<AvailabilityResponseType>) => statusFetcher.getMessageAsync(fresh));
     }
 
     shutdown() {
@@ -154,33 +185,19 @@ class BysykkelProviderFactory implements MessageProviderIcalAdapter<MessageProvi
         this._dataStore = dataStore;
         this._displayEventTitle = displayEventTitle;
         this._apiKey = settings.get("oslobysykkel").apiKey;
-        this._stationsListFetcher = new ValueFetcherAndFormatter<StationsResponseType>(
+        this._stationsListFetcher = new ValueFetcherAndFormatter(
             'bysykkel-stations-list-fetcher',
             this._dataStore,
             JsonFetcher(STATIONS_URL, {headers: {"Client-Identifier": this._apiKey}}),
             60*60*24,
-            (response: StationsResponseType) => {
-                // TODO: Fetch all stations list, sort by distance from home, save ID of nearest station
-                let homeLocation : LatLongType = settings.home.coordinates;
-                let distanceFromHome : (station : StationType) => number = (station : StationType) => {
-                    return station.center.latitude * station.center.latitude
-                };
-
-
-            },
+            (response: StationsResponseType) : Promise<Array<StationType>> => Promise.resolve(response.stations),
             60*60*24
             )
     }
 
     //noinspection JSUnusedGlobalSymbols
-    createMessageProvider(id : string, options : {idAndDescriptionString: string}) : Bysykkel {
-        let stationId : number = parseInt(options.idAndDescriptionString, 10);
-        let stationNameMatch : ?Array<any> = options.idAndDescriptionString.match(/[\d\s]+(.*)/);
-        let stationName = "Bysykkel";
-        if (stationNameMatch) {
-            stationName = stationNameMatch[1];
-        }
-        return new Bysykkel(id, this._dataStore, this._apiKey, stationId, stationName);
+    createMessageProvider(id : string, options : {location: Location}) : Bysykkel {
+        return new Bysykkel(id, this._dataStore, this._apiKey, this._stationsListFetcher.getMessageAsync(), options.location);
     }
 }
 
