@@ -1,9 +1,7 @@
 // @flow
 const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
 
-
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
-const settings = require("../settings/index");
 
 import type {MessageType} from "../message/MessageType";
 import type {MessageProviderIcalAdapter, MessageProvider} from "./MessageProvider";
@@ -50,16 +48,16 @@ class Textmessage implements MessageProvider {
 
 class TextmessageProviderFactory implements MessageProviderIcalAdapter<MessageProvider> {
     _dataStore: PreemptiveCache;
-    _apiKey : string;
+    _displayEventTitle: boolean;
 
-    constructor(dataStore : PreemptiveCache) {
+    constructor(dataStore : PreemptiveCache, config: {}, displayEventTitle: boolean) {
         this._dataStore = dataStore;
-        this._apiKey = settings.get("oslobysykkel").apiKey;
+        this._displayEventTitle = displayEventTitle;
     }
 
     //noinspection JSUnusedGlobalSymbols
     createMessageProvider(id : string, options : {textmessageString: string}, title : ?string) : Textmessage {
-        return new Textmessage(id, this._dataStore, options.textmessageString, title);
+        return new Textmessage(id, this._dataStore, options.textmessageString, this._displayEventTitle && title || undefined);
     }
 }
 
