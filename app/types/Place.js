@@ -7,3 +7,8 @@ export type Location = {
     name : string,
     coordinates : LatLong
 }
+
+export type DatePeriod = {
+    startDate: Date,
+    endDate: Date
+}

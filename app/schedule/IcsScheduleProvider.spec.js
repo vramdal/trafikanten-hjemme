@@ -4,6 +4,7 @@ const IcsScheduleProvider = require("./IcsScheduleProvider");
 const PreemptiveCache = require("../fetch/Mock-PreemptiveCache");
 const moment = require("moment");
 const Entur = require("../provider/Entur.js");
+const DisplayDurationStrategies = require("./DisplayPrioritizer").DisplayDurationStrategies;
 
 let setup = function (calendarEventsJsonFilename) {
     let calendarEventsJson = require(calendarEventsJsonFilename);
@@ -11,7 +12,7 @@ let setup = function (calendarEventsJsonFilename) {
     let messageProviderFactory = new Entur.factory(dataStore, {
         graphQLFetcherFactory: () => () => Promise.resolve(require("../testdata/entur-response-1.json"))
     });
-    const icsScheduleProvider = new IcsScheduleProvider("testsubject", dataStore, "http://notimportant", messageProviderFactory);
+    const icsScheduleProvider = new IcsScheduleProvider("testsubject", dataStore, "http://notimportant", messageProviderFactory, "test-schedule-provider", false, DisplayDurationStrategies.forEventDuration());
     return {calendarEventsJson, dataStore, icsScheduleProvider};
 };
 describe('IcsScheduleProvider.spec.js', () => {

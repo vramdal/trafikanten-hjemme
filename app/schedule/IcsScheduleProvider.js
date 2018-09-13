@@ -1,9 +1,11 @@
 // @flow
 import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {CalendarEvent} from "../fetch/IcalFetcher";
-import type {Location} from "../types/Place";
+import type {DatePeriod, Location} from "../types/Place";
 import type {CachedValueProvider} from "../fetch/Cache";
 import type {PlaylistType} from "../message/MessageType";
+import type {Duration} from "moment";
+import type {DisplayDurationStrategyType} from "./DisplayPrioritizer";
 
 const IcalFetcher = require("../fetch/IcalFetcher");
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
@@ -61,8 +63,9 @@ class IcalScheduleProvider implements ScheduleProvider {
     _displayEventChangeset : DisplayEventChangeset;
     name : ?string;
     _isDisplayEventTitle: boolean;
+    _displayDurationStrategy : DisplayDurationStrategyType;
 
-    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : AdapterUnion, name : string, displayEventTitle? : boolean ) {
+    constructor(id : string, dataStore : PreemptiveCache, calendarUrl : string, messageProviderFactory : AdapterUnion, name : string, displayEventTitle : boolean, displayDurationStrategy : DisplayDurationStrategyType) {
         autoBind(this);
         this.id = id;
         this.name = name;
@@ -72,6 +75,7 @@ class IcalScheduleProvider implements ScheduleProvider {
         this._messageProviders = {};
         this._displayEventChangeset = {};
         this._isDisplayEventTitle = displayEventTitle || false;
+        this._displayDurationStrategy = displayDurationStrategy;
     }
 
     isDisplayEventTitle() : boolean {
@@ -82,11 +86,22 @@ class IcalScheduleProvider implements ScheduleProvider {
         return this._valueProvider()
             .then((calendarEvents : Array<CalendarEvent>) =>
                 calendarEvents.filter((calendarEvent : CalendarEvent) => {
-                    const start = moment(calendarEvent.startDate.getTime());
-                    const end = moment(calendarEvent.endDate.getTime());
-                    return start.isBefore(when) && end.isAfter(when);
+                    return this._displayDurationStrategy(calendarEvent, when);
                 })
             )
+    }
+
+    static forEventDuration(calendarEvent : DatePeriod, when : moment) : boolean {
+        const start = moment(calendarEvent.startDate.getTime());
+        const end = moment(calendarEvent.endDate.getTime());
+        return start.isBefore(when) && end.isAfter(when);
+    }
+
+    static upToEventStart(duration: Duration) : (calendarEvent : DatePeriod, when : moment) => boolean {
+        return ((calendarEvent : CalendarEvent, when : moment) => {
+            const start = moment(calendarEvent.startDate.getTime());
+            return start.isBefore(when.clone().add(duration)) && start.isAfter(when);
+        });
     }
 
     hasEventAt(when: moment) : Promise<boolean> {
@@ -102,7 +117,8 @@ class IcalScheduleProvider implements ScheduleProvider {
                     .filter(calendarEvent => calendarEvent.location || calendarEvent.locationString)
                     .map(this.mapToDisplayEvent)
                     .filter((displayEvent: DisplayEvent) => {
-                        return displayEvent.start.isBefore(forWhen) && displayEvent.end.isAfter(forWhen);
+                        let datePeriod = {startDate: displayEvent.start.toDate(), endDate: displayEvent.end.toDate()};
+                        return this._displayDurationStrategy(datePeriod, forWhen);
                     })
                     .map(this.displayEventToChangeItem)
                     .filter(displayEventChange => displayEventChange.messageProvider)

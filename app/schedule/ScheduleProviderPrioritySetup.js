@@ -4,6 +4,8 @@
 // const groupBy = require("lodash").groupBy;
 // const groupBy = require("lodash").groupBy;
 
+import type {DisplayDurationStrategyName} from "./DisplayPrioritizer";
+
 const zip = require("lodash").zip;
 const values = require("lodash").values;
 
@@ -18,7 +20,8 @@ export type Calendar = {
     url: string,
     name : string,
     messageProvider : MessageProviderName,
-    displayEventTitle? : boolean
+    displayEventTitle? : boolean,
+    displayDurationStrategy? : DisplayDurationStrategyName
 }
 
 class ScheduleProviderPrioritySetup {
