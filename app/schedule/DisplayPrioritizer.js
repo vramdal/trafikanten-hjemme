@@ -4,6 +4,8 @@ import type {DisplayEventChangeset, ScheduleProvider} from "./IcsScheduleProvide
 import type {Calendar, MessageProviderName} from "./ScheduleProviderPrioritySetup";
 import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {PlaylistType} from "../message/MessageType";
+import type {Duration} from "moment/moment";
+import type {DatePeriod} from "../types/Place";
 
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const Met = require("../provider/Met");
@@ -27,6 +29,8 @@ class DisplayPrioritizer {
     _dataStore: PreemptiveCache;
     _playlist : PlaylistType;
 
+    static DisplayDurationStrategies : { [key: string]: (any) => DisplayDurationStrategyType };
+
     constructor(scheduleProviderPrioritySetup : ScheduleProviderPrioritySetup, dataStore : PreemptiveCache) {
         this._dataStore = dataStore;
         this._playlist = [[Object.assign({},
@@ -38,8 +42,9 @@ class DisplayPrioritizer {
         this._scheduleProviders = {};
         this._scheduleProviderPrioritySetup.getCalendars().forEach((calendar : Calendar) => {
             let messageProviderFactory : AdapterUnion = this.createMessageProviderFactory(calendar.messageProvider, calendar.displayEventTitle || false);
+            let displayDurationStrategy : DisplayDurationStrategyType = this.createDisplayDurationStrategy(calendar);
             if (!this._scheduleProviders[calendar.url]) {
-                this._scheduleProviders[calendar.url] = new IcalScheduleProvider(`schedule-provider-${calendar.url}`, dataStore, calendar.url, messageProviderFactory, calendar.name);
+                this._scheduleProviders[calendar.url] = new IcalScheduleProvider(`schedule-provider-${calendar.url}`, dataStore, calendar.url, messageProviderFactory, calendar.name, false, displayDurationStrategy);
             }
         });
         this._prioritizedScheduleProviderLists = prioritizedCalendarSetup.map((col : Array<Calendar>) => col.map((calendar : Calendar) => this._scheduleProviders[calendar.url]));
@@ -104,6 +109,9 @@ class DisplayPrioritizer {
             });
     }
 
+    createDisplayDurationStrategy(calendar : Calendar) : DisplayDurationStrategyType {
+        return DisplayDurationStrategies[calendar.displayDurationStrategy || "forEventDuration"]();
+    }
 }
 
 
@@ -152,3 +160,15 @@ class Column {
 }
 
 module.exports = DisplayPrioritizer;
+
+export type DisplayDurationStrategyType = (calendarEvent: DatePeriod, when: moment) => boolean;
+
+// noinspection JSUnusedGlobalSymbols - reflection
+const DisplayDurationStrategies: { [key: string]: (any) => DisplayDurationStrategyType } = {
+    forEventDuration: () => IcalScheduleProvider.forEventDuration,
+    upToEventStart: (duration: Duration = moment.duration(1, "h")) => IcalScheduleProvider.upToEventStart(duration)
+};
+
+module.exports.DisplayDurationStrategies = DisplayDurationStrategies;
+
+export type DisplayDurationStrategyName = $Keys<typeof DisplayDurationStrategies>;

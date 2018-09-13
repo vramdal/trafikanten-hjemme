@@ -1,6 +1,6 @@
 // @flow
 
-import type {Location} from "../types/Place";
+import type {DatePeriod, Location} from "../types/Place";
 
 const moment = require("moment");
 const IcalExpander = require("ical-expander");
@@ -8,14 +8,12 @@ const fetch = require("node-fetch");
 const geocoder = require("../geocoding/EnturGeocoder");
 
 export type CalendarEvent = {
-    startDate : Date,
-    endDate : Date,
     summary: string,
     location: ?Location,
     locationString: ?string,
     id: string,
     lastModified: string
-};
+} & DatePeriod;
 
 
 
