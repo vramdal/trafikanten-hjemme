@@ -246,7 +246,7 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
-  <component name="PublishConfigData" autoUpload="Always" serverName="trafikanten-2.local" compareModeInSync="TEXT" showNewOnTargetInSync="false">
+  <component name="PublishConfigData" serverName="trafikanten-2.local" compareModeInSync="TEXT" showNewOnTargetInSync="false">
     <serverData>
       <paths name="trafikanten-2.local">
         <serverdata>
@@ -258,7 +258,6 @@
         </serverdata>
       </paths>
     </serverData>
-    <option name="myAutoUpload" value="ALWAYS" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
