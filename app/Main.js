@@ -38,7 +38,7 @@ let display;
 if (program.websocket) {
     console.log('Outputting to WebSocket display on port ' + program.websocket);
     display = new (require("./display/WebsocketDisplay.js"))(program.websocket);
-} if (!program.nogpio) {
+} else if (!program.nogpio) {
     console.log('Outputting to GPIO display');
     display = new (require("./display/GPIOPiDisplay.js"));
 }
