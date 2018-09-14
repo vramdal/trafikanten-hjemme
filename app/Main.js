@@ -43,11 +43,23 @@ if (program.websocket) {
     display = new (require("./display/GPIOPiDisplay.js"));
 }
 console.log("Timing factor", timingfactor);
+
+function toSlot(calendar) {
+    return ({colSpan: 1, calendarUrl: calendar.url});
+}
+
+function notDisabled(calendar) {
+    return calendar.enabled !== false;
+}
+
 fetchService.start().then(() => {
     "use strict";
     let calendarMap = {};
-    let calendarLayout = [settings.get("calendars").filter(calendar => calendar.enabled !== false).map(calendar => ({colSpan: 1, calendarUrl: calendar.url}))];
-    settings.get("calendars").filter(calendar => calendar.enabled !== false).forEach(calendar => calendarMap[calendar.url] = calendar);
+    const calendars = settings.get("calendars");
+    const row1 = calendars.filter(calendar => calendar.name !== "Tekstmeldinger").filter(notDisabled).map(toSlot);
+    const row0 = calendars.filter(calendar => calendar.name === "Tekstmeldinger").filter(notDisabled).map(calendar => ({colSpan: row1.length, calendarUrl: calendar.url}));
+    let calendarLayout = [row0, row1];
+    calendars.filter(notDisabled).forEach(calendar => calendarMap[calendar.url] = calendar);
     const displayPrioritizer = new DisplayPrioritizer(new ScheduleProviderPrioritySetup(calendarLayout, calendarMap), fetchService);
     displayPrioritizer.start();
     let loop = function() {

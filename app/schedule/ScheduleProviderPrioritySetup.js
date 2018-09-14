@@ -57,7 +57,7 @@ class ScheduleProviderPrioritySetup {
     }
 
     // noinspection JSMethodCanBeStatic
-    expandColSpans(layout : Array<Array<Slot>>) {
+    expandColSpans(layout : Array<Array<Slot>>) { // TODO: Fixme
         let resultRows = [];
         for (let rowIdx = 0; rowIdx < layout.length; rowIdx++) {
             resultRows[rowIdx] = [];
