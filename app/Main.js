@@ -33,7 +33,7 @@ let framer = new Framer();
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
 const uiPort = program.uiport;
 console.log("Starting admin UI on port " + uiPort);
-let uiServer = createHttpUiServer(uiPort, process.env.NODE_ENV === 'development');
+let uiServer = createHttpUiServer(uiPort, process.env.NODE_ENV === 'development', {fetchService: fetchService.getState.bind(fetchService)});
 let display;
 if (program.websocket) {
     console.log('Outputting to WebSocket display on port ' + program.websocket);
