@@ -53,6 +53,21 @@ class PreemptiveCache implements Cache<string, *> {
         this._timer = null;
     }
 
+    getState() : {} {
+        return {
+            fetchers: this._fetchers.map((fetcherSpec : FetcherSpec<*>) => ({
+                id: fetcherSpec.id,
+                errorCount: fetcherSpec.errorCount,
+                fetchIntervalSeconds: fetcherSpec.fetchIntervalSeconds,
+                lastFetchedSecond: fetcherSpec.lastFetchedSecond,
+                lastError: fetcherSpec.lastError,
+                isFetching: !!fetcherSpec.isFetching,
+                content: fetcherSpec.content,
+                fetcherState: this.getFetcherState(fetcherSpec.id)
+            }))
+        }
+    }
+
     getValue<V>(fetcherId : string, fresh : boolean = false) : Promise<V> {
         if (!fresh) {
             return this.getContent(fetcherId);

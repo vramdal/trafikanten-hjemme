@@ -4,10 +4,11 @@ const express = require('express');
 const http = require('http');
 const settings = require("../settings");
 const cors = require('cors');
+const _mapValues = require('lodash/mapValues');
 
 export type ExpressServer = {};
 
-function createHttpUiServer(port : number = 6060, isDevEnv : boolean = false) : Promise<ExpressServer> {
+function createHttpUiServer(port : number = 6060, isDevEnv : boolean = false, content: {}) : Promise<ExpressServer> {
     let app = express();
     app.use("/display", express.static('public'));
     app.use("/config", express.static("../../frontend/build"));
@@ -25,6 +26,10 @@ function createHttpUiServer(port : number = 6060, isDevEnv : boolean = false) : 
         console.log("body", config);
         settings.setAll(config);
         res.json(settings.all());
+    });
+    app.get("/state.json", (req, res) => {
+        const state = _mapValues(content, value => value());
+        res.json(state);
     });
     let expressServer = http.createServer(this.app);
     return new Promise((resolve, reject) => {
