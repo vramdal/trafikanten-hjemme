@@ -114,7 +114,6 @@ class IcalScheduleProvider implements ScheduleProvider {
             .then((calendarEvents : Array<CalendarEvent>) => {
                 let added = calendarEvents
                     .filter(calendarEvent => !this._messageProviders[calendarEvent.id])
-                    .filter(calendarEvent => calendarEvent.location || calendarEvent.locationString)
                     .map(this.mapToDisplayEvent)
                     .filter((displayEvent: DisplayEvent) => {
                         let datePeriod = {startDate: displayEvent.start.toDate(), endDate: displayEvent.end.toDate()};

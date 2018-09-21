@@ -197,7 +197,7 @@ class BysykkelProviderFactory implements MessageProviderIcalAdapter<MessageProvi
 
     //noinspection JSUnusedGlobalSymbols
     createMessageProvider(id : string, options : {location: Location}) : Bysykkel {
-        return new Bysykkel(id, this._dataStore, this._apiKey, this._stationsListFetcher.getMessageAsync(), options.location);
+        return new Bysykkel(id, this._dataStore, this._apiKey, this._stationsListFetcher.getMessageAsync(), options.location || settings.get("home"));
     }
 }
 
