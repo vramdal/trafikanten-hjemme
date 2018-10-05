@@ -23,7 +23,7 @@ Create another calendar, call it "Weather". Set up one or more events. Enter a v
 For each of the two calendars, copy the _private_ ICS URL and copy them into the ...
 
 ### Configuration file
-Create a configuration file `.trafikanten-hjemme` in your home directory, with the following JSON structure:
+Create a configuration file `.trafikanten-hjemme.json` in your home directory, with the following JSON structure:
 
 ```
 {
@@ -47,7 +47,7 @@ Create a configuration file `.trafikanten-hjemme` in your home directory, with t
    "oslobysykkel": {
       "apiKey": "BYSYKKEL_API_KEY"
    },
-   "home": {
+   "home": {E
       "coordinates": {
          "latitude": 59.123,
          "longitude": 10.456
