@@ -67,6 +67,7 @@ cd ../app
 npm install
 cd ..
 ```
+Depending on your platform, one or more optional dependencies might fail to build. This is usually OK.
 
 ## Starting the application
 ```
