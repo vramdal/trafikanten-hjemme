@@ -4,6 +4,15 @@
 
 [![Build Status](https://travis-ci.org/vramdal/trafikanten-hjemme.svg?branch=dev)](https://travis-ci.org/vramdal/trafikanten-hjemme)
 
+## Requirements
+
+```
+> node --version
+v8.12.0
+```
+
+
+
 ## Installation
 ### Create Google Calendars
 Create a calendar in Google Calendars. Call it "Public transport" or similar. 
