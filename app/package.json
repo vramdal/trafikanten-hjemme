@@ -10,7 +10,7 @@
     "auto-bind": "^1.2.0",
     "commander": "^2.18.0",
     "cors": "^2.8.4",
-    "debug": "^3.1.0",
+    "debug": "^4.0.1",
     "express": "^4.15.4",
     "flow-bin": "^0.73.0",
     "flow-remove-types": "^1.2.3",
@@ -44,7 +44,6 @@
     "ofe": "0.5.1"
   },
   "bundledDependencies": [
-    "debug",
     "serve-favicon",
     "xml2js"
   ],
