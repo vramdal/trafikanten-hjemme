@@ -1,10 +1,4 @@
 // @flow
-const memwatch = require('memwatch-next');
-
-memwatch.on('leak', (info) => {
-    console.error('Memory leak detected:\n', info);
-});
-
 const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
 const Framer = require("./rendering/Framer.js");
 const EventTypeNames = require("./types/SimpleTypes.js").EventTypeNames;
@@ -24,8 +18,17 @@ program.version(version)
     .option('-N, --nogpio', 'Do not output to GPIO display.')
     .option('-p, --uiport [port]', 'Start admin UI on [port]. Defaults to 6060.', parseInt, 6060)
     .option('-t, --timingfactor <factor>', 'Multiply timeouts by [factor]. Defaults to 1.0', parseFloat, 1.0)
+    .option('-m --memwatch', 'Watch memory for leaks')
     .parse(process.argv)
 ;
+
+if (program.memwatch) {
+    const memwatch = require('memwatch-next');
+
+    memwatch.on('leak', (info) => {
+        console.error('Memory leak detected:\n', info);
+    });
+}
 
 const timingfactor = program.timingfactor;
 

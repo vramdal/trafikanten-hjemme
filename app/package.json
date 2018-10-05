@@ -17,7 +17,6 @@
     "graphql-client": "^2.0.1",
     "ical-expander": "^2.0.0",
     "lodash": "^4.17.10",
-    "memwatch-next": "^0.3.0",
     "moment": "^2.22.1",
     "moment-round": "^1.0.1",
     "node-cache": "^4.2.0",
@@ -41,7 +40,8 @@
     "test": ">=0.0.5"
   },
   "optionalDependencies": {
-    "ofe": "0.5.1"
+    "ofe": "0.5.1",
+    "memwatch-next": "^0.3.0"
   },
   "bundledDependencies": [
     "serve-favicon",
