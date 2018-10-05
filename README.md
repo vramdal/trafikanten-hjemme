@@ -9,8 +9,7 @@
 Create a calendar in Google Calendars. Call it "Public transport" or similar. 
 Set up the display schedule as calendar events. Give each event a location.
 
-Create another calendar, call it "Weather". Set up one or more events. Do not use the Location field, instead, in the 
-description field, enter a location string on the form used by Yr.no URLs, for example `Norway/Oslo/Oslo/Kikutstua/`. 
+Create another calendar, call it "Weather". Set up one or more events. Enter a valid location in the Location field. 
 
 For each of the two calendars, copy the _private_ ICS URL and copy them into the ...
 
@@ -19,31 +18,46 @@ Create a configuration file `.trafikanten-hjemme` in your home directory, with t
 
 ```
 {
-  "calendars": [
-    {
-      "name": "Entur",
-      "url": "YOUR-PUBLIC_TRANSPORT-ICS-URL-HERE",
-      "messageProvider": "Entur"
-    },
-    {
-      "name": "Weather",
-      "url": "YOUR-WEATHER-ICS-URL-HERE",
-      "messageProvider": "Yr"
-    }
-  ],
-
-  "home": {
-    "coordinates": {
-      "latitude": 123.45,
-      "longitude": 678.90
-    },
-    "name": "Home, sweet home"
-  }
+   "calendars": [
+      {
+         "name": "Entur",
+         "url": "YOUR-PUBLIC_TRANSPORT-ICS-URL-HERE",
+         "messageProvider": "Entur",
+         "displayEventTitle": true,
+         "enabled": true
+      },
+      {
+         "name": "Weather",
+         "url": "YOUR-WEATHER-ICS-URL-HERE",
+         "messageProvider": "Met",
+         "displayEventTitle": true,
+         "enabled": true
+      }
+   ],
+   "googleMapsApiKey": "......",
+   "oslobysykkel": {
+      "apiKey": "BYSYKKEL_API_KEY"
+   },
+   "home": {
+      "coordinates": {
+         "latitude": 59.123,
+         "longitude": 10.456
+      },
+      "name": "Home, sweet home"
+   }
 }
-
 ```
 
 Make sure you enter the coordinates for your home.
+
+## Building the application
+```
+cd frontend
+npm install
+cd ../app
+npm install
+cd ..
+```
 
 ## Starting the application
 ```
@@ -51,4 +65,4 @@ cd bin
 ./run.sh
 ```
 
-Browse to [http://localhost:6060/html-led.html](http://localhost:6060/html-led.html)
+Browse to [http://localhost:6060/display/html-led.html](http://localhost:6060/display/html-led.html)
