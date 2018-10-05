@@ -9,6 +9,12 @@
 ```
 > node --version
 v8.12.0
+
+> yarn --version
+v1.10.1
+-- or
+> npm --version
+v6.4.1
 ```
 
 
@@ -59,6 +65,11 @@ Create a configuration file `.trafikanten-hjemme.json` in your home directory, w
 Make sure you enter the coordinates for your home.
 
 ## Building the application
+With yarn:
+```
+yarn install
+```
+With npm:
 ```
 cd frontend
 npm install
@@ -66,6 +77,8 @@ cd ../app
 npm install
 cd ..
 ```
+
+
 Depending on your platform, one or more optional dependencies might fail to build. This is usually OK.
 
 ## Starting the application
