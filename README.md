@@ -43,7 +43,6 @@ Create a configuration file `.trafikanten-hjemme.json` in your home directory, w
          "enabled": true
       }
    ],
-   "googleMapsApiKey": "......",
    "oslobysykkel": {
       "apiKey": "BYSYKKEL_API_KEY"
    },
