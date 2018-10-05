@@ -44,7 +44,6 @@
     "memwatch-next": "^0.3.0"
   },
   "bundledDependencies": [
-    "debug",
     "serve-favicon",
     "xml2js"
   ],
