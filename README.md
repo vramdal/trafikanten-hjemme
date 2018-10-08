@@ -52,7 +52,7 @@ Create a configuration file `.trafikanten-hjemme.json` in your home directory, w
    "oslobysykkel": {
       "apiKey": "BYSYKKEL_API_KEY"
    },
-   "home": {E
+   "home": {
       "coordinates": {
          "latitude": 59.123,
          "longitude": 10.456
