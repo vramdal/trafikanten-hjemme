@@ -15,6 +15,10 @@ export type FetcherSpec<V> = {
     fetchIntervalSeconds : number
 }
 
+export type FetchServiceState = {
+    fetchers: Array<any>,
+}
+
 export type FetcherState =  "HAS_DATA" | "HAS_DATA_AND_ERROR" | "FAILED" | "NOT_RUN";
 
 //const ERROR_FETCHER_HAS_NOT_BEEN_RUN_YET : string = "Fetcher has not been run yet";
@@ -53,7 +57,7 @@ class PreemptiveCache implements Cache<string, *> {
         this._timer = null;
     }
 
-    getState() : {} {
+    getState() : FetchServiceState {
         return {
             fetchers: this._fetchers.map((fetcherSpec : FetcherSpec<*>) => ({
                 id: fetcherSpec.id,
