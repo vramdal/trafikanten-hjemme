@@ -3,9 +3,10 @@ const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
 const Framer = require("./rendering/Framer.js");
 const EventTypeNames = require("./types/SimpleTypes.js").EventTypeNames;
 const createHttpUiServer = require("./http-ui/ExpressServer").createHttpUiServer;
+const fs = require("fs");
 
 const FetchService = require("./fetch/PreemptiveCache.js");
-let fetchService = new FetchService();
+const PreloadedFetchService = require("./fetch/PreloadedCache.js");
 const ScheduleProviderPrioritySetup = require("./schedule/ScheduleProviderPrioritySetup");
 const settings = require('./settings');
 const flatten = require("lodash").flatten;
@@ -19,6 +20,7 @@ program.version(version)
     .option('-p, --uiport [port]', 'Start admin UI on [port]. Defaults to 6060.', parseInt, 6060)
     .option('-t, --timingfactor <factor>', 'Multiply timeouts by [factor]. Defaults to 1.0', parseFloat, 1.0)
     .option('-m --memwatch', 'Watch memory for leaks')
+    .option('-l --load <statefile>', 'Load state file for debugging purposes', undefined)
     .parse(process.argv)
 ;
 
@@ -30,13 +32,35 @@ if (program.memwatch) {
     });
 }
 
+
+let fetchService;
+let calendarMap;
+let calendarLayout;
+if (program.load) {
+    const loadedState = JSON.parse(fs.readFileSync(program.load, "UTF-8"));
+    fetchService = new PreloadedFetchService(loadedState.fetchService);
+    calendarMap = loadedState.calendarMap;
+    calendarLayout = loadedState.calendarLayout;
+} else {
+    fetchService = new FetchService();
+    calendarMap = {};
+    calendarLayout = [settings.get("calendars").filter(calendar => calendar.enabled !== false).map(calendar => ({colSpan: 1, calendarUrl: calendar.url}))];
+    settings.get("calendars").filter(calendar => calendar.enabled !== false).forEach(calendar => calendarMap[calendar.url] = calendar);
+}
+
 const timingfactor = program.timingfactor;
 
 let framer = new Framer();
 let DisplayPrioritizer = require("./schedule/DisplayPrioritizer");
 const uiPort = program.uiport;
+
 console.log("Starting admin UI on port " + uiPort);
-let uiServer = createHttpUiServer(uiPort, process.env.NODE_ENV === 'development', {fetchService: fetchService.getState.bind(fetchService)});
+let uiServer = createHttpUiServer(uiPort, process.env.NODE_ENV === 'development', {
+    fetchService: fetchService.getState.bind(fetchService),
+    calendarMap: () => calendarMap,
+    calendarLayout: () => calendarLayout,
+});
+
 let display;
 if (program.websocket) {
     console.log('Outputting to WebSocket display on port ' + program.websocket);
@@ -48,9 +72,6 @@ if (program.websocket) {
 console.log("Timing factor", timingfactor);
 fetchService.start().then(() => {
     "use strict";
-    let calendarMap = {};
-    let calendarLayout = [settings.get("calendars").filter(calendar => calendar.enabled !== false).map(calendar => ({colSpan: 1, calendarUrl: calendar.url}))];
-    settings.get("calendars").filter(calendar => calendar.enabled !== false).forEach(calendar => calendarMap[calendar.url] = calendar);
     const displayPrioritizer = new DisplayPrioritizer(new ScheduleProviderPrioritySetup(calendarLayout, calendarMap), fetchService);
     displayPrioritizer.start();
     let loop = function() {
