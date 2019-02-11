@@ -29,7 +29,9 @@ function createHttpUiServer(port : number = 6060, isDevEnv : boolean = false, co
     });
     app.get("/state.json", (req, res) => {
         const state = _mapValues(content, value => value());
-        res.json(state);
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(state));
+        // res.json(state);
     });
     let expressServer = http.createServer(this.app);
     return new Promise((resolve, reject) => {
