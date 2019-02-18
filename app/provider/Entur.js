@@ -6,7 +6,7 @@ import type {Location} from '../types/Place';
 const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
 const GraphQLFetcher = require("../fetch/ValueFetcherAndFormatter.js").GraphQLFetcher;
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
-const apiUrl = "https://api.entur.org/journeyplanner/2.0/index/graphql";
+const apiUrl = "https://api.entur.io/journey-planner/v2/graphql";
 // const telemarksvingenLatLong = [59.914240562735536,10.783734648356184];
 //noinspection JSUnusedLocalSymbols
 const fokushallenLatLong = [59.89906, 10.8105978];
