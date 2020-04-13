@@ -1,7 +1,7 @@
 // @flow
 const fetch = require("node-fetch");
 const settings = require("../settings");
-import type {Geocoder} from "./index";
+import type {Geocoder, Coordinates} from "./index";
 import type {Location} from "../types/Place";
 
 const CachedFetcher = require("../fetch/Cache.js").CachedFetcher;
@@ -10,6 +10,8 @@ let headers = {
     'ET-Client-Name': 'trafikanten-hjemme'
 };
 
+const coordinatesRegex = /^(\d+\.\d+)\s*,\s*(\d+\.\d+)(?:,\d+)?$/;
+
 class EnturGeocoder implements Geocoder {
 
     fetcher: CachedFetcher<string, Coordinates>;
@@ -17,7 +19,7 @@ class EnturGeocoder implements Geocoder {
     constructor() {
         const home = settings.get("home");
         let fetcher = new CachedFetcher({}, (placeStr) => {
-            const url = `https://api.entur.org/api/geocoder/1.1/autocomplete?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=${home.coordinates.latitude}&focus.point.lon=${home.coordinates.longitude}&lang=en`;
+            const url = `https://api.entur.io/api/geocoder/1.1/autocomplete?text=${encodeURIComponent(placeStr)}&categories=NO_FILTER&focus.point.lat=${home.coordinates.latitude}&focus.point.lon=${home.coordinates.longitude}&lang=en`;
             return fetch(url, headers)
                 .then(res => res.json())
                 .then(json => {
@@ -46,8 +48,15 @@ class EnturGeocoder implements Geocoder {
         this.fetcher = fetcher
     }
 
-    getCoordinates(str : string) {
+    getCoordinates(str : string) : ?Promise<Coordinates> {
         if (str) {
+            const match = coordinatesRegex.exec(str);
+            if (str.match(coordinatesRegex)) {
+                const lat : number = parseFloat(match[1]);
+                const long : number = parseFloat(match[2]);
+                const coordinates : Coordinates = {latitude: lat, longitude: long};
+                return Promise.resolve({coordinates: coordinates });
+            }
             return this.fetcher.getValue(str);
         } else {
             return undefined;
