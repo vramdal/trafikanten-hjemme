@@ -23,6 +23,10 @@ class EnturGeocoder implements Geocoder {
             return fetch(url, headers)
                 .then(res => res.json())
                 .then(json => {
+                    if (!json.geocoding) {
+                        console.error("Unexpected response format", json);
+                        throw new Error("Unexpected response format");
+                    }
                     if (json.geocoding.errors) {
                         console.error("Entur Geocoder Error", json);
                         throw new Error(json.geocoding.errors[0]);

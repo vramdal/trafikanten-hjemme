@@ -2,7 +2,7 @@
 const ValueFetcherAndFormatter = require("../fetch/ValueFetcherAndFormatter.js").ValueFetcherAndFormatter;
 
 
-const AVAILABILITY_URL = "https://oslobysykkel.no/api/v1/stations/availability";
+const AVAILABILITY_URL = "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json";
 //const STATIONS_URL = "https://oslobysykkel.no/api/v1/stations";
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
 const JsonFetcher = require("../fetch/ValueFetcherAndFormatter.js").JsonFetcher;
@@ -31,19 +31,23 @@ type StationsResponseType = {
 }
 
 type StationAvailabilityType = {
-    id: number,
-    availability: {
-        bikes: number,
-        locks: number
-    }
+    station_id: string,
+    num_bikes_available: number,
+    num_docks_available: number,
+    is_installed: number,
+    is_renting: number,
+    is_returning: number,
+    last_reported: number
 }
 
-type IsoDateStringType = string;
+// type IsoDateStringType = string;
 
 type AvailabilityResponseType = {
-    stations: Array<StationAvailabilityType>,
-    updated_at: IsoDateStringType,
-    refresh_rate: number
+    last_updated: number,
+    ttl: number,
+    data: {
+        stations: Array<StationAvailabilityType>
+    }
 }
 
 // noinspection JSUnusedLocalSymbols
@@ -63,14 +67,14 @@ class Bysykkel implements MessageProvider {
     _statusFetcher: ValueFetcherAndFormatter<AvailabilityResponseType>;
 
     static factory : Class<MessageProviderIcalAdapter<MessageProvider>>;
-    _stationId: number;
+    _stationId: string;
     _stationname: string;
     _apiKey : string;
 
 
     constructor(id: string, dataStore: PreemptiveCache, apiKey : string, stationId : number = defaultStationId, stationname: string = defaultStationName) {
         this._id = id;
-        this._stationId = stationId;
+        this._stationId = stationId + "";
         this._stationname = stationname;
         this._apiKey = apiKey;
         this._statusFetcher = new ValueFetcherAndFormatter(
@@ -107,9 +111,9 @@ class Bysykkel implements MessageProvider {
             return str;
         };
 */
-        let messages = availabilityResponse.stations
-            && availabilityResponse.stations
-                .filter(station => station.id === this._stationId)
+        let messages = availabilityResponse.data.stations
+            && availabilityResponse.data.stations
+                .filter(station => station.station_id === this._stationId)
                 .map((station : StationAvailabilityType) => [
                     {
                         text: this._stationname,
@@ -117,7 +121,7 @@ class Bysykkel implements MessageProvider {
                         animation: {animationName : "NoAnimation", timeoutTicks: 100, alignment: "center"}
                     },
                     {
-                        text: bikesBitmap(station.availability.bikes),
+                        text: bikesBitmap(station.num_bikes_available),
                         start: 128, end: 255, lines: 1,
                         animation: {animationName : "NoAnimation", timeoutTicks: 100, alignment: "center"}
                     }
