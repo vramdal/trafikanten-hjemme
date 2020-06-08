@@ -1,10 +1,4 @@
 // @flow
-const memwatch = require('memwatch-next');
-
-memwatch.on('leak', (info) => {
-    console.error('Memory leak detected:\n', info);
-});
-
 const Display = require("./display/Display");
 const PlaylistDisplay = require("./rendering/PlaylistDisplay.js");
 const Framer = require("./rendering/Framer.js");
