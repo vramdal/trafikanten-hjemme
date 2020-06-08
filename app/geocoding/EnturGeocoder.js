@@ -25,7 +25,7 @@ class EnturGeocoder implements Geocoder {
                 .then(json => {
                     if (!json.geocoding) {
                         console.error("Unexpected response format", json);
-                        throw new Error("Unexpected response format");
+                        throw new Error("Unexpected response format.");
                     }
                     if (json.geocoding.errors) {
                         console.error("Entur Geocoder Error", json);
