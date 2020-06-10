@@ -269,7 +269,7 @@
       <method />
     </configuration>
   </component>
-  <component name="PublishConfigData" autoUpload="Always" serverName="trafikanten-2.local" compareModeInSync="TEXT" showNewOnTargetInSync="false">
+  <component name="PublishConfigData" serverName="trafikanten-2.local" compareModeInSync="TEXT" showNewOnTargetInSync="false">
     <serverData>
       <paths name="trafikanten-2.local">
         <serverdata>
@@ -281,7 +281,11 @@
         </serverdata>
       </paths>
     </serverData>
-    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="trafikanten-2.local" id="2bef0bd9-a212-489e-9890-8d80d6061f3c" port="22" customName="trafikanten-2.local" nameFormat="CUSTOM" username="pi" />
+    </configs>
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
@@ -303,11 +307,10 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="0be55c38-f7ed-400a-a632-ca206790d8b8" name="trafikanten-2.local" url="http://trafikanten-2.local">
-        <fileTransfer host="trafikanten-2.local" port="22" rootFolder="/home/pi" accessType="SFTP">
+        <fileTransfer rootFolder="/home/pi" accessType="SFTP" host="trafikanten-2.local" port="22" sshConfigId="2bef0bd9-a212-489e-9890-8d80d6061f3c" sshConfig="trafikanten-2.local">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
-          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
     </option>
