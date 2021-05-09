@@ -6,7 +6,7 @@
     "auto-bind": "^1.2.0",
     "fetch-hoc": "^0.3.0",
     "flow-runtime": "^0.17.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.21",
     "object-path": "^0.11.4",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
