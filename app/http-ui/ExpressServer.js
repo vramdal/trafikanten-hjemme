@@ -4,6 +4,8 @@ const express = require('express');
 const http = require('http');
 const settings = require("../settings");
 const cors = require('cors');
+const bodyParser = require('body-parser')
+
 
 export type ExpressServer = {};
 
@@ -11,7 +13,7 @@ function createHttpUiServer(port : number = 6060, isDevEnv : boolean = false) : 
     let app = express();
     app.use("/display", express.static('public'));
     app.use("/config", express.static("../../frontend/build"));
-    app.use(express.json());
+    app.use(bodyParser.json());
     const corsOptions = {
         origin: 'http://localhost:3000',
         optionsSuccessStatus: 204 // some legacy browsers (IE11, various SmartTVs) choke on 204

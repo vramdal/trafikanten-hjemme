@@ -6,10 +6,10 @@ import type {AdapterUnion, ProviderUnion} from "../provider/MessageProvider";
 import type {PlaylistType} from "../message/MessageType";
 
 const PreemptiveCache = require("../fetch/PreemptiveCache.js");
-const Met = require("../provider/Met");
+// const Met = require("../provider/Met");
 const Bysykkel = require("../provider/Bysykkel");
 const ScheduleProviderPrioritySetup = require("./ScheduleProviderPrioritySetup.js");
-const Yr = require("../provider/Yr");
+// const Yr = require("../provider/Yr");
 const Entur = require("../provider/Entur");
 const Textmessage = require("../provider/Textmessage");
 const IcalScheduleProvider = require("./IcsScheduleProvider");
@@ -59,8 +59,8 @@ class DisplayPrioritizer {
     createMessageProviderFactory(messageProviderName : MessageProviderName, displayEventTitle: boolean) : AdapterUnion {
         switch (messageProviderName) {
             case 'Entur' : return new Entur.factory(this._dataStore, undefined, displayEventTitle);
-            case 'Yr' : return new Yr.factory(this._dataStore, undefined, displayEventTitle);
-            case 'Met': return new Met.factory(this._dataStore, undefined, displayEventTitle);
+            // case 'Yr' : return new Yr.factory(this._dataStore, undefined, displayEventTitle);
+            // case 'Met': return new Met.factory(this._dataStore, undefined, displayEventTitle);
             case 'Bysykkel' : return new Bysykkel.factory(this._dataStore, undefined, displayEventTitle);
             case 'Textmessage' : return new Textmessage.factory(this._dataStore, undefined, displayEventTitle);
             default : throw new Error("Invalid message provider name: " + messageProviderName);

@@ -9,6 +9,7 @@
   "dependencies": {
     "async": "~0.9.0",
     "auto-bind": "^1.2.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.4",
     "debug": "^3.1.0",
     "express": "^4.15.4",
@@ -40,12 +41,17 @@
     "tape": "^4.8.0",
     "test": ">=0.0.5"
   },
-  "optionalDependencies": {},
   "bundledDependencies": [
     "async",
     "debug",
     "serve-favicon",
     "xml2js"
   ],
-  "false": {}
+  "false": {},
+  "bundleDependencies": [
+    "async",
+    "debug",
+    "serve-favicon",
+    "xml2js"
+  ]
 }
