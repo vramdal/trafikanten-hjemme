@@ -5,7 +5,6 @@ type FrameSpecType = {
     text: string,
     start : number,
     end : number,
-    lines : number
 }
 
 export type MessagePartType = FrameSpecType & {animation: AnimationType}

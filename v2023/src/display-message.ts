@@ -12,12 +12,13 @@ import Framer from "./rendering/Framer";
 type MessagePlayer = (message: MessageSpec) => Promise<void>;
 const display = new WebsocketDisplay();
 
+type LayoutSpec = Omit<MessagePartType, "text">
+
 const defaultMessagePlayer: MessagePlayer = async (message: MessageSpec) => {
   const messageParts : Array<MessagePartType> = message.lines.map((line: LineType, idx: number) => ({
     text: line.text,
     start: (128 * idx),
     end: 128 + (128 * idx),
-    lines: 1,
     animation: {
       animationName: "NoAnimation",
       alignment: "left",
@@ -77,6 +78,7 @@ async function playMessage(text: string, options: any) {
 program
   .command("output")
   .option('-d, --duration <duration>', 'duration of message', (str) => parseInt(str, 10), 5000)
+  .option('-l, --layout <layout-json>', 'layout specification in JSON', (str) => JSON.parse(str))
   .argument('<message>', 'message to display')
   .action(async (text: string, options: any, command: string) => {
     await playMessage(text, options);

@@ -46,7 +46,7 @@ class Framer {
         try {
             console.log("Creating message for ", JSON.stringify(messageType));
             return new Message(messageType.map(part => ({
-                frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType)), part.lines),
+                frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType))),
                 text: part.text
             })));
         } catch (e) {

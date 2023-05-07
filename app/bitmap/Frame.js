@@ -16,13 +16,12 @@ class Frame {
     _x: number;
     _animation: Animation;
     _bitmaps: Array<Bitmap>;
-    _lines: number;
+    _lines: number = 1;
 
-    constructor(x: number, width : number, animation : Animation, lines : number = 1) {
+    constructor(x: number, width: number, animation: Animation) {
         this._x = x;
         this._width = width;
         this._animation = animation;
-        this._lines = lines;
     }
 
     setBitmap(source: AnnotatedBitmap) {
