@@ -1,30 +1,30 @@
+import type { CountdownPromise } from "../timing/Ticker";
 import Ticker from "../timing/Ticker";
-import type {CountdownPromise} from "../timing/Ticker";
-import type {AnnotatedBitmap} from "../bitmap/Bitmap";
-import type {TextInFrame} from "../types/Message";
+import type { AnnotatedBitmap } from "../bitmap/Bitmap";
+import type { TextInFrame } from "../types/Message";
+import Message from "../types/Message";
 import Frame from "../bitmap/Frame";
 
-import Message from "../types/Message";
-
 import ConsoleUtils from "./ConsoleUtils";
+import Display from "../display/Display";
 
-const Rastrifier = require("./Rastrifier");
-const timingFactor = require("../settings").timingFactor;
+import * as Rastrifier from "./Rastrifier";
 
+const timingFactor = 1;
 
 class MessageDisplay {
 
     _ticker: Ticker;
     _framesThatArePlaying: Array<Frame>;
     _stop: boolean;
-    // _displayEventEmitter: DisplayEventEmitter;
+    _display: Display;
     _message: Message;
     _prepared: boolean;
 
-    constructor(message : Message, /*display : DisplayEventEmitter*/) {
+    constructor(message : Message, display : Display) {
         this._message = message;
-        // this._displayEventEmitter = display;
-        this._ticker = new Ticker(25, this.scrollFrames.bind(this), timingFactor);
+        this._display = display;
+        this._ticker = new Ticker(1, this.scrollFrames.bind(this), timingFactor);
         this._stop = false;
         this._prepared = false;
     }
@@ -41,7 +41,7 @@ class MessageDisplay {
 
     play() : Promise<any> {
         this._framesThatArePlaying = this._message.layout.map(frame => frame);
-        // this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_CLEAR);
+        this._display.clear();
         return this._ticker.countdown().then(() => {
             process.stdout.write("\n");
             Promise.resolve();
@@ -70,7 +70,7 @@ class MessageDisplay {
                 this._framesThatArePlaying = frames.filter(frame => !frame.animationComplete);
                 let animationRemaining = frames.map(frame => frame.animationRemaining).reduce(findMax, 0);
                 ConsoleUtils.progressBar(1 - animationRemaining);
-                // this._displayEventEmitter.emit(EventTypeNames.EVENT_BITMAP_UPDATED, frames);
+                this._display.onBitmapUpdated(frames);
                 resolve(this._framesThatArePlaying.length);
             }).catch((err) => {
                 return reject(err);

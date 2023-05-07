@@ -30,10 +30,10 @@ function BitmapProxy(source: Bitmap, width: number, getIdxTranslatedFunc : (idx 
                 } else {
                     return Reflect.get(target, propertyKey, target);
                 }
-            }/*,
+            },
             getByIdx: function(idx) {
                 return getIdxTranslatedFunc(idx);
-            }*/
+            }
 
         });
 }

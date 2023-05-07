@@ -1,7 +1,7 @@
 import type { Layout } from "../bitmap/Frame";
 import { Frame } from "../bitmap/Frame";
 
-const NoAnimation = require("../animations/NoAnimation.js");
+import NoAnimation from "../animations/NoAnimation";
 
 //noinspection JSUnusedLocalSymbols
 function defaultLayout() {

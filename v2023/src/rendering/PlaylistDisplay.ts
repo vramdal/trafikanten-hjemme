@@ -1,17 +1,19 @@
 import Message from "../types/Message";
 
 import MessageDisplay from "./MessageDisplay";
+import Display from "../display/Display";
 
 class PlaylistDisplay {
 
   _messages: Array<Message>;
   _playlistItemIdx: number;
   _currentlyPlayingMessage: MessageDisplay | undefined;
+  _display: Display;
 
   // _displayEventEmitter: DisplayEventEmitter;
 
-  constructor(displayEventEmitter: any, messages: Array<Message>) {
-    // this._displayEventEmitter = displayEventEmitter;
+  constructor(display: Display, messages: Array<Message>) {
+    this._display = display;
     this._playlistItemIdx = 0;
     this._messages = messages.slice();
   }
@@ -44,7 +46,7 @@ class PlaylistDisplay {
 
   //noinspection JSMethodCanBeStatic
   prepareMessage(message: Message): MessageDisplay {
-    let messageDisplay = new MessageDisplay(message);
+    let messageDisplay = new MessageDisplay(message, this._display);
     messageDisplay.prepare();
     return messageDisplay;
 

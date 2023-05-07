@@ -73,10 +73,6 @@ class Scrolling implements Animation {
   get scrollWidth(): number {
     return this._frameWidth + this._source.length
   }
-
-  getTranslatedOnLine(x: number, line: number): Byte {
-    throw new Error("Ikke implementert")
-  }
 }
 
-module.exports = Scrolling;
+export default Scrolling;

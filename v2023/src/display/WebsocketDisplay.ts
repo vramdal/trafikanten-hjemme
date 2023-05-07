@@ -1,16 +1,7 @@
 import WebSocket, { Server } from "ws";
-import type {DisplayInterface} from "./DisplayInterface";
-import {
-    Agent,
-    ClientRequest,
-    ClientRequestArgs,
-    IncomingMessage,
-    OutgoingHttpHeaders,
-    Server as HTTPServer,
-} from "http";
+import type { DisplayInterface } from "./DisplayInterface";
 
 // import type {ExpressServer} from "../http-ui/ExpressServer";
-
 import Display from "./Display";
 
 class WebsocketDisplay extends Display implements DisplayInterface {
@@ -36,6 +27,15 @@ class WebsocketDisplay extends Display implements DisplayInterface {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(this._buffer);
             }
+        });
+    }
+
+    async close() {
+        return new Promise((resolve, reject) => {
+            this._webSocketServer.clients.forEach(client => {
+                client.close();
+            })
+            this._webSocketServer.close(resolve);
         });
     }
 

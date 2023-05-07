@@ -1,24 +1,22 @@
-// @flow
+import type { Animation } from "../animations/Animation";
+import type { AnimationType, MessageType, PlaylistType, } from "../message/MessageType";
+import Message from "../types/Message";
+import NoAnimation from "../animations/NoAnimation";
+import Scrolling from "../animations/Scrolling";
+import Frame from "../bitmap/Frame";
 
-import type {Animation} from "../animations/Animation";
-import type {AnimationType, MessageType, PlaylistType} from "../MessageType";
-//import type {TextInFrame} from "./Message";
+// import PagingAnimation from "../animations/Paging";
 
-const NoAnimation = require("../animations/NoAnimation.js");
-const Message = require("../types/Message.js");
-const Scrolling = require("../animations/Scrolling.js");
-const Frame = require("../bitmap/Frame.js");
-const PagingAnimation = require("../animations/Paging.js");
-const VerticalScrollingAnimation = require("../animations/VerticalScrolling.js");
+// import VerticalScrollingAnimation from "../animations/VerticalScrolling.js";
 
 let animationFactory = (animationSpec : AnimationType) : Animation => {
     "use strict";
     switch (animationSpec.animationName) {
         case "NoAnimation" : return new NoAnimation(animationSpec.timeoutTicks, animationSpec.alignment);
-        case "PagingAnimation" : return new PagingAnimation(animationSpec.ticksPerPage);
+        // case "PagingAnimation" : return new PagingAnimation(animationSpec.ticksPerPage);
         case "ScrollingAnimation": return new Scrolling();
-        case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine, animationSpec.holdOnLastLine, animationSpec.alignment, animationSpec.scrollIn, animationSpec.scrollOut);
-        default: throw new Error("Unknown animation type: " + animationSpec.animationName);
+        // case "VerticalScrollingAnimation": return new VerticalScrollingAnimation(animationSpec.holdOnLine, animationSpec.holdOnLastLine, animationSpec.alignment, animationSpec.scrollIn, animationSpec.scrollOut);
+        default: throw new Error("Unknown animation type: " + (animationSpec as any).animationName);
     }
 };
 
@@ -32,12 +30,10 @@ class Framer {
     //noinspection JSMethodCanBeStatic
     assertPlaylist(messageOrPlaylistType : (MessageType | PlaylistType)) {
         let playlistType: PlaylistType;
-        if (messageOrPlaylistType.playlistId) {
+        if ("playlistId" in messageOrPlaylistType) {
             playlistType = messageOrPlaylistType;
         } else {
-            let playlistArray: PlaylistType = [messageOrPlaylistType];
-            playlistArray.playlistId = (messageOrPlaylistType: MessageType).messageId + "-playlist";
-            playlistType = playlistArray;
+            playlistType = Object.assign([messageOrPlaylistType], {playlistId: (messageOrPlaylistType as MessageType).messageId + "-playlist"});
         }
         return playlistType;
     }
@@ -46,7 +42,7 @@ class Framer {
         try {
             console.log("Creating message for ", JSON.stringify(messageType));
             return new Message(messageType.map(part => ({
-                frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation: AnimationType)), part.lines),
+                frame: new Frame(part.start, part.end - part.start, animationFactory((part.animation)), part.lines),
                 text: part.text
             })));
         } catch (e) {
@@ -57,4 +53,4 @@ class Framer {
 
 }
 
-module.exports = Framer;
+export default Framer;

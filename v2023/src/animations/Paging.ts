@@ -71,4 +71,4 @@ class PagingAnimation implements Animation {
 
 }
 
-module.exports = PagingAnimation;
+export default PagingAnimation;

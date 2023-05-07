@@ -1,5 +1,3 @@
-// @flow
-
 import type {Animation} from "./Animation";
 import type {Bitmap} from "../bitmap/Bitmap";
 import type {Alignments} from "./Types";
@@ -7,7 +5,7 @@ import { Byte } from "../types/SimpleTypes";
 
 // type AlignmentFunc = (frameWidth : number, contentPixelLength : number) => number;
 
-const Alignment = require("./Alignment");
+import Alignment from "./Alignment";
 
 //noinspection JSUnusedGlobalSymbols
 class NoAnimation implements Animation {
@@ -63,10 +61,7 @@ class NoAnimation implements Animation {
         return this._countdown;
     }
 
-    getTranslatedOnLine(x: number, line: number): Byte {
-        throw new Error("Ikke implementert");
-    }
-
 
 }
-module.exports = NoAnimation;
+
+export default NoAnimation;
