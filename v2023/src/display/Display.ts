@@ -54,9 +54,11 @@ class Display implements DisplayInterface {
 
   play() {
     if (this._playlist) {
-      this._playlist.play().catch(err => {
+      return this._playlist.play().catch(err => {
         console.error("Display error: ", err)
       });
+    } else {
+      return Promise.resolve();
     }
   }
 
@@ -66,6 +68,8 @@ class Display implements DisplayInterface {
       this._playlist.stop();
     }
   }
+
+  close() {}
 
 
 }

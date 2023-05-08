@@ -1,8 +1,8 @@
-import Display from "./Display.js";
+import Display from "./Display";
 import type {DisplayInterface} from "./DisplayInterface";
 
 
-import * as BitmapUtil from "../bitmap/BitmapUtil.js";
+import * as BitmapUtil from "../bitmap/BitmapUtil";
 
 class ConsoleDisplay extends Display implements DisplayInterface {
 

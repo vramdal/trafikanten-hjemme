@@ -1,7 +1,8 @@
 class ConsoleUtils {
 
-    static progressBar(percentage: number) {
+    static progressBar(progress: number, max: number) {
         let barWidth = 70;
+        const percentage = progress / max;
         let full = new Array(barWidth).fill("-");
         let numCompleteChars = Math.ceil((percentage) * barWidth);
         full.fill("|", 0, numCompleteChars);
