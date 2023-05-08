@@ -13,6 +13,4 @@ export type MessagePartType = FrameSpecType & {animation: AnimationType}
 
 export type MessageType = Array<MessagePartType> & { messageId: string };
 
-class _PlaylistSpec extends Array<MessageType> { playlistId : string }
-
-export type PlaylistType = {} & _PlaylistSpec;
+export type PlaylistType = Array<MessageType> & { playlistId : string };

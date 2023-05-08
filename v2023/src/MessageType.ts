@@ -1,3 +1,5 @@
+import { MessagePartType } from "./message/MessageType";
+
 export type Alignments = 'left' | 'center' | 'right';
 import { NoAnimationType, ScrollingType } from "./animations/Types";
 
@@ -13,11 +15,8 @@ export type LineType = {
   animation: AnimationType
 }
 
-export type MessageType = {
-  durationMs: number,
-  lines: Array<LineType>
-}
+export type MessageSpec = Array<MessagePartType>;
 
-class _PlaylistSpec extends Array<MessageType> { playlistId : string }
+class _PlaylistSpec extends Array<MessageSpec> { playlistId : string }
 
 export type PlaylistType = _PlaylistSpec;

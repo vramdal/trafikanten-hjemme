@@ -1,64 +1,91 @@
-import { LineType, MessageType as MessageSpec } from "./MessageType";
+import { MessageSpec } from "./MessageType";
 import { program } from "commander";
 import WebsocketDisplay from "./display/WebsocketDisplay";
-import { rastrify } from "./rendering/Rastrifier";
-import { AnnotatedBitmap } from "./bitmap/Bitmap";
 import { readFileSync } from "fs";
 import PlaylistDisplay from "./rendering/PlaylistDisplay";
 import Message from "./types/Message";
-import { PlaylistType, MessageType, MessagePartType } from "./message/MessageType";
+import { MessagePartType, MessageType, PlaylistType } from "./message/MessageType";
 import Framer from "./rendering/Framer";
 
 type MessagePlayer = (message: MessageSpec) => Promise<void>;
 const display = new WebsocketDisplay();
+// const display = new ConsoleDisplay();
 
-type LayoutSpec = Omit<MessagePartType, "text">
-
-const defaultMessagePlayer: MessagePlayer = async (message: MessageSpec) => {
-  const messageParts : Array<MessagePartType> = message.lines.map((line: LineType, idx: number) => ({
-    text: line.text,
-    start: (128 * idx),
-    end: 128 + (128 * idx),
+const defaultMessage: Array<MessagePartType> = [{
+  start: 0,
+  end: 80,
+  text: "Frame 1",
+  animation: {
+    animationName: "NoAnimation",
+    alignment: "left",
+    timeoutTicks: 5000
+  }
+},
+  {
+    start: 80,
+    end: 128,
+    text: "Frame 2",
+    animation: {
+      animationName: "NoAnimation",
+      alignment: "right",
+      timeoutTicks: 5000
+    }
+  },
+  {
+    start: 128,
+    end: 198,
+    text: "Frame 3",
     animation: {
       animationName: "NoAnimation",
       alignment: "left",
-      timeoutTicks: message.durationMs
+      timeoutTicks: 5000
     }
-  }));
+  },
+  {
+    start: 198,
+    end: 256,
+    text: "Frame 4",
+    animation: {
+      animationName: "NoAnimation",
+      alignment: "right",
+      timeoutTicks: 5000
+    }
+  }
+]
+
+const defaultMessagePlayer: MessagePlayer = async (message: MessageSpec) => {
+  /*
+    const messageParts: Array<MessagePartType> = message.lines.slice(0, 3).map((line: LineType, idx: number) => ({
+      text: line.text,
+      ...defaultMessage[idx],
+    }));
+  */
   const framer = new Framer();
-  // framer.createMessage()
-  let framedMessage : MessageType = Object.assign(messageParts, {messageId: "test"});
-  const playlist: PlaylistType = Object.assign([framedMessage], { playlistId: "test" });
-  const messageSpecs = [].concat(playlist);
-  const messages : Array<Message> = playlist.map(playlistMessage => framer.parse(playlistMessage)).flat();
+  let framedMessage: MessageType = Object.assign(message, {messageId: "test"});
+  const playlist: PlaylistType = Object.assign([framedMessage], {playlistId: "test"});
+  const messages: Array<Message> = playlist.map(playlistMessage => framer.parse(playlistMessage)).flat();
   return new Promise<void>((resolve) => {
     display.playlist = new PlaylistDisplay(display, messages);
     display.clear();
-    // display.buffer.set(rastrified);
-    display.play();
-    // display.output();
-    // console.log(message.lines.map(line => line.text).join("\n"));
-    setTimeout(resolve, message.durationMs);
+    display.play().then(resolve);
+    // setTimeout(resolve, 5000);
   });
 }
 
 function createTextMessage(text: string, options: any): MessageSpec {
   const textLines = text.split(/[\n\r]/);
-  return {
-    durationMs: options.duration,
-    lines: textLines.slice(0, 2).map(textLine => {
-      const line: LineType = {
-        text: textLine,
-        animation: {
-          animationName: "NoAnimation",
-          alignment: "left",
-          timeoutTicks: options.duration
-        }
-      };
-      return line;
-    })
-  };
+  return textLines.slice(0, 2).map((textLine, idx) => ({
+    text: textLine,
+    start: 128 * idx,
+    end: 128 * (idx + 1),
+    animation: {
+      animationName: "NoAnimation",
+      alignment: "left",
+      timeoutTicks: options.duration
+    }
+  }));
 }
+
 
 program
   .version('0.0.1')
@@ -68,28 +95,32 @@ program
     console.log("Playlist file: " + playlistFile);
   })
 
-async function playMessage(text: string, options: any) {
+async function playSimpleMessage(text: string, options: any) {
   const messagePlayer = defaultMessagePlayer;
   const message = createTextMessage(text.trim(), options);
   await messagePlayer(message);
   await display.close();
 }
 
+const playComplexMessage = async (message: Array<MessagePartType>) => {
+  // TODO: Validate message
+  await defaultMessagePlayer(message);
+  await display.close();
+};
+
 program
   .command("output")
   .option('-d, --duration <duration>', 'duration of message', (str) => parseInt(str, 10), 5000)
-  .option('-l, --layout <layout-json>', 'layout specification in JSON', (str) => JSON.parse(str))
-  .argument('<message>', 'message to display')
+  .argument('<message>', 'message to display (simple string)')
   .action(async (text: string, options: any, command: string) => {
-    await playMessage(text, options);
+    await playSimpleMessage(text, options);
   })
 program
   .command("output-file")
-  .option('-d, --duration <duration>', 'duration of message', (str) => parseInt(str, 10), 5000)
-  .argument('<file>', 'file to display')
+  .argument('<file>', 'file to display (JSON)')
   .action(async (file: string, options: any, command: string) => {
-    const fileContents = readFileSync(file, { encoding: 'utf8', flag: 'r' });
-    await playMessage(fileContents, options);
+    const fileContents = JSON.parse(readFileSync(file, {encoding: 'utf8', flag: 'r'}));
+    await playComplexMessage(fileContents);
   });
 program
   .action(async () => {
@@ -98,7 +129,7 @@ program
     process.stdin.setEncoding('utf8');
     for await (const chunk of process.stdin) str += chunk;
     console.log(`Outputting: '${str}'`)
-    await playMessage(str.trim(), { duration: 1000 });
+    await playSimpleMessage(str.trim(), {duration: 1000});
   })
 
 

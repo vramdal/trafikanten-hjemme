@@ -1,0 +1,41 @@
+[{
+  "text": "Bookinger i dag",
+  "start": 0,
+  "end": 80,
+  "animation": {
+    "animationName": "NoAnimation",
+    "alignment": "left",
+    "timeoutTicks": 5000
+  }
+},
+  {
+    "text": "49",
+    "start": 80,
+    "end": 128,
+    "animation": {
+      "animationName": "NoAnimation",
+      "alignment": "right",
+      "timeoutTicks": 5000
+    }
+  },
+  {
+    "text": "I går",
+    "start": 128,
+    "end": 198,
+    "animation": {
+      "animationName": "NoAnimation",
+      "alignment": "left",
+      "timeoutTicks": 5000
+    }
+  },
+  {
+    "text": "38",
+    "start": 198,
+    "end": 256,
+    "animation": {
+      "animationName": "NoAnimation",
+      "alignment": "right",
+      "timeoutTicks": 5000
+    }
+  }
+]
