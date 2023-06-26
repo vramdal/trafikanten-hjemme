@@ -1,0 +1,20 @@
+{
+  "name": "display-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "ht1632": "^1.0.0",
+    "rpi-gpio": "^2.1.7"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}
